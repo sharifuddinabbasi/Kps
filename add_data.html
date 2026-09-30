@@ -88,6 +88,7 @@
                         <option value="AC Abbott">AC Abbott</option>
                         <option value="Bank 02% Musharaf">Bank 02% Musharaf</option>
                         <option value="Depo Bachat">Depo Bachat</option>
+                        <option value="Office 02% Arif">Office 02% Arif</option>
                     </select>
                 </div>
             </div>
@@ -502,6 +503,8 @@
                         isMatch = itemAccount.includes('bank 02%') || itemAccount.includes('bank 02% musharaf') || itemAccount.includes('com musharaf');
                     } else if (selectedAccount === 'Depo Bachat') {
                         isMatch = itemAccount.includes('depo bachat') || itemAccount.includes('bachat');
+                    } else if (selectedAccount === 'Office 02% Arif') {
+                        isMatch = itemAccount.includes('office 02%') || itemAccount.includes('office 02% arif') || itemAccount.includes('arif');
                     }
 
                     if (isMatch) {

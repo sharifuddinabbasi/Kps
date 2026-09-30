@@ -270,6 +270,7 @@
                     <option value="AC Abbott">AC Abbott</option>
                     <option value="Bank 02% Musharaf">Bank 02% Musharaf</option>
                     <option value="Depo Bachat">Depo Bachat</option>
+                    <option value="Office 02% Arif">Office 02% Arif</option>
                 </select>
                 <button type="button" id="row-pdf-btn" onclick="triggerDownload('table-container', 'Account_Details', 'pdf')" class="pdf-btn">PDF</button>
                 <button type="button" id="row-jpg-btn" onclick="triggerDownload('table-container', 'Account_Details', 'jpg')" class="jpg-btn">JPG</button>
@@ -386,7 +387,7 @@
     <div id="exportModal" class="modal-overlay">
         <div class="modal-box">
             <h3>Export Options</h3>
-            <p>تمام ڈیٹا ایکسپورٹ کریں یا رو کا رینج منتخب کریں:</p>
+            <p>Tamam data export karein ya row ka range muntakhab karein:</p>
             
             <div class="modal-inputs">
                 <div>
@@ -400,9 +401,9 @@
             </div>
 
             <div class="modal-actions">
-                <button type="button" class="modal-btn btn-range" onclick="processExportRange()">ایکپورٹ منتخب روز (Selected Range)</button>
-                <button type="button" class="modal-btn btn-all" onclick="processExportAll()">ایکپورٹ تمام ڈیٹا (All Data)</button>
-                <button type="button" class="modal-btn btn-cancel" onclick="closeExportModal()">منسوخ کریں (Cancel)</button>
+                <button type="button" class="modal-btn btn-range" onclick="processExportRange()">Export Range</button>
+                <button type="button" class="modal-btn btn-all" onclick="processExportAll()">Export All Data</button>
+                <button type="button" class="modal-btn btn-cancel" onclick="closeExportModal()">Cancel</button>
             </div>
         </div>
     </div>
@@ -581,7 +582,7 @@
             const totalRows = expenseList.querySelectorAll('tr').length;
 
             if (isNaN(fromVal) || isNaN(toVal) || fromVal < 1 || toVal < fromVal || fromVal > totalRows) {
-                alert('برائے مہربانی درست سیریل نمبر کا انتخاب کریں۔');
+                alert('Barah-e-karam durust S.No ka intekhab karein.');
                 return;
             }
 
@@ -1002,6 +1003,8 @@
                         isMatch = itemAccount.includes('bank 02%') || itemAccount.includes('bank 02% musharaf') || itemAccount.includes('com musharaf');
                     } else if (selectedAccount === 'Depo Bachat') {
                         isMatch = itemAccount.includes('depo bachat') || itemAccount.includes('bachat');
+                    } else if (selectedAccount === 'Office 02% Arif') {
+                        isMatch = itemAccount.includes('office 02%') || itemAccount.includes('office 02% arif') || itemAccount.includes('arif');
                     }
 
                     if (isMatch && searchTerm) {
