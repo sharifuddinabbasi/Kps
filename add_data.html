@@ -80,7 +80,7 @@
                         <option value="CEO">CEO</option>
                         <option value="Musharaf Amanat">Musharaf Amanat</option>
                         <option value="Farooq Shah Amanat">Farooq Shah Amanat</option>
-                        <option value="AC 53 Frooq Shah">AC 53 Frooq Shah</option>
+                        <option value="AC 53 Farooq Shah">AC 53 Farooq Shah</option>
                         <option value="AC 44-C Iftikhar">AC 44-C Iftikhar</option>
                         <option value="AC 49-B Fawad Khan">AC 49-B Fawad Khan</option>
                         <option value="AC B-1 Farooq Shah">AC B-1 Farooq Shah</option>
@@ -207,7 +207,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const expensesRef = collection(db, "ceo_expenses");
-        const q = query(expensesRef, orderBy("createdAt", "asc"));
+        const q = query(expensesRef, orderBy("date", "asc"));
 
         const accountFilter = document.getElementById('account-filter');
         const pageTitle = document.getElementById('page-title');
@@ -261,7 +261,8 @@
 
             if (acc.includes('musharaf amanat') || acc.includes('mushraf amanat') || 
                 acc === 'musharaf' || acc === 'amanat musharaf' ||
-                (acc.includes('farooq shah') && !acc.includes('ac'))) {
+                (acc.includes('farooq shah') && !acc.includes('ac')) ||
+                (acc.includes('frooq shah') && !acc.includes('ac'))) {
                 return false;
             }
 
@@ -486,8 +487,8 @@
                     if (selectedAccount === 'Musharaf Amanat') {
                         isMatch = itemAccount.includes('musharaf amanat') || itemAccount.includes('mushraf amanat') || itemAccount === 'musharaf' || itemAccount === '' || itemAccount === 'amanat musharaf';
                     } else if (selectedAccount === 'Farooq Shah Amanat') {
-                        isMatch = itemAccount.includes('farooq shah') && !itemAccount.includes('ac');
-                    } else if (selectedAccount === 'AC 53 Frooq Shah') {
+                        isMatch = (itemAccount.includes('farooq shah') || itemAccount.includes('frooq shah')) && !itemAccount.includes('ac');
+                    } else if (selectedAccount === 'AC 53 Farooq Shah') {
                         isMatch = itemAccount.includes('ac 53') || itemAccount.includes('ac53');
                     } else if (selectedAccount === 'AC 44-C Iftikhar') {
                         isMatch = itemAccount.includes('ac 44') || itemAccount.includes('ac44') || itemAccount.includes('iftikhar');
@@ -742,6 +743,12 @@
             loadingDiv.style.display = 'none';
             snapshot.forEach((docSnap) => {
                 allExpensesData.push({ id: docSnap.id, expense: docSnap.data() });
+            });
+            // Tariqh (date) ke hisab se sorting
+            allExpensesData.sort((a, b) => {
+                const dateA = a.expense.date || '';
+                const dateB = b.expense.date || '';
+                return dateA.localeCompare(dateB);
             });
             renderData();
         });
