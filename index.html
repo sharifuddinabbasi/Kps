@@ -81,7 +81,6 @@
         .selected-details-container td { font-size: 9px; }
 
         .date-badge { background: #007bff; color: #fff; padding: 2px 5px; border-radius: 3px; font-size: 10px; }
-        .slip-link { color: #007bff; font-weight: bold; text-decoration: underline; white-space: nowrap; }
         
         .pdf-btn { background-color: #dc3545; color: white; border: none; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold; }
         .pdf-btn:hover { background-color: #bd2130; }
@@ -234,10 +233,6 @@
         .export-mode-active .export-summary-container {
             display: block !important;
         }
-
-        .export-mode-active .view-col {
-            display: none !important;
-        }
     </style>
 </head>
 <body>
@@ -272,6 +267,7 @@
                     <option value="Bank 02% Musharaf">Bank 02% Musharaf</option>
                     <option value="Depo Bachat">Depo Bachat</option>
                     <option value="Office 02% Arif">Office 02% Arif</option>
+                    <option value="Altaf Rent A Car">Altaf Rent A Car</option>
                 </select>
                 <button type="button" id="row-pdf-btn" onclick="triggerDownload('table-container', 'Account_Details', 'pdf')" class="pdf-btn">PDF</button>
                 <button type="button" id="row-jpg-btn" onclick="triggerDownload('table-container', 'Account_Details', 'jpg')" class="jpg-btn">JPG</button>
@@ -340,15 +336,14 @@
             <table style="width: 100%; table-layout: fixed;">
                 <thead>
                     <tr>
-                        <th style="width: 28%;">Account Name</th>
-                        <th style="width: 40%;">Description</th>
-                        <th style="width: 10%;" class="view-col">View</th>
-                        <th style="width: 22%;" id="dynamic-column-header" class="text-right">Amount</th>
+                        <th style="width: 30%;">Account Name</th>
+                        <th style="width: 45%;">Description</th>
+                        <th style="width: 25%;" id="dynamic-column-header" class="text-right">Amount</th>
                     </tr>
                 </thead>
                 <tbody id="selected-details-body">
                     <tr>
-                        <td colspan="4" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td>
+                        <td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td>
                     </tr>
                 </tbody>
             </table>
@@ -495,7 +490,8 @@
             if (acc.includes('musharaf amanat') || acc.includes('mushraf amanat') || 
                 acc === 'musharaf' || acc === 'amanat musharaf' ||
                 (acc.includes('farooq shah') && !acc.includes('ac')) ||
-                (acc.includes('frooq shah') && !acc.includes('ac'))) {
+                (acc.includes('frooq shah') && !acc.includes('ac')) ||
+                acc.includes('altaf rent a car') || acc.includes('altaf rent')) {
                 return false;
             }
 
@@ -722,19 +718,11 @@
             });
         };
 
-        // Date year placed on the second line to save space
         function formatDateToDMY(dateStr) {
             if (!dateStr) return '-';
             const parts = dateStr.split('-');
             if (parts.length === 3) return `${parts[2]}-${parts[1]}<br>${parts[0]}`;
             return dateStr;
-        }
-
-        function formatSlipHtml(slipValue) {
-            if (!slipValue) return '-';
-            let url = slipValue.trim();
-            if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
-            return `<a href="${url}" target="_blank" class="slip-link">View</a>`;
         }
 
         function getAutoCeoDataByDate(searchTerm = '') {
@@ -785,7 +773,6 @@
                     desc: item.expense.desc || '',
                     received: rec,
                     sent: sent,
-                    slip: item.expense.slip || '',
                     isAc53: isAc,
                     isAmanat: isAmanat
                 });
@@ -882,27 +869,38 @@
                 ceoSelectedDetails.style.display = 'none';
                 ceoThirdDetails.style.display = 'none';
 
-                cardOneLabel.innerText = 'Total Received';
-                
-                if (isAcAccount(selectedAccount)) {
-                    cardTwoLabel.innerText = 'Total Sent';
-                    cardThreeLabel.innerText = 'Total';
-                } else {
-                    cardTwoLabel.innerText = 'Total Return';
-                    cardThreeLabel.innerText = 'Remaining Payable';
+                let colOneLabel = 'Total Received';
+                let colTwoLabel = 'Total Sent';
+                let colThreeLabel = 'Total';
+                let firstColHeader = 'Received';
+                let secondColHeader = 'Sent';
+
+                if (selectedAccount === 'Altaf Rent A Car') {
+                    colOneLabel = 'Total Charges';
+                    colTwoLabel = 'Total Pay';
+                    colThreeLabel = 'Remaining Charges';
+                    firstColHeader = 'Charges';
+                    secondColHeader = 'Pay';
+                } else if (!isAcAccount(selectedAccount)) {
+                    colOneLabel = 'Total Received';
+                    colTwoLabel = 'Total Return';
+                    colThreeLabel = 'Remaining Payable';
+                    firstColHeader = 'Received';
+                    secondColHeader = 'Return';
                 }
 
-                const secondColHeader = isAcAccount(selectedAccount) ? 'Sent' : 'Return';
+                cardOneLabel.innerText = colOneLabel;
+                cardTwoLabel.innerText = colTwoLabel;
+                cardThreeLabel.innerText = colThreeLabel;
+
                 tableContainer.classList.add('large-scroll');
                 
-                // Adjusted Column Widths: Description enlarged, Received widened to prevent line-break
                 tableHeaderRow.innerHTML = `
-                    <th style="width: 7%;">S.No</th>
-                    <th style="width: 12%;">Date</th>
-                    <th style="width: 41%;">Description</th>
-                    <th style="width: 10%;" class="view-col">Slip</th>
-                    <th style="width: 15%;" class="text-right">Received</th>
-                    <th style="width: 15%;" class="text-right">${secondColHeader}</th>
+                    <th style="width: 8%;">S.No</th>
+                    <th style="width: 14%;">Date</th>
+                    <th style="width: 46%;">Description</th>
+                    <th style="width: 16%;" class="text-right">${firstColHeader}</th>
+                    <th style="width: 16%;" class="text-right">${secondColHeader}</th>
                 `;
             }
 
@@ -1009,6 +1007,8 @@
                         isMatch = itemAccount.includes('depo bachat') || itemAccount.includes('bachat');
                     } else if (selectedAccount === 'Office 02% Arif') {
                         isMatch = itemAccount.includes('office 02%') || itemAccount.includes('office 02% arif') || itemAccount.includes('arif');
+                    } else if (selectedAccount === 'Altaf Rent A Car') {
+                        isMatch = itemAccount.includes('altaf rent a car') || itemAccount.includes('altaf rent');
                     }
 
                     if (isMatch && searchTerm) {
@@ -1029,7 +1029,6 @@
                             <td>${count++}</td>
                             <td>${formatDateToDMY(expense.date)}</td>
                             <td style="text-align: left;">${expense.desc || ''}</td>
-                            <td class="view-col">${formatSlipHtml(expense.slip)}</td>
                             <td class="text-right" style="font-weight: bold;">${formatPlainNum(recVal)}</td>
                             <td class="text-right" style="font-weight: bold;">${formatPlainNum(sentVal)}</td>
                         `;
@@ -1057,7 +1056,7 @@
             });
 
             if (filteredItems.length === 0) {
-                selectedDetailsBody.innerHTML = `<tr><td colspan="4" style="color:#666; padding: 8px;">No records found</td></tr>`;
+                selectedDetailsBody.innerHTML = `<tr><td colspan="3" style="color:#666; padding: 8px;">No records found</td></tr>`;
             } else {
                 filteredItems.forEach(item => {
                     let amountVal = 0;
@@ -1068,7 +1067,6 @@
                     tr2.innerHTML = `
                         <td style="text-align: left; font-weight: bold;">${item.account}</td>
                         <td style="text-align: left;">${item.desc || '-'}</td>
-                        <td class="view-col">${formatSlipHtml(item.slip)}</td>
                         <td class="text-right" style="font-weight: bold; color: #007bff; white-space: nowrap;">${formatPlainNum(amountVal)}</td>
                     `;
                     selectedDetailsBody.appendChild(tr2);
@@ -1086,7 +1084,7 @@
 
         function updateDateBoxOnly(dateStr, items) {
             selectedDateDisplay.innerText = `Amount: 0`;
-            selectedDetailsBody.innerHTML = `<tr><td colspan="4" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td></tr>`;
+            selectedDetailsBody.innerHTML = `<tr><td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td></tr>`;
 
             thirdDateDisplay.innerHTML = `Date: ${dateStr}`;
 

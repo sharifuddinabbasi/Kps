@@ -43,7 +43,6 @@
         td.clickable-val { cursor: pointer; font-weight: bold; color: #007bff; }
         td.clickable-val:hover { background-color: #e2f0ff; text-decoration: underline; }
         
-        /* Right alignment for numbers */
         .text-right { text-align: right !important; padding-right: 6px !important; }
         th.text-right { text-align: right !important; padding-right: 6px !important; }
 
@@ -60,9 +59,7 @@
         .selected-details-header { display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: bold; color: #007bff; padding: 6px 0 4px 0; background: #eef6ff; position: sticky; top: 0; z-index: 20; border-bottom: 1px solid #cce4ff; }
         .selected-details-container th { position: sticky; top: 25px; z-index: 15; background-color: #f2f2f2; }
         .date-badge { background: #007bff; color: #fff; padding: 2px 6px; border-radius: 3px; font-size: 10px; }
-        .slip-link { color: #007bff; font-weight: bold; text-decoration: underline; white-space: nowrap; }
 
-        /* Selected Date Details Table Font Size -1px */
         #ceo-third-details th, 
         #ceo-third-details td {
             font-size: 9px !important;
@@ -96,6 +93,7 @@
                         <option value="Bank 02% Musharaf">Bank 02% Musharaf</option>
                         <option value="Depo Bachat">Depo Bachat</option>
                         <option value="Office 02% Arif">Office 02% Arif</option>
+                        <option value="Altaf Rent A Car">Altaf Rent A Car</option>
                     </select>
                 </div>
             </div>
@@ -154,15 +152,14 @@
             <table style="width: 100%; table-layout: fixed;">
                 <thead>
                     <tr>
-                        <th style="width: 28%;">Account Name</th>
-                        <th style="width: 40%;">Description</th>
-                        <th style="width: 10%;" class="view-col">View</th>
-                        <th style="width: 22%;" id="dynamic-column-header" class="text-right">Amount</th>
+                        <th style="width: 30%;">Account Name</th>
+                        <th style="width: 45%;">Description</th>
+                        <th style="width: 25%;" id="dynamic-column-header" class="text-right">Amount</th>
                     </tr>
                 </thead>
                 <tbody id="selected-details-body">
                     <tr>
-                        <td colspan="4" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td>
+                        <td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td>
                     </tr>
                 </tbody>
             </table>
@@ -269,7 +266,8 @@
             if (acc.includes('musharaf amanat') || acc.includes('mushraf amanat') || 
                 acc === 'musharaf' || acc === 'amanat musharaf' ||
                 (acc.includes('farooq shah') && !acc.includes('ac')) ||
-                (acc.includes('frooq shah') && !acc.includes('ac'))) {
+                (acc.includes('frooq shah') && !acc.includes('ac')) ||
+                acc.includes('altaf rent a car') || acc.includes('altaf rent')) {
                 return false;
             }
 
@@ -279,15 +277,8 @@
         function formatDateToDMY(dateStr) {
             if (!dateStr) return '-';
             const parts = dateStr.split('-');
-            if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            if (parts.length === 3) return `${parts[2]}-${parts[1]}<br>${parts[0]}`;
             return dateStr;
-        }
-
-        function formatSlipHtml(slipValue) {
-            if (!slipValue) return '-';
-            let url = slipValue.trim();
-            if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
-            return `<a href="${url}" target="_blank" class="slip-link">View</a>`;
         }
 
         function getAutoCeoDataByDate() {
@@ -331,7 +322,6 @@
                     desc: item.expense.desc || '',
                     received: rec,
                     sent: sent,
-                    slip: item.expense.slip || '',
                     isAc53: isAc,
                     isAmanat: isAmanat
                 });
@@ -358,26 +348,39 @@
                 mainDataTable.classList.remove('scrollable-table');
                 tableHeaderRow.innerHTML = `
                     <th style="width: 8%;">S.No</th>
-                    <th style="width: 18%;">Date</th>
-                    <th style="width: 18.5%;" class="text-right">Amount<br>Rec.</th>
-                    <th style="width: 18.5%;" class="text-right">Amount<br>Sent</th>
-                    <th style="width: 18.5%;" class="text-right">Amanat<br>Rec.</th>
-                    <th style="width: 18.5%;" class="text-right">Amanat<br>Return</th>
+                    <th style="width: 13%;">Date</th>
+                    <th style="width: 19.5%;" class="text-right">Amount<br>Rec.</th>
+                    <th style="width: 19.5%;" class="text-right">Amount<br>Sent</th>
+                    <th style="width: 20%;" class="text-right">Amanat<br>Rec.</th>
+                    <th style="width: 20%;" class="text-right">Amanat<br>Return</th>
                 `;
             } else {
                 if (ceoNetSummaryHeader) ceoNetSummaryHeader.style.display = 'none';
                 secondSummary.style.display = 'none';
-                cardOneLabel.innerText = 'Total Received';
                 
-                if (isAcAccount(selectedAccount)) {
-                    cardTwoLabel.innerText = 'Total Sent';
-                    cardThreeLabel.innerText = 'Total';
-                } else {
-                    cardTwoLabel.innerText = 'Total Return';
-                    cardThreeLabel.innerText = 'Remaining Payable';
+                let colOneLabel = 'Total Received';
+                let colTwoLabel = 'Total Sent';
+                let colThreeLabel = 'Total';
+                let firstColHeader = 'Received';
+                let secondColHeader = 'Sent';
+
+                if (selectedAccount === 'Altaf Rent A Car') {
+                    colOneLabel = 'Total Charges';
+                    colTwoLabel = 'Total Pay';
+                    colThreeLabel = 'Remaining Charges';
+                    firstColHeader = 'Charges';
+                    secondColHeader = 'Pay';
+                } else if (!isAcAccount(selectedAccount)) {
+                    colOneLabel = 'Total Received';
+                    colTwoLabel = 'Total Return';
+                    colThreeLabel = 'Remaining Payable';
+                    firstColHeader = 'Received';
+                    secondColHeader = 'Return';
                 }
 
-                const secondColHeader = isAcAccount(selectedAccount) ? 'Sent' : 'Return';
+                cardOneLabel.innerText = colOneLabel;
+                cardTwoLabel.innerText = colTwoLabel;
+                cardThreeLabel.innerText = colThreeLabel;
 
                 tableFooter.style.display = 'table-footer-group';
                 ceoSelectedDetails.style.display = 'none';
@@ -387,19 +390,17 @@
                 mainDataTable.classList.add('scrollable-table');
                 tableHeaderRow.innerHTML = `
                     <th style="width: 8%;">S.No</th>
-                    <th style="width: 16%;">Date</th>
-                    <th style="width: 40%;">Description</th>
-                    <th style="width: 8%;" class="view-col">Slip</th>
-                    <th style="width: 12%;" class="text-right">Received</th>
-                    <th style="width: 12%;" class="text-right">${secondColHeader}</th>
+                    <th style="width: 14%;">Date</th>
+                    <th style="width: 44%;">Description</th>
+                    <th style="width: 16%;" class="text-right">${firstColHeader}</th>
+                    <th style="width: 16%;" class="text-right">${secondColHeader}</th>
                     <th style="width: 12%;" class="action-col">Action</th>
                 `;
                 addRowFormTr.innerHTML = `
                     <td id="next-sno" style="font-weight: bold;">1</td>
                     <td><input type="date" id="date" required></td>
                     <td><input type="text" id="desc" placeholder="Description" required></td>
-                    <td class="view-col"><input type="text" id="slip" placeholder="URL"></td>
-                    <td><input type="number" id="received" placeholder="Rec" step="1"></td>
+                    <td><input type="number" id="received" placeholder="${firstColHeader}" step="1"></td>
                     <td><input type="number" id="sent" placeholder="${secondColHeader}" step="1"></td>
                     <td class="action-col"><button type="button" id="submit-btn" class="add-btn">Add</button></td>
                 `;
@@ -451,7 +452,7 @@
                     snoTd.innerText = count++;
 
                     const dateTd = document.createElement('td');
-                    dateTd.innerText = formattedDate;
+                    dateTd.innerHTML = formattedDate;
                     dateTd.className = 'clickable-val';
                     dateTd.addEventListener('click', () => {
                         updateDateBoxOnly(formattedDate, data.items);
@@ -514,6 +515,8 @@
                         isMatch = itemAccount.includes('depo bachat') || itemAccount.includes('bachat');
                     } else if (selectedAccount === 'Office 02% Arif') {
                         isMatch = itemAccount.includes('office 02%') || itemAccount.includes('office 02% arif') || itemAccount.includes('arif');
+                    } else if (selectedAccount === 'Altaf Rent A Car') {
+                        isMatch = itemAccount.includes('altaf rent a car') || itemAccount.includes('altaf rent');
                     }
 
                     if (isMatch) {
@@ -530,12 +533,11 @@
                             <td>${count++}</td>
                             <td>${formatDateToDMY(expense.date)}</td>
                             <td style="text-align: left;">${expense.desc || ''}</td>
-                            <td class="view-col">${formatSlipHtml(expense.slip)}</td>
-                            <td class="text-right" style="font-weight: bold;">${formatPlainNum(recVal)}</td>
-                            <td class="text-right" style="font-weight: bold;">${formatPlainNum(sentVal)}</td>
+                            <td class="text-right">${formatPlainNum(recVal)}</td>
+                            <td class="text-right">${formatPlainNum(sentVal)}</td>
                             <td class="action-col">
                                 <div class="action-btns">
-                                    <button class="edit-btn" data-id="${id}" data-date="${expense.date || ''}" data-desc="${expense.desc || ''}" data-slip="${expense.slip || ''}" data-received="${recVal}" data-sent="${sentVal}">Edit</button>
+                                    <button class="edit-btn" data-id="${id}" data-date="${expense.date || ''}" data-desc="${expense.desc || ''}" data-received="${recVal}" data-sent="${sentVal}">Edit</button>
                                     <button class="delete-btn" data-id="${id}">Del</button>
                                 </div>
                             </td>
@@ -561,7 +563,6 @@
                         const docId = e.target.getAttribute('data-id');
                         const oldDate = e.target.getAttribute('data-date');
                         const oldDesc = e.target.getAttribute('data-desc');
-                        const oldSlip = e.target.getAttribute('data-slip');
                         const oldRec = e.target.getAttribute('data-received');
                         const oldSent = e.target.getAttribute('data-sent');
 
@@ -569,19 +570,23 @@
                         if (newDate === null) return;
                         const newDesc = prompt("Nayi Description likhein:", oldDesc);
                         if (newDesc === null) return;
-                        const newSlip = prompt("Nayi Slip Link likhein:", oldSlip);
-                        if (newSlip === null) return;
-                        const newRec = prompt("Nayi Received Raqam:", oldRec);
+                        
+                        let promptRec = "Nayi Received Raqam:";
+                        let promptSent = isAcAccount(selectedAccount) ? "Nayi Sent Raqam:" : "Nayi Return Raqam:";
+                        if (selectedAccount === 'Altaf Rent A Car') {
+                            promptRec = "Nayi Charges Raqam:";
+                            promptSent = "Nayi Pay Raqam:";
+                        }
+
+                        const newRec = prompt(promptRec, oldRec);
                         if (newRec === null) return;
                         
-                        const promptLabel = isAcAccount(selectedAccount) ? "Nayi Sent Raqam:" : "Nayi Return Raqam:";
-                        const newSent = prompt(promptLabel, oldSent);
+                        const newSent = prompt(promptSent, oldSent);
                         if (newSent === null) return;
 
                         await updateDoc(doc(db, "ceo_expenses", docId), {
                             date: newDate,
                             desc: newDesc,
-                            slip: newSlip,
                             received: parseFloat(newRec) || 0,
                             sent: parseFloat(newSent) || 0
                         });
@@ -608,7 +613,7 @@
             });
 
             if (filteredItems.length === 0) {
-                selectedDetailsBody.innerHTML = `<tr><td colspan="4" style="color:#666; padding: 8px;">No records found</td></tr>`;
+                selectedDetailsBody.innerHTML = `<tr><td colspan="3" style="color:#666; padding: 8px;">No records found</td></tr>`;
             } else {
                 filteredItems.forEach(item => {
                     let amountVal = 0;
@@ -619,7 +624,6 @@
                     tr2.innerHTML = `
                         <td style="text-align: left; font-weight: bold;">${item.account}</td>
                         <td style="text-align: left;">${item.desc || '-'}</td>
-                        <td class="view-col">${formatSlipHtml(item.slip)}</td>
                         <td class="text-right" style="font-weight: bold; color: #007bff; white-space: nowrap;">${formatPlainNum(amountVal)}</td>
                     `;
                     selectedDetailsBody.appendChild(tr2);
@@ -637,9 +641,9 @@
 
         function updateDateBoxOnly(dateStr, items) {
             selectedDateDisplay.innerText = `Amount: 0`;
-            selectedDetailsBody.innerHTML = `<tr><td colspan="4" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td></tr>`;
+            selectedDetailsBody.innerHTML = `<tr><td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td></tr>`;
 
-            thirdDateDisplay.innerText = `Date: ${dateStr}`;
+            thirdDateDisplay.innerHTML = `Date: ${dateStr}`;
 
             let totalAmtRec = 0;
             let totalAmtSent = 0;
@@ -720,7 +724,6 @@
             const selectedAccount = accountFilter.value;
             const dateInput = document.getElementById('date');
             const descInput = document.getElementById('desc');
-            const slipInput = document.getElementById('slip');
             const receivedInput = document.getElementById('received');
             const sentInput = document.getElementById('sent');
 
@@ -733,14 +736,12 @@
                 account: selectedAccount,
                 date: dateInput ? dateInput.value : '',
                 desc: descInput ? descInput.value : '',
-                slip: slipInput ? slipInput.value : '',
                 received: receivedInput ? (parseFloat(receivedInput.value) || 0) : 0,
                 sent: sentInput ? (parseFloat(sentInput.value) || 0) : 0,
                 createdAt: new Date()
             });
 
             if (descInput) descInput.value = '';
-            if (slipInput) slipInput.value = '';
             if (receivedInput) receivedInput.value = '';
             if (sentInput) sentInput.value = '';
             if (dateInput) dateInput.valueAsDate = new Date();
@@ -766,3 +767,4 @@
     </script>
 </body>
 </html>
+ 
