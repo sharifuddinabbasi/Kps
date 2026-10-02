@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail. Altaf Rent A Car - View</title>
+
+    <!-- PWA Code -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007bff">
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+      }
+    </script>
+
+    <!-- HTML2PDF & HTML2CANVAS Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f7f6; overflow: hidden; }
+        .container { display: flex; flex-direction: column; height: 100vh; max-width: 900px; margin: 0 auto; background: #ffffff; padding: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-y: auto; position: relative; }
+        .fixed-header { flex-shrink: 0; background: #ffffff; padding-bottom: 8px; border-bottom: 2px solid #eee; position: relative; }
+        
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
+        h1 { color: #333; font-size: 18px; margin: 0; }
+        
+        .header-right-btns { display: flex; align-items: center; gap: 6px; }
+        
+        .pdf-btn { background-color: #dc3545; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
+        .pdf-btn:hover { background-color: #bd2130; }
+
+        .jpg-btn { background-color: #28a745; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
+        .jpg-btn:hover { background-color: #218838; }
+
+        .summary { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 5px; }
+        .card { flex: 1 1 calc(33.333% - 8px); min-width: 80px; padding: 6px 4px; border-radius: 6px; text-align: center; color: white; }
+        .card.received-card { background-color: #28a745; }
+        .card.sent-card { background-color: #007bff; }
+        .card.balance-card { background-color: #dc3545; }
+        .card h3 { margin: 0; font-size: 10px; text-transform: uppercase; }
+        .card p { font-size: 13px; font-weight: bold; margin: 2px 0 0 0; word-break: break-word; }
+        
+        .table-portion { flex: 1 1 auto; overflow-y: auto; overflow-x: auto; margin-top: 5px; border: 1px solid #007bff; border-radius: 4px; width: 100%; margin-bottom: 10px; }
+
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th, td { border: 1px solid #ddd; padding: 5px 2px; text-align: center; font-size: 11px; vertical-align: middle; }
+        th { background-color: #f2f2f2; font-weight: bold; position: sticky; top: 0; z-index: 10; line-height: 1.1; white-space: nowrap; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tbody tr { height: 28px; }
+        
+        .text-right { text-align: right !important; padding-right: 6px !important; }
+        th.text-right { text-align: right !important; padding-right: 6px !important; }
+
+        .status { margin-bottom: 5px; color: #666; font-size: 11px; }
+        .footer-text { text-align: center; font-size: 11px; font-weight: bold; color: #333; margin-top: 10px; margin-bottom: 10px; padding-bottom: 5px; }
+
+        .export-mode-active,
+        .export-mode-active.table-portion {
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            border: none !important;
+        }
+        .export-mode-active table {
+            width: 100% !important;
+            min-width: 100% !important;
+            table-layout: fixed !important;
+        }
+        .export-header-title {
+            display: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 6px;
+        }
+        .export-mode-active .export-header-title {
+            display: block !important;
+        }
+        .export-summary-container {
+            display: none;
+            margin-bottom: 12px;
+        }
+        .export-mode-active .export-summary-container {
+            display: block !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="fixed-header">
+            <div class="header-top">
+                <h1>Detail. Altaf Rent A Car</h1>
+                <div class="header-right-btns">
+                    <button type="button" onclick="triggerDownload('pdf')" class="pdf-btn">PDF</button>
+                    <button type="button" onclick="triggerDownload('jpg')" class="jpg-btn">JPG</button>
+                </div>
+            </div>
+            
+            <div class="summary" id="summary-cards">
+                <div class="card received-card">
+                    <h3>Total Charges</h3>
+                    <p id="total-charges">0</p>
+                </div>
+                <div class="card sent-card">
+                    <h3>Total Pay</h3>
+                    <p id="total-pay">0</p>
+                </div>
+                <div class="card balance-card">
+                    <h3>Remaining Charges</h3>
+                    <p id="total-balance">0</p>
+                </div>
+            </div>
+
+            <div id="loading" class="status">Loading data...</div>
+        </div>
+
+        <div id="table-container" class="table-portion">
+            <div class="export-header-title">Account Detail Altaf Rent A Car</div>
+            <div id="export-summary-holder" class="export-summary-container"></div>
+
+            <table id="main-data-table">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">S.No</th>
+                        <th style="width: 14%;">Date</th>
+                        <th style="width: 42%;">Description</th>
+                        <th style="width: 19%;" class="text-right">Charges</th>
+                        <th style="width: 15%;" class="text-right">Pay</th>
+                    </tr>
+                </thead>
+                <tbody id="expense-list"></tbody>
+            </table>
+        </div>
+
+        <div class="footer-text">Created by Sharifuddin</div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSPb0bIHj9edsuZi0RO1VNhTovDZYOrP8",
+            authDomain: "khanpetolum.firebaseapp.com",
+            projectId: "khanpetolum",
+            storageBucket: "khanpetolum.firebasestorage.app",
+            messagingSenderId: "667827334582",
+            appId: "1:667827334582:web:dc1edc4522f027689ca517",
+            measurementId: "G-HHLCHWEE06"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const expensesRef = collection(db, "ceo_expenses");
+        const q = query(expensesRef, orderBy("date", "asc"));
+
+        const expenseList = document.getElementById('expense-list');
+        const totalChargesDisplay = document.getElementById('total-charges');
+        const totalPayDisplay = document.getElementById('total-pay');
+        const totalBalanceDisplay = document.getElementById('total-balance');
+        const loadingDiv = document.getElementById('loading');
+
+        let allExpensesData = [];
+
+        function formatPlainNum(num) {
+            return num !== undefined && num !== null ? num.toString() : '0';
+        }
+
+        function formatDateToDMY(dateStr) {
+            if (!dateStr) return '-';
+            const parts = dateStr.split('-');
+            if (parts.length === 3) return `${parts[2]}-${parts[1]}<br>${parts[0]}`;
+            return dateStr;
+        }
+
+        function renderData() {
+            expenseList.innerHTML = '';
+            let count = 1;
+            let sumCharges = 0;
+            let sumPay = 0;
+
+            allExpensesData.forEach(item => {
+                const acc = item.expense.account ? item.expense.account.toLowerCase().trim() : '';
+                const isMatch = acc.includes('altaf rent a car') || acc.includes('altaf rent');
+
+                if (isMatch) {
+                    const exp = item.expense;
+                    const recVal = exp.received || 0;
+                    const sentVal = exp.sent || 0;
+
+                    sumCharges += recVal;
+                    sumPay += sentVal;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${count++}</td>
+                        <td>${formatDateToDMY(exp.date)}</td>
+                        <td style="text-align: left; word-break: break-word;">${exp.desc || ''}</td>
+                        <td class="text-right" style="font-weight: bold; white-space: nowrap;">${formatPlainNum(recVal)}</td>
+                        <td class="text-right" style="font-weight: bold; white-space: nowrap;">${formatPlainNum(sentVal)}</td>
+                    `;
+                    expenseList.appendChild(tr);
+                }
+            });
+
+            totalChargesDisplay.innerText = formatPlainNum(sumCharges);
+            totalPayDisplay.innerText = formatPlainNum(sumPay);
+            totalBalanceDisplay.innerText = formatPlainNum(sumCharges - sumPay);
+        }
+
+        window.triggerDownload = function(format) {
+            const element = document.getElementById('table-container');
+            const summaryCards = document.getElementById('summary-cards');
+            const summaryHolder = document.getElementById('export-summary-holder');
+            
+            summaryHolder.innerHTML = '';
+            const clonedSummary = summaryCards.cloneNode(true);
+            summaryHolder.appendChild(clonedSummary);
+
+            element.classList.add('export-mode-active');
+
+            if (format === 'pdf') {
+                const opt = {
+                    margin:       [8, 8, 8, 8],
+                    filename:     `Account_Detail_Altaf_Rent_A_Car.pdf`,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                html2pdf().set(opt).from(element).save().then(() => {
+                    element.classList.remove('export-mode-active');
+                });
+            } else if (format === 'jpg') {
+                html2canvas(element, { scale: 2, useCORS: true, scrollY: 0 }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `Account_Detail_Altaf_Rent_A_Car.jpg`;
+                    link.href = canvas.toDataURL('image/jpeg', 0.98);
+                    link.click();
+                    element.classList.remove('export-mode-active');
+                });
+            }
+        };
+
+        onSnapshot(q, (snapshot) => {
+            allExpensesData = [];
+            loadingDiv.style.display = 'none';
+            snapshot.forEach((docSnap) => {
+                allExpensesData.push({ id: docSnap.id, expense: docSnap.data() });
+            });
+
+            allExpensesData.sort((a, b) => {
+                const dateA = a.expense.date || '';
+                const dateB = b.expense.date || '';
+                return dateA.localeCompare(dateB);
+            });
+
+            renderData();
+        });
+    </script>
+</body>
+</html>
