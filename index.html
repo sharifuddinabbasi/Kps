@@ -67,6 +67,10 @@
         tbody tr { height: 26px; }
         td.clickable-val { cursor: pointer; font-weight: bold; color: #007bff; }
         td.clickable-val:hover { background-color: #e2f0ff; text-decoration: underline; }
+        
+        .text-right { text-align: right !important; padding-right: 6px !important; }
+        th.text-right { text-align: right !important; padding-right: 6px !important; }
+
         .status { margin-bottom: 5px; color: #666; font-size: 11px; }
 
         .selected-details-container { flex: 0 0 auto; margin-top: 6px; padding: 0 6px 6px 6px; background: #eef6ff; border: 1px solid #007bff; border-radius: 4px; width: 100%; max-height: 600px; overflow-y: auto; position: relative; }
@@ -144,9 +148,6 @@
             line-height: 1.2 !important;
             word-break: keep-all !important;
             word-wrap: break-word !important;
-        }
-        #table-container.pdf-export-mode td:nth-child(2) {
-            white-space: nowrap !important;
         }
 
         .pdf-export-mode .card h3,
@@ -342,7 +343,7 @@
                         <th style="width: 28%;">Account Name</th>
                         <th style="width: 40%;">Description</th>
                         <th style="width: 10%;" class="view-col">View</th>
-                        <th style="width: 22%;" id="dynamic-column-header">Amount</th>
+                        <th style="width: 22%;" id="dynamic-column-header" class="text-right">Amount</th>
                     </tr>
                 </thead>
                 <tbody id="selected-details-body">
@@ -387,7 +388,7 @@
     <div id="exportModal" class="modal-overlay">
         <div class="modal-box">
             <h3>Export Options</h3>
-            <p>Tamam data export karein ya row ka range muntakhab karein:</p>
+            <p>تمام ڈیٹا ایکسپورٹ کریں یا رو کا رینج منتخب کریں:</p>
             
             <div class="modal-inputs">
                 <div>
@@ -401,9 +402,9 @@
             </div>
 
             <div class="modal-actions">
-                <button type="button" class="modal-btn btn-range" onclick="processExportRange()">Export Range</button>
-                <button type="button" class="modal-btn btn-all" onclick="processExportAll()">Export All Data</button>
-                <button type="button" class="modal-btn btn-cancel" onclick="closeExportModal()">Cancel</button>
+                <button type="button" class="modal-btn btn-range" onclick="processExportRange()">ایکپورٹ منتخب روز (Selected Range)</button>
+                <button type="button" class="modal-btn btn-all" onclick="processExportAll()">ایکپورٹ تمام ڈیٹا (All Data)</button>
+                <button type="button" class="modal-btn btn-cancel" onclick="closeExportModal()">منسوخ کریں (Cancel)</button>
             </div>
         </div>
     </div>
@@ -425,8 +426,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const expensesRef = collection(db, "ceo_expenses");
-        
-        // Sorting by Date first, then createdAt
         const q = query(expensesRef, orderBy("date", "asc"));
 
         const accountFilter = document.getElementById('account-filter');
@@ -585,7 +584,7 @@
             const totalRows = expenseList.querySelectorAll('tr').length;
 
             if (isNaN(fromVal) || isNaN(toVal) || fromVal < 1 || toVal < fromVal || fromVal > totalRows) {
-                alert('Barah-e-karam durust S.No ka intekhab karein.');
+                alert('برائے مہربانی درست سیریل نمبر کا انتخاب کریں۔');
                 return;
             }
 
@@ -723,10 +722,11 @@
             });
         };
 
+        // Date year placed on the second line to save space
         function formatDateToDMY(dateStr) {
             if (!dateStr) return '-';
             const parts = dateStr.split('-');
-            if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            if (parts.length === 3) return `${parts[2]}-${parts[1]}<br>${parts[0]}`;
             return dateStr;
         }
 
@@ -809,10 +809,10 @@
             if (isSearchActive) {
                 tableContainer.classList.add('large-scroll');
                 tableHeaderRow.innerHTML = `
-                    <th style="width: 18%;">Date</th>
+                    <th style="width: 14%;">Date</th>
                     <th style="width: 25%;">Account Name</th>
-                    <th style="width: 29%;">Description</th>
-                    <th style="width: 14%;">Amount</th>
+                    <th style="width: 33%;">Description</th>
+                    <th style="width: 14%;" class="text-right">Amount</th>
                     <th style="width: 14%;">Remarks</th>
                 `;
 
@@ -843,10 +843,10 @@
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td style="white-space: nowrap;">${formatDateToDMY(expense.date)}</td>
+                        <td>${formatDateToDMY(expense.date)}</td>
                         <td style="text-align: left; font-weight: bold;">${rawAccount}</td>
                         <td style="text-align: left;">${desc || '-'}</td>
-                        <td style="font-weight: bold; color: #007bff;">${formatPlainNum(displayAmount)}</td>
+                        <td class="text-right" style="font-weight: bold; color: #007bff;">${formatPlainNum(displayAmount)}</td>
                         <td style="font-size: 9px; font-weight: bold; color: #333;">${remarkText}</td>
                     `;
                     expenseList.appendChild(row);
@@ -868,12 +868,12 @@
                 tableContainer.classList.remove('large-scroll');
                 
                 tableHeaderRow.innerHTML = `
-                    <th style="width: 8%; white-space: nowrap;">S.No</th>
-                    <th style="width: 18%;">Date</th>
-                    <th style="width: 18.5%;">Amount<br>Rec.</th>
-                    <th style="width: 18.5%;">Amount<br>Sent</th>
-                    <th style="width: 18.5%;">Amanat<br>Rec.</th>
-                    <th style="width: 18.5%;">Amanat<br>Return</th>
+                    <th style="width: 7%;">S.No</th>
+                    <th style="width: 13%;">Date</th>
+                    <th style="width: 20%;" class="text-right">Amount<br>Rec.</th>
+                    <th style="width: 20%;" class="text-right">Amount<br>Sent</th>
+                    <th style="width: 20%;" class="text-right">Amanat<br>Rec.</th>
+                    <th style="width: 20%;" class="text-right">Amanat<br>Return</th>
                 `;
             } else {
                 if (ceoNetSummaryHeader) ceoNetSummaryHeader.style.display = 'none';
@@ -895,13 +895,14 @@
                 const secondColHeader = isAcAccount(selectedAccount) ? 'Sent' : 'Return';
                 tableContainer.classList.add('large-scroll');
                 
+                // Adjusted Column Widths: Description enlarged, Received widened to prevent line-break
                 tableHeaderRow.innerHTML = `
-                    <th style="width: 9%; white-space: nowrap;">S.No</th>
-                    <th style="width: 17%;">Date</th>
-                    <th style="width: 36%;">Description</th>
+                    <th style="width: 7%;">S.No</th>
+                    <th style="width: 12%;">Date</th>
+                    <th style="width: 41%;">Description</th>
                     <th style="width: 10%;" class="view-col">Slip</th>
-                    <th style="width: 14%;">Received</th>
-                    <th style="width: 14%;">${secondColHeader}</th>
+                    <th style="width: 15%;" class="text-right">Received</th>
+                    <th style="width: 15%;" class="text-right">${secondColHeader}</th>
                 `;
             }
 
@@ -930,8 +931,9 @@
                     const createTd = (val, type, label) => {
                         const td = document.createElement('td');
                         td.innerText = formatPlainNum(val);
+                        td.classList.add('text-right');
                         if (val > 0) {
-                            td.className = 'clickable-val';
+                            td.className += ' clickable-val';
                             td.addEventListener('click', () => {
                                 updateAmountBoxOnly(data.items, type, label, val);
                             });
@@ -943,9 +945,8 @@
                     snoTd.innerText = count++;
 
                     const dateTd = document.createElement('td');
-                    dateTd.innerText = formattedDate;
+                    dateTd.innerHTML = formattedDate;
                     dateTd.className = 'clickable-val';
-                    dateTd.style.whiteSpace = 'nowrap';
                     dateTd.addEventListener('click', () => {
                         updateDateBoxOnly(formattedDate, data.items);
                     });
@@ -1026,11 +1027,11 @@
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>${count++}</td>
-                            <td style="white-space: nowrap;">${formatDateToDMY(expense.date)}</td>
+                            <td>${formatDateToDMY(expense.date)}</td>
                             <td style="text-align: left;">${expense.desc || ''}</td>
                             <td class="view-col">${formatSlipHtml(expense.slip)}</td>
-                            <td style="font-weight: bold;">${formatPlainNum(recVal)}</td>
-                            <td style="font-weight: bold;">${formatPlainNum(sentVal)}</td>
+                            <td class="text-right" style="font-weight: bold;">${formatPlainNum(recVal)}</td>
+                            <td class="text-right" style="font-weight: bold;">${formatPlainNum(sentVal)}</td>
                         `;
                         expenseList.appendChild(row);
                     }
@@ -1068,7 +1069,7 @@
                         <td style="text-align: left; font-weight: bold;">${item.account}</td>
                         <td style="text-align: left;">${item.desc || '-'}</td>
                         <td class="view-col">${formatSlipHtml(item.slip)}</td>
-                        <td style="font-weight: bold; color: #007bff; white-space: nowrap;">${formatPlainNum(amountVal)}</td>
+                        <td class="text-right" style="font-weight: bold; color: #007bff; white-space: nowrap;">${formatPlainNum(amountVal)}</td>
                     `;
                     selectedDetailsBody.appendChild(tr2);
                 });
@@ -1087,7 +1088,7 @@
             selectedDateDisplay.innerText = `Amount: 0`;
             selectedDetailsBody.innerHTML = `<tr><td colspan="4" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td></tr>`;
 
-            thirdDateDisplay.innerText = `Date: ${dateStr}`;
+            thirdDateDisplay.innerHTML = `Date: ${dateStr}`;
 
             let totalAmtRec = 0;
             let totalAmtSent = 0;
@@ -1122,7 +1123,7 @@
 
             let headerHtml = `<th style="width: 28%;">Account Name</th><th style="width: 35%;">Description</th>`;
             activeCols.forEach(col => {
-                headerHtml += `<th style="width: ${dynamicColWidth};">${col.label}</th>`;
+                headerHtml += `<th style="width: ${dynamicColWidth};" class="text-right">${col.label}</th>`;
             });
             thirdTableHeader.innerHTML = headerHtml;
 
@@ -1155,7 +1156,7 @@
                     if (col.key === 'amnRec') cellVal = valAmnRec;
                     if (col.key === 'amnRet') cellVal = valAmnRet;
 
-                    rowHtml += `<td style="font-weight: bold; color: ${cellVal > 0 ? '#007bff' : '#333'}; white-space: nowrap;">${cellVal > 0 ? formatPlainNum(cellVal) : '0'}</td>`;
+                    rowHtml += `<td class="text-right" style="font-weight: bold; color: ${cellVal > 0 ? '#007bff' : '#333'}; white-space: nowrap;">${cellVal > 0 ? formatPlainNum(cellVal) : '0'}</td>`;
                 });
 
                 const tr3 = document.createElement('tr');
@@ -1171,7 +1172,6 @@
                 allExpensesData.push({ id: docSnap.id, expense: docSnap.data() });
             });
 
-            // Fallback JavaScript date sorting to ensure 100% accurate chronological order
             allExpensesData.sort((a, b) => {
                 const dateA = a.expense.date || '';
                 const dateB = b.expense.date || '';

@@ -42,7 +42,14 @@
         tbody tr { height: 26px; }
         td.clickable-val { cursor: pointer; font-weight: bold; color: #007bff; }
         td.clickable-val:hover { background-color: #e2f0ff; text-decoration: underline; }
+        
+        /* Right alignment for numbers */
+        .text-right { text-align: right !important; padding-right: 6px !important; }
+        th.text-right { text-align: right !important; padding-right: 6px !important; }
+
         .add-row-form input { width: 100%; padding: 2px 1px; border: 1px solid #ccc; border-radius: 3px; font-size: 9px; text-align: center; }
+        .add-row-form input[type="number"] { text-align: right !important; padding-right: 4px !important; }
+        
         .add-btn { background-color: #28a745; color: white; border: none; padding: 4px 2px; border-radius: 3px; cursor: pointer; font-weight: bold; width: 100%; font-size: 10px; }
         .action-btns { display: flex; gap: 2px; justify-content: center; }
         .edit-btn { background-color: #ffc107; color: #000; border: none; padding: 3px 5px; border-radius: 3px; cursor: pointer; font-size: 9px; font-weight: bold; }
@@ -150,7 +157,7 @@
                         <th style="width: 28%;">Account Name</th>
                         <th style="width: 40%;">Description</th>
                         <th style="width: 10%;" class="view-col">View</th>
-                        <th style="width: 22%;" id="dynamic-column-header">Amount</th>
+                        <th style="width: 22%;" id="dynamic-column-header" class="text-right">Amount</th>
                     </tr>
                 </thead>
                 <tbody id="selected-details-body">
@@ -352,10 +359,10 @@
                 tableHeaderRow.innerHTML = `
                     <th style="width: 8%;">S.No</th>
                     <th style="width: 18%;">Date</th>
-                    <th style="width: 18.5%;">Amount<br>Rec.</th>
-                    <th style="width: 18.5%;">Amount<br>Sent</th>
-                    <th style="width: 18.5%;">Amanat<br>Rec.</th>
-                    <th style="width: 18.5%;">Amanat<br>Return</th>
+                    <th style="width: 18.5%;" class="text-right">Amount<br>Rec.</th>
+                    <th style="width: 18.5%;" class="text-right">Amount<br>Sent</th>
+                    <th style="width: 18.5%;" class="text-right">Amanat<br>Rec.</th>
+                    <th style="width: 18.5%;" class="text-right">Amanat<br>Return</th>
                 `;
             } else {
                 if (ceoNetSummaryHeader) ceoNetSummaryHeader.style.display = 'none';
@@ -383,8 +390,8 @@
                     <th style="width: 16%;">Date</th>
                     <th style="width: 40%;">Description</th>
                     <th style="width: 8%;" class="view-col">Slip</th>
-                    <th style="width: 12%;">Received</th>
-                    <th style="width: 12%;">${secondColHeader}</th>
+                    <th style="width: 12%;" class="text-right">Received</th>
+                    <th style="width: 12%;" class="text-right">${secondColHeader}</th>
                     <th style="width: 12%;" class="action-col">Action</th>
                 `;
                 addRowFormTr.innerHTML = `
@@ -430,8 +437,9 @@
                     const createTd = (val, type, label) => {
                         const td = document.createElement('td');
                         td.innerText = formatPlainNum(val);
+                        td.classList.add('text-right');
                         if (val > 0) {
-                            td.className = 'clickable-val';
+                            td.className += ' clickable-val';
                             td.addEventListener('click', () => {
                                 updateAmountBoxOnly(data.items, type, label, val);
                             });
@@ -523,8 +531,8 @@
                             <td>${formatDateToDMY(expense.date)}</td>
                             <td style="text-align: left;">${expense.desc || ''}</td>
                             <td class="view-col">${formatSlipHtml(expense.slip)}</td>
-                            <td>${formatPlainNum(recVal)}</td>
-                            <td>${formatPlainNum(sentVal)}</td>
+                            <td class="text-right" style="font-weight: bold;">${formatPlainNum(recVal)}</td>
+                            <td class="text-right" style="font-weight: bold;">${formatPlainNum(sentVal)}</td>
                             <td class="action-col">
                                 <div class="action-btns">
                                     <button class="edit-btn" data-id="${id}" data-date="${expense.date || ''}" data-desc="${expense.desc || ''}" data-slip="${expense.slip || ''}" data-received="${recVal}" data-sent="${sentVal}">Edit</button>
@@ -612,7 +620,7 @@
                         <td style="text-align: left; font-weight: bold;">${item.account}</td>
                         <td style="text-align: left;">${item.desc || '-'}</td>
                         <td class="view-col">${formatSlipHtml(item.slip)}</td>
-                        <td style="font-weight: bold; color: #007bff; white-space: nowrap;">${formatPlainNum(amountVal)}</td>
+                        <td class="text-right" style="font-weight: bold; color: #007bff; white-space: nowrap;">${formatPlainNum(amountVal)}</td>
                     `;
                     selectedDetailsBody.appendChild(tr2);
                 });
@@ -666,7 +674,7 @@
 
             let headerHtml = `<th style="width: 28%;">Account Name</th><th style="width: 35%;">Description</th>`;
             activeCols.forEach(col => {
-                headerHtml += `<th style="width: ${dynamicColWidth};">${col.label}</th>`;
+                headerHtml += `<th style="width: ${dynamicColWidth};" class="text-right">${col.label}</th>`;
             });
             thirdTableHeader.innerHTML = headerHtml;
 
@@ -699,7 +707,7 @@
                     if (col.key === 'amnRec') cellVal = valAmnRec;
                     if (col.key === 'amnRet') cellVal = valAmnRet;
 
-                    rowHtml += `<td style="font-weight: bold; color: ${cellVal > 0 ? '#007bff' : '#333'}; white-space: nowrap;">${cellVal > 0 ? formatPlainNum(cellVal) : '0'}</td>`;
+                    rowHtml += `<td class="text-right" style="font-weight: bold; color: ${cellVal > 0 ? '#007bff' : '#333'}; white-space: nowrap;">${cellVal > 0 ? formatPlainNum(cellVal) : '0'}</td>`;
                 });
 
                 const tr3 = document.createElement('tr');
@@ -744,12 +752,13 @@
             snapshot.forEach((docSnap) => {
                 allExpensesData.push({ id: docSnap.id, expense: docSnap.data() });
             });
-            // Tariqh (date) ke hisab se sorting
+
             allExpensesData.sort((a, b) => {
                 const dateA = a.expense.date || '';
                 const dateB = b.expense.date || '';
                 return dateA.localeCompare(dateB);
             });
+
             renderData();
         });
 
