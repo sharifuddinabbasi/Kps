@@ -972,6 +972,15 @@
                 cardTwoLabel.innerText = 'Amount Sent';
                 cardThreeLabel.innerText = 'Total';
                 
+                // CEO اکاؤنٹ میں دونوں تفصیلاتی بکس ظاہر کریں (جب تک کہ سرچ آن نہ ہو)
+                if (!isSearchActive) {
+                    ceoSelectedDetails.style.display = 'block';
+                    ceoThirdDetails.style.display = 'block';
+                } else {
+                    ceoSelectedDetails.style.display = 'none';
+                    ceoThirdDetails.style.display = 'none';
+                }
+
                 tableContainer.classList.remove('large-scroll');
                 
                 tableHeaderRow.innerHTML = `
@@ -985,6 +994,10 @@
             } else {
                 if (ceoNetSummaryHeader) ceoNetSummaryHeader.style.display = 'none';
                 secondSummary.style.display = 'none';
+
+                // دیگر اکاؤنٹس میں ان دونوں تفصیلاتی بکسز کو چھپائیں
+                ceoSelectedDetails.style.display = 'none';
+                ceoThirdDetails.style.display = 'none';
 
                 let colOneLabel = 'Total Received';
                 let colTwoLabel = 'Total Sent';
@@ -1078,7 +1091,6 @@
 
                 let overallAmanat;
                 if (isSearchActive) {
-                    // سرچ میں لائیو ٹوٹل
                     overallAmanat = {
                         amanatReceived: sumAmanatReceived,
                         amanatReturn: sumAmanatReturn,
@@ -1114,17 +1126,14 @@
                     const itemDesc = item.expense.desc ? item.expense.desc.toLowerCase() : '';
                     const itemDate = item.expense.date || '';
 
-                    // صرف منتخب اکاؤنٹ کا ڈیٹا
                     let isMatch = isAccountMatch(itemAccount, selectedAccount);
                     if (!isMatch) return;
 
-                    // سرچ فلٹر
                     if (searchTerm) {
                         const matchSearch = itemDesc.includes(searchTerm) || itemAccount.includes(searchTerm);
                         if (!matchSearch) return;
                     }
 
-                    // تاریخ فلٹر (صرف جب سرچ آن نہ ہو)
                     if (!isSearchActive && shouldFilterByMonth && !checkDateInRange(itemDate, currentSelectedMonth, fromDateVal, toDateVal)) {
                         return;
                     }
