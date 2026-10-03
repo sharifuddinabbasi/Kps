@@ -30,10 +30,53 @@
         .card h3 { margin: 0; font-size: 10px; text-transform: uppercase; }
         .card p { font-size: 13px; font-weight: bold; margin: 2px 0 0 0; word-break: break-word; }
         
-        /* Month Filter Bar */
-        .month-filter-row { display: flex; align-items: center; gap: 8px; margin: 6px 0 4px 0; background: #f8faff; padding: 4px 8px; border-radius: 4px; border: 1px dashed #007bff; }
-        .month-filter-row label { font-size: 11px; font-weight: bold; color: #333; }
-        .month-select { padding: 3px 6px; font-size: 12px; border-radius: 4px; border: 1px solid #007bff; background: #fff; font-weight: bold; color: #007bff; cursor: pointer; }
+        /* Month & Date Range Two-Level Filter Container */
+        .controls-filter-row { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 5px; 
+            margin: 6px 0 4px 0; 
+            background: #f8faff; 
+            padding: 6px 8px; 
+            border-radius: 4px; 
+            border: 1px dashed #007bff; 
+        }
+        .filter-line { 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+            flex-wrap: nowrap; /* بٹن کو نیچے نئی لائن میں جانے سے روکے گا */
+            width: 100%;
+        }
+        .controls-filter-row label { 
+            font-size: 11px; 
+            font-weight: bold; 
+            color: #333; 
+            white-space: nowrap; 
+            flex-shrink: 0;
+        }
+        .control-input { 
+            padding: 3px 4px; 
+            font-size: 11px; 
+            border-radius: 4px; 
+            border: 1px solid #007bff; 
+            background: #fff; 
+            color: #333; 
+            outline: none; 
+            flex: 1; /* اسکرین کے مطابق ایڈجسٹ ہوگی */
+            min-width: 0;
+        }
+        .reset-filter-btn { 
+            background: #6c757d; 
+            color: #fff; 
+            border: none; 
+            padding: 4px 8px; 
+            border-radius: 3px; 
+            font-size: 11px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            flex-shrink: 0; /* بٹن کا سائز چھوٹا یا ختم نہیں ہوگا */
+        }
 
         .scrollable-body { flex: 0 0 auto; height: 250px; overflow-y: auto; overflow-x: auto; margin-top: 8px; border-bottom: 1px solid #ddd; width: 100%; }
         .scrollable-body.large-scroll { max-height: 480px !important; height: auto; flex: 1 1 auto; }
@@ -133,24 +176,36 @@
                 </div>
             </div>
 
-            <!-- Month Selection Row -->
-            <div id="month-filter-container" class="month-filter-row">
-                <label for="month-filter">Select Month:</label>
-                <select id="month-filter" class="month-select">
-                    <option value="all">All Months</option>
-                    <option value="01">January</option>
-                    <option value="02">February</option>
-                    <option value="03">March</option>
-                    <option value="04">April</option>
-                    <option value="05">May</option>
-                    <option value="06">June</option>
-                    <option value="07">July</option>
-                    <option value="08">August</option>
-                    <option value="09">September</option>
-                    <option value="10">October</option>
-                    <option value="11">November</option>
-                    <option value="12">December</option>
-                </select>
+            <!-- Month Dropdown Upar, From-To Date Neeche -->
+            <div id="month-filter-container" class="controls-filter-row">
+                <div class="filter-line">
+                    <label for="month-filter">Select Month:</label>
+                    <select id="month-filter" class="control-input">
+                        <option value="all">All Months</option>
+                        <option value="01">January</option>
+                        <option value="02">February</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                </div>
+
+                <div class="filter-line">
+                    <label for="from-date-filter">From:</label>
+                    <input type="date" id="from-date-filter" class="control-input">
+
+                    <label for="to-date-filter">To:</label>
+                    <input type="date" id="to-date-filter" class="control-input">
+
+                    <button type="button" id="clear-dates-btn" class="reset-filter-btn" title="Reset Dates">✕</button>
+                </div>
             </div>
         </div>
 
@@ -241,6 +296,9 @@
         const accountFilter = document.getElementById('account-filter');
         const monthFilter = document.getElementById('month-filter');
         const monthFilterContainer = document.getElementById('month-filter-container');
+        const fromDateFilter = document.getElementById('from-date-filter');
+        const toDateFilter = document.getElementById('to-date-filter');
+        const clearDatesBtn = document.getElementById('clear-dates-btn');
 
         const pageTitle = document.getElementById('page-title');
         const ceoNetSummaryHeader = document.getElementById('ceo-net-summary-header');
@@ -280,12 +338,10 @@
         const createdByContainer = document.getElementById('created-by-container');
         const mainDataTable = document.getElementById('main-data-table');
 
-        // Function to get system current month
         function getSystemCurrentMonth() {
             return String(new Date().getMonth() + 1).padStart(2, '0');
         }
 
-        // Set default month to system month initially
         if (monthFilter) {
             monthFilter.value = getSystemCurrentMonth();
         }
@@ -293,7 +349,9 @@
         let allExpensesData = [];
 
         function formatPlainNum(num) {
-            return num !== undefined && num !== null ? num.toString() : '0';
+            if (num === undefined || num === null || isNaN(num)) return '0';
+            const parsed = Number(num);
+            return parsed.toLocaleString('en-IN');
         }
 
         function isAcAccount(accStr) {
@@ -320,6 +378,22 @@
                    acc.includes('altaf rent a car') || acc.includes('altaf rent');
         }
 
+        function checkDateInRange(dateStr, selectedMonth, fromDate, toDate) {
+            if (!dateStr || dateStr === 'no-date') return true;
+
+            if (fromDate && dateStr < fromDate) return false;
+            if (toDate && dateStr > toDate) return false;
+
+            if (!fromDate && !toDate && selectedMonth !== 'all') {
+                const parts = dateStr.split('-');
+                if (parts.length >= 2 && parts[1] !== selectedMonth) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         function formatDateToDMY(dateStr) {
             if (!dateStr) return '-';
             const parts = dateStr.split('-');
@@ -327,19 +401,16 @@
             return dateStr;
         }
 
-        function getAutoCeoDataByDate(selectedMonth = 'all') {
+        function getAutoCeoDataByDate(selectedMonth = 'all', fromDate = '', toDate = '') {
             const dateSummary = {};
 
             allExpensesData.forEach(item => {
                 const rawAccount = item.expense.account ? item.expense.account.trim() : '';
+                const desc = item.expense.desc ? item.expense.desc.trim() : '';
                 const date = item.expense.date || 'no-date';
 
-                // Month filter for CEO rows
-                if (selectedMonth !== 'all' && date !== 'no-date') {
-                    const dateParts = date.split('-');
-                    if (dateParts.length >= 2 && dateParts[1] !== selectedMonth) {
-                        return;
-                    }
+                if (!checkDateInRange(date, selectedMonth, fromDate, toDate)) {
+                    return;
                 }
 
                 if (!dateSummary[date]) {
@@ -407,8 +478,9 @@
         function renderData() {
             const selectedAccount = accountFilter.value;
             const currentSelectedMonth = monthFilter ? monthFilter.value : 'all';
+            const fromDateVal = fromDateFilter ? fromDateFilter.value : '';
+            const toDateVal = toDateFilter ? toDateFilter.value : '';
 
-            // Show or hide month filter based on account
             if (isExcludedFromMonthFilter(selectedAccount)) {
                 monthFilterContainer.style.display = 'none';
             } else {
@@ -500,7 +572,7 @@
             let count = 1;
 
             if (selectedAccount === 'CEO') {
-                const autoCeoData = getAutoCeoDataByDate(currentSelectedMonth);
+                const autoCeoData = getAutoCeoDataByDate(currentSelectedMonth, fromDateVal, toDateVal);
                 const sortedDates = Object.keys(autoCeoData).sort();
 
                 let sumAmountReceived = 0;
@@ -571,13 +643,11 @@
 
                 allExpensesData.forEach((item) => {
                     const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
+                    const itemDesc = item.expense.desc ? item.expense.desc.toLowerCase() : '';
                     const itemDate = item.expense.date || '';
 
-                    if (shouldFilterByMonth && currentSelectedMonth !== 'all' && itemDate) {
-                        const parts = itemDate.split('-');
-                        if (parts.length >= 2 && parts[1] !== currentSelectedMonth) {
-                            return;
-                        }
+                    if (shouldFilterByMonth && !checkDateInRange(itemDate, currentSelectedMonth, fromDateVal, toDateVal)) {
+                        return;
                     }
 
                     let isMatch = false;
@@ -851,16 +921,33 @@
             renderData();
         });
 
-        // Account change hone par month selection system current month par reset hoga
         accountFilter.addEventListener('change', () => {
             if (monthFilter) {
                 monthFilter.value = getSystemCurrentMonth();
             }
+            if (fromDateFilter) fromDateFilter.value = '';
+            if (toDateFilter) toDateFilter.value = '';
             renderData();
         });
 
         if (monthFilter) {
-            monthFilter.addEventListener('change', renderData);
+            monthFilter.addEventListener('change', () => {
+                if (fromDateFilter) fromDateFilter.value = '';
+                if (toDateFilter) toDateFilter.value = '';
+                renderData();
+            });
+        }
+
+        if (fromDateFilter) fromDateFilter.addEventListener('change', renderData);
+        if (toDateFilter) toDateFilter.addEventListener('change', renderData);
+
+        if (clearDatesBtn) {
+            clearDatesBtn.addEventListener('click', () => {
+                if (fromDateFilter) fromDateFilter.value = '';
+                if (toDateFilter) toDateFilter.value = '';
+                if (monthFilter) monthFilter.value = getSystemCurrentMonth();
+                renderData();
+            });
         }
     </script>
 </body>
