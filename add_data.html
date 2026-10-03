@@ -30,6 +30,11 @@
         .card h3 { margin: 0; font-size: 10px; text-transform: uppercase; }
         .card p { font-size: 13px; font-weight: bold; margin: 2px 0 0 0; word-break: break-word; }
         
+        /* Month Filter Bar */
+        .month-filter-row { display: flex; align-items: center; gap: 8px; margin: 6px 0 4px 0; background: #f8faff; padding: 4px 8px; border-radius: 4px; border: 1px dashed #007bff; }
+        .month-filter-row label { font-size: 11px; font-weight: bold; color: #333; }
+        .month-select { padding: 3px 6px; font-size: 12px; border-radius: 4px; border: 1px solid #007bff; background: #fff; font-weight: bold; color: #007bff; cursor: pointer; }
+
         .scrollable-body { flex: 0 0 auto; height: 250px; overflow-y: auto; overflow-x: auto; margin-top: 8px; border-bottom: 1px solid #ddd; width: 100%; }
         .scrollable-body.large-scroll { max-height: 480px !important; height: auto; flex: 1 1 auto; }
 
@@ -127,6 +132,26 @@
                     <p id="total-balance-2">0</p>
                 </div>
             </div>
+
+            <!-- Month Selection Row -->
+            <div id="month-filter-container" class="month-filter-row">
+                <label for="month-filter">Select Month:</label>
+                <select id="month-filter" class="month-select">
+                    <option value="all">All Months</option>
+                    <option value="01">January</option>
+                    <option value="02">February</option>
+                    <option value="03">March</option>
+                    <option value="04">April</option>
+                    <option value="05">May</option>
+                    <option value="06">June</option>
+                    <option value="07">July</option>
+                    <option value="08">August</option>
+                    <option value="09">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
         </div>
 
         <div id="scrollable-body" class="scrollable-body">
@@ -214,6 +239,9 @@
         const q = query(expensesRef, orderBy("date", "asc"));
 
         const accountFilter = document.getElementById('account-filter');
+        const monthFilter = document.getElementById('month-filter');
+        const monthFilterContainer = document.getElementById('month-filter-container');
+
         const pageTitle = document.getElementById('page-title');
         const ceoNetSummaryHeader = document.getElementById('ceo-net-summary-header');
         const ceoNetValue = document.getElementById('ceo-net-value');
@@ -250,8 +278,17 @@
         const thirdDetailsBody = document.getElementById('third-details-body');
 
         const createdByContainer = document.getElementById('created-by-container');
-
         const mainDataTable = document.getElementById('main-data-table');
+
+        // Function to get system current month
+        function getSystemCurrentMonth() {
+            return String(new Date().getMonth() + 1).padStart(2, '0');
+        }
+
+        // Set default month to system month initially
+        if (monthFilter) {
+            monthFilter.value = getSystemCurrentMonth();
+        }
 
         let allExpensesData = [];
 
@@ -274,6 +311,15 @@
             return true;
         }
 
+        function isExcludedFromMonthFilter(accName) {
+            const acc = accName.toLowerCase().trim();
+            return (acc.includes('farooq shah') && !acc.includes('ac')) ||
+                   (acc.includes('frooq shah') && !acc.includes('ac')) ||
+                   acc.includes('musharaf amanat') || acc.includes('mushraf amanat') ||
+                   acc === 'musharaf' || acc === 'amanat musharaf' ||
+                   acc.includes('altaf rent a car') || acc.includes('altaf rent');
+        }
+
         function formatDateToDMY(dateStr) {
             if (!dateStr) return '-';
             const parts = dateStr.split('-');
@@ -281,12 +327,20 @@
             return dateStr;
         }
 
-        function getAutoCeoDataByDate() {
+        function getAutoCeoDataByDate(selectedMonth = 'all') {
             const dateSummary = {};
 
             allExpensesData.forEach(item => {
                 const rawAccount = item.expense.account ? item.expense.account.trim() : '';
                 const date = item.expense.date || 'no-date';
+
+                // Month filter for CEO rows
+                if (selectedMonth !== 'all' && date !== 'no-date') {
+                    const dateParts = date.split('-');
+                    if (dateParts.length >= 2 && dateParts[1] !== selectedMonth) {
+                        return;
+                    }
+                }
 
                 if (!dateSummary[date]) {
                     dateSummary[date] = {
@@ -330,8 +384,37 @@
             return dateSummary;
         }
 
+        function getOverallAmanatSummary() {
+            let totalAmanatRec = 0;
+            let totalAmanatRet = 0;
+
+            allExpensesData.forEach(item => {
+                const rawAccount = item.expense.account ? item.expense.account.trim() : '';
+                const isAc = isAcAccount(rawAccount);
+                if (!isAc) {
+                    totalAmanatRec += item.expense.received || 0;
+                    totalAmanatRet += item.expense.sent || 0;
+                }
+            });
+
+            return {
+                amanatReceived: totalAmanatRec,
+                amanatReturn: totalAmanatRet,
+                remainingPayable: totalAmanatRec - totalAmanatRet
+            };
+        }
+
         function renderData() {
             const selectedAccount = accountFilter.value;
+            const currentSelectedMonth = monthFilter ? monthFilter.value : 'all';
+
+            // Show or hide month filter based on account
+            if (isExcludedFromMonthFilter(selectedAccount)) {
+                monthFilterContainer.style.display = 'none';
+            } else {
+                monthFilterContainer.style.display = 'flex';
+            }
+
             pageTitle.innerText = `Detail. ${selectedAccount}`;
 
             if (selectedAccount === 'CEO') {
@@ -357,7 +440,7 @@
             } else {
                 if (ceoNetSummaryHeader) ceoNetSummaryHeader.style.display = 'none';
                 secondSummary.style.display = 'none';
-                
+
                 let colOneLabel = 'Total Received';
                 let colTwoLabel = 'Total Sent';
                 let colThreeLabel = 'Total';
@@ -417,20 +500,16 @@
             let count = 1;
 
             if (selectedAccount === 'CEO') {
-                const autoCeoData = getAutoCeoDataByDate();
+                const autoCeoData = getAutoCeoDataByDate(currentSelectedMonth);
                 const sortedDates = Object.keys(autoCeoData).sort();
 
                 let sumAmountReceived = 0;
                 let sumAmountSent = 0;
-                let sumAmanatReceived = 0;
-                let sumAmanatReturn = 0;
 
                 sortedDates.forEach(dateStr => {
                     const data = autoCeoData[dateStr];
                     sumAmountReceived += data.amountReceived;
                     sumAmountSent += data.amountSent;
-                    sumAmanatReceived += data.amanatReceived;
-                    sumAmanatReturn += data.amanatReturn;
 
                     const formattedDate = formatDateToDMY(dateStr);
                     const row = document.createElement('tr');
@@ -468,9 +547,9 @@
                     expenseList.appendChild(row);
                 });
 
+                const overallAmanat = getOverallAmanatSummary();
                 const totalBalance = sumAmountReceived - sumAmountSent;
-                const remainingPayable = sumAmanatReceived - sumAmanatReturn;
-                const netValue = totalBalance - remainingPayable;
+                const netValue = totalBalance - overallAmanat.remainingPayable;
 
                 if (ceoNetSummaryHeader && ceoNetValue) {
                     ceoNetSummaryHeader.style.display = 'inline-block';
@@ -481,16 +560,25 @@
                 totalSentDisplay.innerText = formatPlainNum(sumAmountSent);
                 totalBalanceDisplay.innerText = formatPlainNum(totalBalance);
 
-                totalReceivedDisplay2.innerText = formatPlainNum(sumAmanatReceived);
-                totalSentDisplay2.innerText = formatPlainNum(sumAmanatReturn);
-                totalBalanceDisplay2.innerText = formatPlainNum(remainingPayable);
+                totalReceivedDisplay2.innerText = formatPlainNum(overallAmanat.amanatReceived);
+                totalSentDisplay2.innerText = formatPlainNum(overallAmanat.amanatReturn);
+                totalBalanceDisplay2.innerText = formatPlainNum(overallAmanat.remainingPayable);
 
             } else {
                 let totalReceived = 0;
                 let totalSent = 0;
+                const shouldFilterByMonth = !isExcludedFromMonthFilter(selectedAccount);
 
                 allExpensesData.forEach((item) => {
                     const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
+                    const itemDate = item.expense.date || '';
+
+                    if (shouldFilterByMonth && currentSelectedMonth !== 'all' && itemDate) {
+                        const parts = itemDate.split('-');
+                        if (parts.length >= 2 && parts[1] !== currentSelectedMonth) {
+                            return;
+                        }
+                    }
 
                     let isMatch = false;
                     if (selectedAccount === 'Musharaf Amanat') {
@@ -763,8 +851,17 @@
             renderData();
         });
 
-        accountFilter.addEventListener('change', renderData);
+        // Account change hone par month selection system current month par reset hoga
+        accountFilter.addEventListener('change', () => {
+            if (monthFilter) {
+                monthFilter.value = getSystemCurrentMonth();
+            }
+            renderData();
+        });
+
+        if (monthFilter) {
+            monthFilter.addEventListener('change', renderData);
+        }
     </script>
 </body>
 </html>
- 
