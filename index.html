@@ -25,20 +25,20 @@
         .fixed-header { flex-shrink: 0; background: #ffffff; padding-bottom: 8px; border-bottom: 2px solid #eee; position: relative; }
         
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
-        h1 { color: #333; font-size: 18px; margin: 0; }
+        h1 { color: #333; font-size: clamp(17px, 1.2vw + 10px, 22px); margin: 0; }
         
         .header-right-btns { display: flex; align-items: center; gap: 6px; }
 
         .account-select-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-        .account-select { padding: 4px 8px; font-size: 13px; border-radius: 4px; border: 1px solid #007bff; background-color: #e9f5ff; font-weight: bold; color: #007bff; cursor: pointer; }
+        .account-select { padding: 4px 8px; font-size: clamp(12px, 0.8vw + 8px, 15px); border-radius: 4px; border: 1px solid #007bff; background-color: #e9f5ff; font-weight: bold; color: #007bff; cursor: pointer; }
         
-        .search-toggle-btn { background-color: #007bff; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .search-toggle-btn { background-color: #007bff; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: clamp(11px, 0.7vw + 7px, 14px); font-weight: bold; }
         .search-toggle-btn:hover { background-color: #0056b3; }
         .search-toggle-btn.active { background-color: #dc3545; }
 
         .search-container { display: none; margin-bottom: 10px; background: #eef6ff; padding: 8px; border-radius: 6px; border: 1px solid #007bff; }
         .search-container.show { display: flex; gap: 8px; align-items: center; }
-        .search-box { padding: 6px 10px; font-size: 13px; border-radius: 4px; border: 1px solid #ccc; flex: 1; outline: none; }
+        .search-box { padding: 6px 10px; font-size: clamp(12px, 0.8vw + 8px, 15px); border-radius: 4px; border: 1px solid #ccc; flex: 1; outline: none; }
         .search-box:focus { border-color: #007bff; }
 
         .summary { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 5px; }
@@ -46,10 +46,9 @@
         .card.received-card { background-color: #28a745; }
         .card.sent-card { background-color: #007bff; }
         .card.balance-card { background-color: #dc3545; }
-        .card h3 { margin: 0; font-size: 10px; text-transform: uppercase; }
-        .card p { font-size: 13px; font-weight: bold; margin: 2px 0 0 0; word-break: break-word; }
+        .card h3 { margin: 0; font-size: clamp(9.5px, 0.6vw + 6px, 12px); text-transform: uppercase; }
+        .card p { font-size: clamp(12.5px, 0.9vw + 7px, 16px); font-weight: bold; margin: 2px 0 0 0; word-break: break-word; }
         
-        /* Month & Date Range Two-Level Filter Container */
         .controls-filter-row { 
             display: flex; 
             flex-direction: column; 
@@ -66,9 +65,9 @@
             gap: 6px; 
             width: 100%;
         }
-        .controls-filter-row label { font-size: 11px; font-weight: bold; color: #333; flex-shrink: 0; }
-        .control-input { padding: 3px 6px; font-size: 11px; border-radius: 4px; border: 1px solid #007bff; background: #fff; color: #333; outline: none; }
-        .reset-filter-btn { background: #6c757d; color: #fff; border: none; padding: 4px 8px; border-radius: 3px; font-size: 11px; cursor: pointer; font-weight: bold; flex-shrink: 0; line-height: 1; }
+        .controls-filter-row label { font-size: clamp(10.5px, 0.6vw + 7px, 13px); font-weight: bold; color: #333; flex-shrink: 0; }
+        .control-input { padding: 3px 6px; font-size: clamp(10.5px, 0.6vw + 7px, 13px); border-radius: 4px; border: 1px solid #007bff; background: #fff; color: #333; outline: none; }
+        .reset-filter-btn { background: #6c757d; color: #fff; border: none; padding: 4px 8px; border-radius: 3px; font-size: clamp(10.5px, 0.6vw + 7px, 13px); cursor: pointer; font-weight: bold; flex-shrink: 0; line-height: 1; }
 
         .table-portion { flex: 0 0 auto; height: 250px; overflow-y: auto; overflow-x: auto; margin-top: 5px; border-bottom: 1px solid #ddd; width: 100%; position: relative; }
         
@@ -82,36 +81,35 @@
         }
 
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th, td { border: 1px solid #ddd; padding: 4px 1px; text-align: center; font-size: 10px; white-space: normal; overflow: hidden; word-wrap: break-word; word-break: keep-all; hyphens: none; vertical-align: middle; }
+        th, td { border: 1px solid #ddd; padding: clamp(4px, 0.4vw + 2px, 6px) clamp(1px, 0.3vw + 1px, 4px); text-align: center; font-size: clamp(10px, 0.7vw + 6px, 12.5px); white-space: normal; overflow: hidden; word-wrap: break-word; word-break: keep-all; hyphens: none; vertical-align: middle; }
         th { background-color: #f2f2f2; font-weight: bold; position: sticky; top: 0; z-index: 10; line-height: 1.1; }
         tr:nth-child(even) { background-color: #f9f9f9; }
-        tbody tr { height: 26px; }
+        tbody tr { height: clamp(26px, 1vw + 20px, 32px); }
         td.clickable-val { cursor: pointer; font-weight: bold; color: #007bff; }
         td.clickable-val:hover { background-color: #e2f0ff; text-decoration: underline; }
         
         .text-right { text-align: right !important; padding-right: 6px !important; }
         th.text-right { text-align: right !important; padding-right: 6px !important; }
 
-        .status { margin-bottom: 5px; color: #666; font-size: 11px; }
+        .status { margin-bottom: 5px; color: #666; font-size: clamp(10px, 0.6vw + 7px, 12px); }
 
         .selected-details-container { flex: 0 0 auto; margin-top: 6px; padding: 0 6px 6px 6px; background: #eef6ff; border: 1px solid #007bff; border-radius: 4px; width: 100%; max-height: 600px; overflow-y: auto; position: relative; }
-        .selected-details-header { display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: bold; color: #007bff; padding: 6px 0 4px 0; background: #eef6ff; position: sticky; top: 0; z-index: 20; border-bottom: 1px solid #cce4ff; }
+        .selected-details-header { display: flex; align-items: center; justify-content: space-between; font-size: clamp(11px, 0.7vw + 7px, 13.5px); font-weight: bold; color: #007bff; padding: 6px 0 4px 0; background: #eef6ff; position: sticky; top: 0; z-index: 20; border-bottom: 1px solid #cce4ff; }
         .selected-details-container th { position: sticky; top: 25px; z-index: 15; background-color: #f2f2f2; }
         
         .selected-details-container th, 
-        .selected-details-container td { font-size: 9px; }
+        .selected-details-container td { font-size: clamp(9px, 0.6vw + 5px, 11.5px); }
 
-        .date-badge { background: #007bff; color: #fff; padding: 2px 5px; border-radius: 3px; font-size: 10px; }
+        .date-badge { background: #007bff; color: #fff; padding: 2px 5px; border-radius: 3px; font-size: clamp(9.5px, 0.6vw + 6px, 12px); }
         
-        .pdf-btn { background-color: #dc3545; color: white; border: none; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold; }
+        .pdf-btn { background-color: #dc3545; color: white; border: none; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-size: clamp(10px, 0.6vw + 6.5px, 12.5px); font-weight: bold; }
         .pdf-btn:hover { background-color: #bd2130; }
 
-        .jpg-btn { background-color: #28a745; color: white; border: none; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold; }
+        .jpg-btn { background-color: #28a745; color: white; border: none; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-size: clamp(10px, 0.6vw + 6.5px, 12.5px); font-weight: bold; }
         .jpg-btn:hover { background-color: #218838; }
 
-        .footer-text { text-align: center; font-size: 11px; font-weight: bold; color: #333; margin-top: 15px; margin-bottom: 10px; padding-bottom: 10px; }
+        .footer-text { text-align: center; font-size: clamp(11px, 0.6vw + 7px, 13px); font-weight: bold; color: #333; margin-top: 15px; margin-bottom: 10px; padding-bottom: 10px; }
 
-        /* Watermark & Export Meta */
         .export-meta-footer { display: none; margin-top: 10px; font-size: 9px; color: #666; text-align: right; border-top: 1px dashed #ccc; padding-top: 4px; }
         .export-mode-active .export-meta-footer { display: block !important; }
         .watermark-overlay { display: none; position: absolute; top: 35%; left: 15%; width: 70%; text-align: center; font-size: 34px; color: rgba(0, 123, 255, 0.08); font-weight: bold; transform: rotate(-25deg); pointer-events: none; z-index: 0; }
@@ -334,24 +332,11 @@
                 </div>
             </div>
 
-            <!-- Month Dropdown Upar, From-To Date & Close Button Ek Hi Line Me -->
             <div id="month-filter-container" class="controls-filter-row">
                 <div class="filter-line">
                     <label for="month-filter">Select Month:</label>
                     <select id="month-filter" class="control-input" style="flex: 1;">
                         <option value="all">All Months</option>
-                        <option value="01">January</option>
-                        <option value="02">February</option>
-                        <option value="03">March</option>
-                        <option value="04">April</option>
-                        <option value="05">May</option>
-                        <option value="06">June</option>
-                        <option value="07">July</option>
-                        <option value="08">August</option>
-                        <option value="09">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
                     </select>
                 </div>
 
@@ -546,23 +531,21 @@
         const fromSnoInput = document.getElementById('fromSno');
         const toSnoInput = document.getElementById('toSno');
 
-        function getSystemCurrentMonth() {
-            return String(new Date().getMonth() + 1).padStart(2, '0');
-        }
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
 
-        if (monthFilter) {
-            monthFilter.value = getSystemCurrentMonth();
+        function getSystemCurrentYearMonth() {
+            const d = new Date();
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            return `${yyyy}-${mm}`;
         }
 
         let allExpensesData = [];
         let currentExportTarget = { elementId: '', fileName: '', format: '' };
         let isSearchActive = false;
-
-        function formatPlainNum(num) {
-            if (num === undefined || num === null || isNaN(num)) return '0';
-            const parsed = Number(num);
-            return parsed.toLocaleString('en-IN');
-        }
 
         function isAcAccount(accStr) {
             if (!accStr) return false;
@@ -618,16 +601,76 @@
                    acc.includes('altaf rent a car') || acc.includes('altaf rent');
         }
 
-        function checkDateInRange(dateStr, selectedMonth, fromDate, toDate) {
+        function populateMonthFilterForAccount(selectedAccount) {
+            if (!monthFilter) return;
+            const uniqueYearMonths = new Set();
+
+            allExpensesData.forEach(item => {
+                const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
+                const d = item.expense.date;
+
+                let match = false;
+                if (selectedAccount === 'CEO') {
+                    match = true;
+                } else {
+                    match = isAccountMatch(itemAccount, selectedAccount);
+                }
+
+                if (match && d && d !== 'no-date') {
+                    const parts = d.split('-');
+                    if (parts.length >= 2) {
+                        uniqueYearMonths.add(`${parts[0]}-${parts[1]}`);
+                    }
+                }
+            });
+
+            const sorted = Array.from(uniqueYearMonths).sort();
+            monthFilter.innerHTML = '<option value="all">All Months</option>';
+
+            sorted.forEach(ym => {
+                const parts = ym.split('-');
+                const year = parts[0];
+                const month = parts[1];
+                const mIndex = parseInt(month, 10) - 1;
+                const label = `${monthNames[mIndex]} ${year}`;
+
+                const opt = document.createElement('option');
+                opt.value = ym;
+                opt.textContent = label;
+                monthFilter.appendChild(opt);
+            });
+
+            const sysYM = getSystemCurrentYearMonth();
+            const hasSysMonth = sorted.includes(sysYM);
+
+            if (hasSysMonth) {
+                monthFilter.value = sysYM;
+            } else if (sorted.length > 0) {
+                monthFilter.value = sorted[sorted.length - 1];
+            } else {
+                monthFilter.value = 'all';
+            }
+        }
+
+        function formatPlainNum(num) {
+            if (num === undefined || num === null || isNaN(num)) return '0';
+            const parsed = Number(num);
+            return parsed.toLocaleString('en-IN');
+        }
+
+        function checkDateInRange(dateStr, selectedYearMonth, fromDate, toDate) {
             if (!dateStr || dateStr === 'no-date') return true;
 
             if (fromDate && dateStr < fromDate) return false;
             if (toDate && dateStr > toDate) return false;
 
-            if (!fromDate && !toDate && selectedMonth !== 'all') {
+            if (!fromDate && !toDate && selectedYearMonth !== 'all') {
                 const parts = dateStr.split('-');
-                if (parts.length >= 2 && parts[1] !== selectedMonth) {
-                    return false;
+                if (parts.length >= 2) {
+                    const itemYM = `${parts[0]}-${parts[1]}`;
+                    if (itemYM !== selectedYearMonth) {
+                        return false;
+                    }
                 }
             }
 
@@ -866,7 +909,7 @@
             return dateStr;
         }
 
-        function getAutoCeoDataByDate(searchTerm = '', selectedMonth = 'all', fromDate = '', toDate = '') {
+        function getAutoCeoDataByDate(searchTerm = '', selectedYearMonth = 'all', fromDate = '', toDate = '') {
             const dateSummary = {};
 
             allExpensesData.forEach(item => {
@@ -874,7 +917,7 @@
                 const desc = item.expense.desc ? item.expense.desc.trim() : '';
                 const date = item.expense.date || 'no-date';
 
-                if (!isSearchActive && !checkDateInRange(date, selectedMonth, fromDate, toDate)) {
+                if (!isSearchActive && !checkDateInRange(date, selectedYearMonth, fromDate, toDate)) {
                     return;
                 }
 
@@ -953,7 +996,6 @@
             const fromDateVal = fromDateFilter ? fromDateFilter.value : '';
             const toDateVal = toDateFilter ? toDateFilter.value : '';
 
-            // Show or hide month filter
             if (isSearchActive || isExcludedFromMonthFilter(selectedAccount)) {
                 monthFilterContainer.style.display = 'none';
             } else {
@@ -962,8 +1004,6 @@
 
             pageTitle.innerText = `Detail. ${selectedAccount}`;
             createdByContainer.style.display = 'block';
-
-            // Summary cards are visible in both normal & search mode
             firstSummaryCards.style.display = 'flex';
 
             if (selectedAccount === 'CEO') {
@@ -972,7 +1012,6 @@
                 cardTwoLabel.innerText = 'Amount Sent';
                 cardThreeLabel.innerText = 'Total';
                 
-                // CEO اکاؤنٹ میں دونوں تفصیلاتی بکس ظاہر کریں (جب تک کہ سرچ آن نہ ہو)
                 if (!isSearchActive) {
                     ceoSelectedDetails.style.display = 'block';
                     ceoThirdDetails.style.display = 'block';
@@ -995,7 +1034,6 @@
                 if (ceoNetSummaryHeader) ceoNetSummaryHeader.style.display = 'none';
                 secondSummary.style.display = 'none';
 
-                // دیگر اکاؤنٹس میں ان دونوں تفصیلاتی بکسز کو چھپائیں
                 ceoSelectedDetails.style.display = 'none';
                 ceoThirdDetails.style.display = 'none';
 
@@ -1126,8 +1164,7 @@
                     const itemDesc = item.expense.desc ? item.expense.desc.toLowerCase() : '';
                     const itemDate = item.expense.date || '';
 
-                    let isMatch = isAccountMatch(itemAccount, selectedAccount);
-                    if (!isMatch) return;
+                    if (!isAccountMatch(itemAccount, selectedAccount)) return;
 
                     if (searchTerm) {
                         const matchSearch = itemDesc.includes(searchTerm) || itemAccount.includes(searchTerm);
@@ -1296,13 +1333,12 @@
                 return dateA.localeCompare(dateB);
             });
 
+            populateMonthFilterForAccount(accountFilter.value);
             renderData();
         });
 
         accountFilter.addEventListener('change', () => {
-            if (monthFilter) {
-                monthFilter.value = getSystemCurrentMonth();
-            }
+            populateMonthFilterForAccount(accountFilter.value);
             if (fromDateFilter) fromDateFilter.value = '';
             if (toDateFilter) toDateFilter.value = '';
             if (searchInput) searchInput.value = '';
@@ -1324,7 +1360,7 @@
             clearDatesBtn.addEventListener('click', () => {
                 if (fromDateFilter) fromDateFilter.value = '';
                 if (toDateFilter) toDateFilter.value = '';
-                if (monthFilter) monthFilter.value = getSystemCurrentMonth();
+                populateMonthFilterForAccount(accountFilter.value);
                 renderData();
             });
         }

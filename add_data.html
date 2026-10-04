@@ -17,27 +17,26 @@
     <style>
         * { box-sizing: border-box; }
         html, body { height: 100%; margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f7f6; overflow: hidden; }
-        .container { display: flex; flex-direction: column; height: 100vh; max-width: 1000px; margin: 0 auto; background: #ffffff; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-y: auto; }
-        .fixed-header { flex-shrink: 0; background: #ffffff; padding-bottom: 8px; border-bottom: 2px solid #ddd; }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
-        h1 { color: #333; font-size: 18px; margin: 0; }
-        .account-select { padding: 4px 8px; font-size: 13px; border-radius: 4px; border: 1px solid #007bff; background-color: #e9f5ff; font-weight: bold; color: #007bff; cursor: pointer; }
-        .summary { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
-        .card { flex: 1 1 calc(33.333% - 8px); min-width: 80px; padding: 6px 4px; border-radius: 6px; text-align: center; color: white; }
+        .container { display: flex; flex-direction: column; height: 100vh; max-width: 1000px; margin: 0 auto; background: #ffffff; padding: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; }
+        .fixed-header { flex-shrink: 0; background: #ffffff; padding-bottom: 6px; border-bottom: 2px solid #ddd; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+        h1 { color: #333; font-size: clamp(16px, 1vw + 10px, 21px); margin: 0; }
+        .account-select { padding: 4px 8px; font-size: clamp(12px, 0.8vw + 8px, 15px); border-radius: 4px; border: 1px solid #007bff; background-color: #e9f5ff; font-weight: bold; color: #007bff; cursor: pointer; }
+        .summary { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 5px; }
+        .card { flex: 1 1 calc(33.333% - 6px); min-width: 75px; padding: 5px 3px; border-radius: 6px; text-align: center; color: white; }
         .card.received-card { background-color: #28a745; }
         .card.sent-card { background-color: #007bff; }
         .card.balance-card { background-color: #dc3545; }
-        .card h3 { margin: 0; font-size: 10px; text-transform: uppercase; }
-        .card p { font-size: 13px; font-weight: bold; margin: 2px 0 0 0; word-break: break-word; }
+        .card h3 { margin: 0; font-size: clamp(9.5px, 0.6vw + 6px, 12px); text-transform: uppercase; }
+        .card p { font-size: clamp(12px, 0.9vw + 7px, 15px); font-weight: bold; margin: 2px 0 0 0; word-break: break-word; }
         
-        /* Month & Date Range Two-Level Filter Container */
         .controls-filter-row { 
             display: flex; 
             flex-direction: column; 
-            gap: 5px; 
-            margin: 6px 0 4px 0; 
+            gap: 4px; 
+            margin: 4px 0; 
             background: #f8faff; 
-            padding: 6px 8px; 
+            padding: 5px 6px; 
             border-radius: 4px; 
             border: 1px dashed #007bff; 
         }
@@ -45,11 +44,11 @@
             display: flex; 
             align-items: center; 
             gap: 5px; 
-            flex-wrap: nowrap; /* بٹن کو نیچے نئی لائن میں جانے سے روکے گا */
+            flex-wrap: nowrap;
             width: 100%;
         }
         .controls-filter-row label { 
-            font-size: 11px; 
+            font-size: clamp(10.5px, 0.6vw + 7px, 13px); 
             font-weight: bold; 
             color: #333; 
             white-space: nowrap; 
@@ -57,63 +56,108 @@
         }
         .control-input { 
             padding: 3px 4px; 
-            font-size: 11px; 
+            font-size: clamp(10.5px, 0.6vw + 7px, 13px); 
             border-radius: 4px; 
             border: 1px solid #007bff; 
             background: #fff; 
             color: #333; 
             outline: none; 
-            flex: 1; /* اسکرین کے مطابق ایڈجسٹ ہوگی */
+            flex: 1; 
             min-width: 0;
         }
         .reset-filter-btn { 
             background: #6c757d; 
             color: #fff; 
             border: none; 
-            padding: 4px 8px; 
+            padding: 3px 7px; 
             border-radius: 3px; 
-            font-size: 11px; 
+            font-size: clamp(10.5px, 0.6vw + 7px, 13px); 
             cursor: pointer; 
             font-weight: bold; 
-            flex-shrink: 0; /* بٹن کا سائز چھوٹا یا ختم نہیں ہوگا */
+            flex-shrink: 0; 
         }
 
-        .scrollable-body { flex: 0 0 auto; height: 250px; overflow-y: auto; overflow-x: auto; margin-top: 8px; border-bottom: 1px solid #ddd; width: 100%; }
-        .scrollable-body.large-scroll { max-height: 480px !important; height: auto; flex: 1 1 auto; }
+        .scrollable-body { flex: 0 0 auto; height: 250px; overflow-y: auto; overflow-x: auto; margin-top: 6px; border-bottom: 1px solid #ddd; width: 100%; }
+        
+        .scrollable-body.large-scroll { 
+            height: calc(100vh - 280px) !important;
+            max-height: calc(100vh - 280px) !important;
+            flex: 0 0 auto !important;
+            margin-bottom: 5px;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            overflow-x: auto !important;
+            overflow-y: auto !important;
+        }
 
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        table.scrollable-table { min-width: 100%; }
         
-        th, td { border: 1px solid #ddd; padding: 4px 2px; text-align: center; font-size: 10px; white-space: normal; overflow: hidden; word-wrap: break-word; word-break: keep-all; hyphens: none; vertical-align: middle; }
+        table.scrollable-table { 
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            table.scrollable-table { 
+                min-width: 400px !important; 
+            }
+        }
+        
+        th, td { border: 1px solid #ddd; padding: clamp(4px, 0.4vw + 2px, 6px) clamp(1px, 0.3vw + 1px, 4px); text-align: center; font-size: clamp(10px, 0.7vw + 6px, 12.5px); white-space: normal; overflow: hidden; word-wrap: break-word; word-break: keep-all; hyphens: none; vertical-align: middle; }
         th { background-color: #f2f2f2; font-weight: bold; position: sticky; top: 0; z-index: 10; line-height: 1.1; }
         tr:nth-child(even) { background-color: #f9f9f9; }
-        tbody tr { height: 26px; }
+        tbody tr { height: clamp(26px, 1vw + 20px, 32px); }
         td.clickable-val { cursor: pointer; font-weight: bold; color: #007bff; }
         td.clickable-val:hover { background-color: #e2f0ff; text-decoration: underline; }
         
-        .text-right { text-align: right !important; padding-right: 6px !important; }
-        th.text-right { text-align: right !important; padding-right: 6px !important; }
+        tfoot {
+            position: static !important;
+            background-color: #ffffff;
+        }
+        tfoot td {
+            background-color: #f1f8ff;
+            border-top: 2px solid #007bff;
+            padding: 3px 1px !important;
+        }
 
-        .add-row-form input { width: 100%; padding: 2px 1px; border: 1px solid #ccc; border-radius: 3px; font-size: 9px; text-align: center; }
-        .add-row-form input[type="number"] { text-align: right !important; padding-right: 4px !important; }
+        .text-right { text-align: right !important; padding-right: 4px !important; }
+        th.text-right { text-align: right !important; padding-right: 4px !important; }
+
+        .add-row-form input { 
+            width: 100%; 
+            min-width: 0 !important;
+            padding: clamp(3px, 0.3vw + 2px, 5px) 2px !important; 
+            border: 1px solid #007bff; 
+            border-radius: 3px; 
+            font-size: clamp(9px, 0.6vw + 5px, 11.5px) !important; 
+            text-align: center; 
+            background: #fff; 
+        }
+        .add-row-form input[type="date"] {
+            font-size: clamp(8.5px, 0.5vw + 5.5px, 11px) !important;
+            padding: 2px 0px !important;
+        }
+        .add-row-form input[type="number"] { 
+            text-align: right !important; 
+            padding-right: 2px !important; 
+        }
         
-        .add-btn { background-color: #28a745; color: white; border: none; padding: 4px 2px; border-radius: 3px; cursor: pointer; font-weight: bold; width: 100%; font-size: 10px; }
+        .add-btn { background-color: #28a745; color: white; border: none; padding: 4px 1px; border-radius: 3px; cursor: pointer; font-weight: bold; width: 100%; font-size: clamp(9px, 0.6vw + 5.5px, 11.5px); }
         .action-btns { display: flex; gap: 2px; justify-content: center; }
-        .edit-btn { background-color: #ffc107; color: #000; border: none; padding: 3px 5px; border-radius: 3px; cursor: pointer; font-size: 9px; font-weight: bold; }
-        .delete-btn { background-color: #dc3545; color: white; border: none; padding: 3px 5px; border-radius: 3px; cursor: pointer; font-size: 9px; font-weight: bold; }
-        .status { margin-bottom: 5px; color: #666; font-size: 11px; }
+        .edit-btn { background-color: #ffc107; color: #000; border: none; padding: 3px 4px; border-radius: 3px; cursor: pointer; font-size: clamp(9px, 0.6vw + 5.5px, 11.5px); font-weight: bold; }
+        .delete-btn { background-color: #dc3545; color: white; border: none; padding: 3px 4px; border-radius: 3px; cursor: pointer; font-size: clamp(9px, 0.6vw + 5.5px, 11.5px); font-weight: bold; }
+        .status { margin-bottom: 5px; color: #666; font-size: clamp(10px, 0.6vw + 7px, 12px); }
         
         .selected-details-container { flex: 0 0 auto; margin-top: 8px; padding: 0 6px 6px 6px; background: #eef6ff; border: 1px solid #007bff; border-radius: 4px; width: 100%; max-height: 600px; overflow-y: auto; position: relative; }
-        .selected-details-header { display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: bold; color: #007bff; padding: 6px 0 4px 0; background: #eef6ff; position: sticky; top: 0; z-index: 20; border-bottom: 1px solid #cce4ff; }
+        .selected-details-header { display: flex; align-items: center; justify-content: space-between; font-size: clamp(11px, 0.7vw + 7px, 13.5px); font-weight: bold; color: #007bff; padding: 6px 0 4px 0; background: #eef6ff; position: sticky; top: 0; z-index: 20; border-bottom: 1px solid #cce4ff; }
         .selected-details-container th { position: sticky; top: 25px; z-index: 15; background-color: #f2f2f2; }
-        .date-badge { background: #007bff; color: #fff; padding: 2px 6px; border-radius: 3px; font-size: 10px; }
+        .date-badge { background: #007bff; color: #fff; padding: 2px 6px; border-radius: 3px; font-size: clamp(9.5px, 0.6vw + 6px, 12px); }
 
         #ceo-third-details th, 
         #ceo-third-details td {
-            font-size: 9px !important;
+            font-size: clamp(9px, 0.6vw + 5px, 11.5px) !important;
         }
 
-        .footer-text { text-align: center; font-size: 11px; font-weight: bold; color: #333; margin-top: 24px; margin-bottom: 8px; }
+        .footer-text { text-align: center; font-size: clamp(11px, 0.6vw + 7px, 13px); font-weight: bold; color: #333; margin-top: 24px; margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -176,24 +220,11 @@
                 </div>
             </div>
 
-            <!-- Month Dropdown Upar, From-To Date Neeche -->
             <div id="month-filter-container" class="controls-filter-row">
                 <div class="filter-line">
                     <label for="month-filter">Select Month:</label>
                     <select id="month-filter" class="control-input">
                         <option value="all">All Months</option>
-                        <option value="01">January</option>
-                        <option value="02">February</option>
-                        <option value="03">March</option>
-                        <option value="04">April</option>
-                        <option value="05">May</option>
-                        <option value="06">June</option>
-                        <option value="07">July</option>
-                        <option value="08">August</option>
-                        <option value="09">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
                     </select>
                 </div>
 
@@ -338,21 +369,19 @@
         const createdByContainer = document.getElementById('created-by-container');
         const mainDataTable = document.getElementById('main-data-table');
 
-        function getSystemCurrentMonth() {
-            return String(new Date().getMonth() + 1).padStart(2, '0');
-        }
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
 
-        if (monthFilter) {
-            monthFilter.value = getSystemCurrentMonth();
+        function getSystemCurrentYearMonth() {
+            const d = new Date();
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            return `${yyyy}-${mm}`;
         }
 
         let allExpensesData = [];
-
-        function formatPlainNum(num) {
-            if (num === undefined || num === null || isNaN(num)) return '0';
-            const parsed = Number(num);
-            return parsed.toLocaleString('en-IN');
-        }
 
         function isAcAccount(accStr) {
             if (!accStr) return false;
@@ -369,6 +398,36 @@
             return true;
         }
 
+        function isAccountMatch(itemAccount, selectedAccount) {
+            const acc = itemAccount.toLowerCase().trim();
+            if (selectedAccount === 'Musharaf Amanat') {
+                return acc.includes('musharaf amanat') || acc.includes('mushraf amanat') || acc === 'musharaf' || acc === '' || acc === 'amanat musharaf';
+            } else if (selectedAccount === 'Farooq Shah Amanat') {
+                return (acc.includes('farooq shah') || acc.includes('frooq shah')) && !acc.includes('ac');
+            } else if (selectedAccount === 'AC 53 Farooq Shah') {
+                return acc.includes('ac 53') || acc.includes('ac53');
+            } else if (selectedAccount === 'AC 44-C Iftikhar') {
+                return acc.includes('ac 44') || acc.includes('ac44') || acc.includes('iftikhar');
+            } else if (selectedAccount === 'AC 49-B Fawad Khan') {
+                return acc.includes('ac 49') || acc.includes('ac49') || acc.includes('fawad');
+            } else if (selectedAccount === 'AC B-1 Farooq Shah') {
+                return acc.includes('ac b-1') || acc.includes('ac b1');
+            } else if (selectedAccount === 'AC B-2 Farooq Shah') {
+                return acc.includes('ac b-2') || acc.includes('ac b2');
+            } else if (selectedAccount === 'AC Abbott') {
+                return acc.includes('abbott');
+            } else if (selectedAccount === 'Bank 02% Musharaf') {
+                return acc.includes('bank 02%') || acc.includes('bank 02% musharaf') || acc.includes('com musharaf');
+            } else if (selectedAccount === 'Depo Bachat') {
+                return acc.includes('depo bachat') || acc.includes('bachat');
+            } else if (selectedAccount === 'Office 02% Arif') {
+                return acc.includes('office 02%') || acc.includes('office 02% arif') || acc.includes('arif');
+            } else if (selectedAccount === 'Altaf Rent A Car') {
+                return acc.includes('altaf rent a car') || acc.includes('altaf rent');
+            }
+            return false;
+        }
+
         function isExcludedFromMonthFilter(accName) {
             const acc = accName.toLowerCase().trim();
             return (acc.includes('farooq shah') && !acc.includes('ac')) ||
@@ -378,16 +437,76 @@
                    acc.includes('altaf rent a car') || acc.includes('altaf rent');
         }
 
-        function checkDateInRange(dateStr, selectedMonth, fromDate, toDate) {
+        function populateMonthFilterForAccount(selectedAccount) {
+            if (!monthFilter) return;
+            const uniqueYearMonths = new Set();
+
+            allExpensesData.forEach(item => {
+                const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
+                const d = item.expense.date;
+
+                let match = false;
+                if (selectedAccount === 'CEO') {
+                    match = true;
+                } else {
+                    match = isAccountMatch(itemAccount, selectedAccount);
+                }
+
+                if (match && d && d !== 'no-date') {
+                    const parts = d.split('-');
+                    if (parts.length >= 2) {
+                        uniqueYearMonths.add(`${parts[0]}-${parts[1]}`);
+                    }
+                }
+            });
+
+            const sorted = Array.from(uniqueYearMonths).sort();
+            monthFilter.innerHTML = '<option value="all">All Months</option>';
+
+            sorted.forEach(ym => {
+                const parts = ym.split('-');
+                const year = parts[0];
+                const month = parts[1];
+                const mIndex = parseInt(month, 10) - 1;
+                const label = `${monthNames[mIndex]} ${year}`;
+
+                const opt = document.createElement('option');
+                opt.value = ym;
+                opt.textContent = label;
+                monthFilter.appendChild(opt);
+            });
+
+            const sysYM = getSystemCurrentYearMonth();
+            const hasSysMonth = sorted.includes(sysYM);
+
+            if (hasSysMonth) {
+                monthFilter.value = sysYM;
+            } else if (sorted.length > 0) {
+                monthFilter.value = sorted[sorted.length - 1];
+            } else {
+                monthFilter.value = 'all';
+            }
+        }
+
+        function formatPlainNum(num) {
+            if (num === undefined || num === null || isNaN(num)) return '0';
+            const parsed = Number(num);
+            return parsed.toLocaleString('en-IN');
+        }
+
+        function checkDateInRange(dateStr, selectedYearMonth, fromDate, toDate) {
             if (!dateStr || dateStr === 'no-date') return true;
 
             if (fromDate && dateStr < fromDate) return false;
             if (toDate && dateStr > toDate) return false;
 
-            if (!fromDate && !toDate && selectedMonth !== 'all') {
+            if (!fromDate && !toDate && selectedYearMonth !== 'all') {
                 const parts = dateStr.split('-');
-                if (parts.length >= 2 && parts[1] !== selectedMonth) {
-                    return false;
+                if (parts.length >= 2) {
+                    const itemYM = `${parts[0]}-${parts[1]}`;
+                    if (itemYM !== selectedYearMonth) {
+                        return false;
+                    }
                 }
             }
 
@@ -401,15 +520,14 @@
             return dateStr;
         }
 
-        function getAutoCeoDataByDate(selectedMonth = 'all', fromDate = '', toDate = '') {
+        function getAutoCeoDataByDate(selectedYearMonth = 'all', fromDate = '', toDate = '') {
             const dateSummary = {};
 
             allExpensesData.forEach(item => {
                 const rawAccount = item.expense.account ? item.expense.account.trim() : '';
-                const desc = item.expense.desc ? item.expense.desc.trim() : '';
                 const date = item.expense.date || 'no-date';
 
-                if (!checkDateInRange(date, selectedMonth, fromDate, toDate)) {
+                if (!checkDateInRange(date, selectedYearMonth, fromDate, toDate)) {
                     return;
                 }
 
@@ -543,18 +661,19 @@
                 createdByContainer.style.display = 'none';
                 scrollableBody.classList.add('large-scroll');
                 mainDataTable.classList.add('scrollable-table');
+
                 tableHeaderRow.innerHTML = `
                     <th style="width: 8%;">S.No</th>
                     <th style="width: 14%;">Date</th>
-                    <th style="width: 44%;">Description</th>
+                    <th style="width: 32%;">Description</th>
                     <th style="width: 16%;" class="text-right">${firstColHeader}</th>
                     <th style="width: 16%;" class="text-right">${secondColHeader}</th>
-                    <th style="width: 12%;" class="action-col">Action</th>
+                    <th style="width: 14%;" class="action-col">Action</th>
                 `;
                 addRowFormTr.innerHTML = `
                     <td id="next-sno" style="font-weight: bold;">1</td>
                     <td><input type="date" id="date" required></td>
-                    <td><input type="text" id="desc" placeholder="Description" required></td>
+                    <td><input type="text" id="desc" placeholder="Desc" required></td>
                     <td><input type="number" id="received" placeholder="${firstColHeader}" step="1"></td>
                     <td><input type="number" id="sent" placeholder="${secondColHeader}" step="1"></td>
                     <td class="action-col"><button type="button" id="submit-btn" class="add-btn">Add</button></td>
@@ -643,41 +762,13 @@
 
                 allExpensesData.forEach((item) => {
                     const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
-                    const itemDesc = item.expense.desc ? item.expense.desc.toLowerCase() : '';
                     const itemDate = item.expense.date || '';
 
                     if (shouldFilterByMonth && !checkDateInRange(itemDate, currentSelectedMonth, fromDateVal, toDateVal)) {
                         return;
                     }
 
-                    let isMatch = false;
-                    if (selectedAccount === 'Musharaf Amanat') {
-                        isMatch = itemAccount.includes('musharaf amanat') || itemAccount.includes('mushraf amanat') || itemAccount === 'musharaf' || itemAccount === '' || itemAccount === 'amanat musharaf';
-                    } else if (selectedAccount === 'Farooq Shah Amanat') {
-                        isMatch = (itemAccount.includes('farooq shah') || itemAccount.includes('frooq shah')) && !itemAccount.includes('ac');
-                    } else if (selectedAccount === 'AC 53 Farooq Shah') {
-                        isMatch = itemAccount.includes('ac 53') || itemAccount.includes('ac53');
-                    } else if (selectedAccount === 'AC 44-C Iftikhar') {
-                        isMatch = itemAccount.includes('ac 44') || itemAccount.includes('ac44') || itemAccount.includes('iftikhar');
-                    } else if (selectedAccount === 'AC 49-B Fawad Khan') {
-                        isMatch = itemAccount.includes('ac 49') || itemAccount.includes('ac49') || itemAccount.includes('fawad');
-                    } else if (selectedAccount === 'AC B-1 Farooq Shah') {
-                        isMatch = itemAccount.includes('ac b-1') || itemAccount.includes('ac b1');
-                    } else if (selectedAccount === 'AC B-2 Farooq Shah') {
-                        isMatch = itemAccount.includes('ac b-2') || itemAccount.includes('ac b2');
-                    } else if (selectedAccount === 'AC Abbott') {
-                        isMatch = itemAccount.includes('abbott');
-                    } else if (selectedAccount === 'Bank 02% Musharaf') {
-                        isMatch = itemAccount.includes('bank 02%') || itemAccount.includes('bank 02% musharaf') || itemAccount.includes('com musharaf');
-                    } else if (selectedAccount === 'Depo Bachat') {
-                        isMatch = itemAccount.includes('depo bachat') || itemAccount.includes('bachat');
-                    } else if (selectedAccount === 'Office 02% Arif') {
-                        isMatch = itemAccount.includes('office 02%') || itemAccount.includes('office 02% arif') || itemAccount.includes('arif');
-                    } else if (selectedAccount === 'Altaf Rent A Car') {
-                        isMatch = itemAccount.includes('altaf rent a car') || itemAccount.includes('altaf rent');
-                    }
-
-                    if (isMatch) {
+                    if (isAccountMatch(itemAccount, selectedAccount)) {
                         const expense = item.expense;
                         const id = item.id;
                         const recVal = expense.received || 0;
@@ -753,7 +844,7 @@
 
                 totalReceivedDisplay.innerText = formatPlainNum(totalReceived);
                 totalSentDisplay.innerText = formatPlainNum(totalSent);
-                totalBalanceDisplay.innerText = formatPlainNum(totalReceived - totalSent);
+                totalBalanceDisplay.innerText = formatPlainNum(totalBalance);
             }
         }
 
@@ -918,13 +1009,12 @@
                 return dateA.localeCompare(dateB);
             });
 
+            populateMonthFilterForAccount(accountFilter.value);
             renderData();
         });
 
         accountFilter.addEventListener('change', () => {
-            if (monthFilter) {
-                monthFilter.value = getSystemCurrentMonth();
-            }
+            populateMonthFilterForAccount(accountFilter.value);
             if (fromDateFilter) fromDateFilter.value = '';
             if (toDateFilter) toDateFilter.value = '';
             renderData();
@@ -945,7 +1035,7 @@
             clearDatesBtn.addEventListener('click', () => {
                 if (fromDateFilter) fromDateFilter.value = '';
                 if (toDateFilter) toDateFilter.value = '';
-                if (monthFilter) monthFilter.value = getSystemCurrentMonth();
+                populateMonthFilterForAccount(accountFilter.value);
                 renderData();
             });
         }
