@@ -88,6 +88,9 @@
         td.clickable-val { cursor: pointer; font-weight: bold; color: #007bff; }
         td.clickable-val:hover { background-color: #e2f0ff; text-decoration: underline; }
         
+        .slip-link { color: #007bff; font-weight: bold; text-decoration: underline; cursor: pointer; }
+        .slip-link:hover { color: #0056b3; }
+
         .text-right { text-align: right !important; padding-right: 6px !important; }
         th.text-right { text-align: right !important; padding-right: 6px !important; }
 
@@ -1064,9 +1067,10 @@
                 tableContainer.classList.add('large-scroll');
                 
                 tableHeaderRow.innerHTML = `
-                    <th style="width: 8%;">S.No</th>
-                    <th style="width: 14%;">Date</th>
-                    <th style="width: 46%;">Description</th>
+                    <th style="width: 7%;">S.No</th>
+                    <th style="width: 13%;">Date</th>
+                    <th style="width: 38%;">Description</th>
+                    <th style="width: 10%;">Slip</th>
                     <th style="width: 16%;" class="text-right">${firstColHeader}</th>
                     <th style="width: 16%;" class="text-right">${secondColHeader}</th>
                 `;
@@ -1182,11 +1186,18 @@
                     totalReceived += recVal;
                     totalSent += sentVal;
 
+                    // Slip چیک کرنا: slipUrl یا slip فیلڈ موجود ہو تو View لنک، ورنہ '-'
+                    const slipUrl = expense.slipUrl || expense.slip || '';
+                    const slipHtml = slipUrl 
+                        ? `<a href="${slipUrl}" target="_blank" class="slip-link">View</a>` 
+                        : '-';
+
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${count++}</td>
                         <td>${formatDateToDMY(expense.date)}</td>
                         <td style="text-align: left;">${expense.desc || ''}</td>
+                        <td>${slipHtml}</td>
                         <td class="text-right">${formatPlainNum(recVal)}</td>
                         <td class="text-right">${formatPlainNum(sentVal)}</td>
                     `;

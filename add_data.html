@@ -77,7 +77,7 @@
             flex-shrink: 0; 
         }
 
-        .scrollable-body { flex: 0 0 auto; height: 250px; overflow-y: auto; overflow-x: auto; margin-top: 6px; border-bottom: 1px solid #ddd; width: 100%; }
+        .scrollable-body { flex: 0 0 auto; height: 250px; overflow-y: auto; overflow-x: auto; margin-top: 6px; border-bottom: 1px solid #ddd; width: 100%; -webkit-overflow-scrolling: touch; }
         
         .scrollable-body.large-scroll { 
             height: calc(100vh - 280px) !important;
@@ -88,6 +88,7 @@
             border-radius: 4px;
             overflow-x: auto !important;
             overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
         }
 
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
@@ -102,13 +103,26 @@
             }
         }
         
-        th, td { border: 1px solid #ddd; padding: clamp(4px, 0.4vw + 2px, 6px) clamp(1px, 0.3vw + 1px, 4px); text-align: center; font-size: clamp(10px, 0.7vw + 6px, 12.5px); white-space: normal; overflow: hidden; word-wrap: break-word; word-break: keep-all; hyphens: none; vertical-align: middle; }
+        th, td { border: 1px solid #ddd; padding: clamp(4px, 0.4vw + 2px, 6px) 2px; text-align: center; font-size: clamp(9.5px, 0.6vw + 6px, 12px); white-space: normal; overflow: hidden; vertical-align: middle; word-wrap: break-word; }
         th { background-color: #f2f2f2; font-weight: bold; position: sticky; top: 0; z-index: 10; line-height: 1.1; }
         tr:nth-child(even) { background-color: #f9f9f9; }
-        tbody tr { height: clamp(26px, 1vw + 20px, 32px); }
+        tbody tr { height: clamp(28px, 1vw + 22px, 36px); }
         td.clickable-val { cursor: pointer; font-weight: bold; color: #007bff; }
         td.clickable-val:hover { background-color: #e2f0ff; text-decoration: underline; }
         
+        .desc-cell {
+            text-align: left !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow-wrap: break-word !important;
+            line-height: 1.25 !important;
+            padding: 3px 4px !important;
+            max-width: 0 !important;
+        }
+
+        .slip-link { color: #007bff; font-weight: bold; text-decoration: underline; cursor: pointer; }
+        .slip-link:hover { color: #0056b3; }
+
         tfoot {
             position: static !important;
             background-color: #ffffff;
@@ -123,17 +137,17 @@
         th.text-right { text-align: right !important; padding-right: 4px !important; }
 
         .add-row-form input { 
-            width: 100%; 
+            width: 100% !important; 
             min-width: 0 !important;
-            padding: clamp(3px, 0.3vw + 2px, 5px) 2px !important; 
+            padding: 3px 2px !important; 
             border: 1px solid #007bff; 
             border-radius: 3px; 
-            font-size: clamp(9px, 0.6vw + 5px, 11.5px) !important; 
+            font-size: clamp(9px, 0.5vw + 5px, 11px) !important; 
             text-align: center; 
             background: #fff; 
         }
         .add-row-form input[type="date"] {
-            font-size: clamp(8.5px, 0.5vw + 5.5px, 11px) !important;
+            font-size: clamp(8px, 0.4vw + 5px, 10px) !important;
             padding: 2px 0px !important;
         }
         .add-row-form input[type="number"] { 
@@ -141,10 +155,10 @@
             padding-right: 2px !important; 
         }
         
-        .add-btn { background-color: #28a745; color: white; border: none; padding: 4px 1px; border-radius: 3px; cursor: pointer; font-weight: bold; width: 100%; font-size: clamp(9px, 0.6vw + 5.5px, 11.5px); }
+        .add-btn { background-color: #28a745; color: white; border: none; padding: 4px 1px; border-radius: 3px; cursor: pointer; font-weight: bold; width: 100%; font-size: clamp(9px, 0.5vw + 5.5px, 11px); }
         .action-btns { display: flex; gap: 2px; justify-content: center; }
-        .edit-btn { background-color: #ffc107; color: #000; border: none; padding: 3px 4px; border-radius: 3px; cursor: pointer; font-size: clamp(9px, 0.6vw + 5.5px, 11.5px); font-weight: bold; }
-        .delete-btn { background-color: #dc3545; color: white; border: none; padding: 3px 4px; border-radius: 3px; cursor: pointer; font-size: clamp(9px, 0.6vw + 5.5px, 11.5px); font-weight: bold; }
+        .edit-btn { background-color: #ffc107; color: #000; border: none; padding: 3px 4px; border-radius: 3px; cursor: pointer; font-size: clamp(8.5px, 0.5vw + 5px, 11px); font-weight: bold; }
+        .delete-btn { background-color: #dc3545; color: white; border: none; padding: 3px 4px; border-radius: 3px; cursor: pointer; font-size: clamp(8.5px, 0.5vw + 5px, 11px); font-weight: bold; }
         .status { margin-bottom: 5px; color: #666; font-size: clamp(10px, 0.6vw + 7px, 12px); }
         
         .selected-details-container { flex: 0 0 auto; margin-top: 8px; padding: 0 6px 6px 6px; background: #eef6ff; border: 1px solid #007bff; border-radius: 4px; width: 100%; max-height: 600px; overflow-y: auto; position: relative; }
@@ -242,7 +256,7 @@
 
         <div id="scrollable-body" class="scrollable-body">
             <div id="loading" class="status">Loading data...</div>
-            <table id="main-data-table">
+            <table id="main-data-table" class="scrollable-table">
                 <thead>
                     <tr id="table-header-row"></tr>
                 </thead>
@@ -663,17 +677,19 @@
                 mainDataTable.classList.add('scrollable-table');
 
                 tableHeaderRow.innerHTML = `
-                    <th style="width: 8%;">S.No</th>
-                    <th style="width: 14%;">Date</th>
-                    <th style="width: 32%;">Description</th>
+                    <th style="width: 7%;">S.No</th>
+                    <th style="width: 9%;">Date</th>
+                    <th style="width: 30%;">Description</th>
+                    <th style="width: 7%;">Slip</th>
                     <th style="width: 16%;" class="text-right">${firstColHeader}</th>
                     <th style="width: 16%;" class="text-right">${secondColHeader}</th>
-                    <th style="width: 14%;" class="action-col">Action</th>
+                    <th style="width: 15%;" class="action-col">Action</th>
                 `;
                 addRowFormTr.innerHTML = `
                     <td id="next-sno" style="font-weight: bold;">1</td>
                     <td><input type="date" id="date" required></td>
                     <td><input type="text" id="desc" placeholder="Desc" required></td>
+                    <td><input type="text" id="slip" placeholder="URL"></td>
                     <td><input type="number" id="received" placeholder="${firstColHeader}" step="1"></td>
                     <td><input type="number" id="sent" placeholder="${secondColHeader}" step="1"></td>
                     <td class="action-col"><button type="button" id="submit-btn" class="add-btn">Add</button></td>
@@ -777,16 +793,22 @@
                         totalReceived += recVal;
                         totalSent += sentVal;
 
+                        const slipVal = expense.slip || expense.slipUrl || '';
+                        const slipHtml = slipVal 
+                            ? `<a href="${slipVal}" target="_blank" class="slip-link">View</a>` 
+                            : '-';
+
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>${count++}</td>
                             <td>${formatDateToDMY(expense.date)}</td>
-                            <td style="text-align: left;">${expense.desc || ''}</td>
+                            <td class="desc-cell">${expense.desc || ''}</td>
+                            <td>${slipHtml}</td>
                             <td class="text-right">${formatPlainNum(recVal)}</td>
                             <td class="text-right">${formatPlainNum(sentVal)}</td>
                             <td class="action-col">
                                 <div class="action-btns">
-                                    <button class="edit-btn" data-id="${id}" data-date="${expense.date || ''}" data-desc="${expense.desc || ''}" data-received="${recVal}" data-sent="${sentVal}">Edit</button>
+                                    <button class="edit-btn" data-id="${id}" data-date="${expense.date || ''}" data-desc="${expense.desc || ''}" data-slip="${slipVal}" data-received="${recVal}" data-sent="${sentVal}">Edit</button>
                                     <button class="delete-btn" data-id="${id}">Del</button>
                                 </div>
                             </td>
@@ -812,6 +834,7 @@
                         const docId = e.target.getAttribute('data-id');
                         const oldDate = e.target.getAttribute('data-date');
                         const oldDesc = e.target.getAttribute('data-desc');
+                        const oldSlip = e.target.getAttribute('data-slip') || '';
                         const oldRec = e.target.getAttribute('data-received');
                         const oldSent = e.target.getAttribute('data-sent');
 
@@ -819,6 +842,8 @@
                         if (newDate === null) return;
                         const newDesc = prompt("Nayi Description likhein:", oldDesc);
                         if (newDesc === null) return;
+                        const newSlip = prompt("Slip URL / Link (khali chhor sakte hain):", oldSlip);
+                        if (newSlip === null) return;
                         
                         let promptRec = "Nayi Received Raqam:";
                         let promptSent = isAcAccount(selectedAccount) ? "Nayi Sent Raqam:" : "Nayi Return Raqam:";
@@ -836,6 +861,7 @@
                         await updateDoc(doc(db, "ceo_expenses", docId), {
                             date: newDate,
                             desc: newDesc,
+                            slip: newSlip.trim(),
                             received: parseFloat(newRec) || 0,
                             sent: parseFloat(newSent) || 0
                         });
@@ -973,6 +999,7 @@
             const selectedAccount = accountFilter.value;
             const dateInput = document.getElementById('date');
             const descInput = document.getElementById('desc');
+            const slipInput = document.getElementById('slip');
             const receivedInput = document.getElementById('received');
             const sentInput = document.getElementById('sent');
 
@@ -985,12 +1012,14 @@
                 account: selectedAccount,
                 date: dateInput ? dateInput.value : '',
                 desc: descInput ? descInput.value : '',
+                slip: slipInput ? slipInput.value.trim() : '',
                 received: receivedInput ? (parseFloat(receivedInput.value) || 0) : 0,
                 sent: sentInput ? (parseFloat(sentInput.value) || 0) : 0,
                 createdAt: new Date()
             });
 
             if (descInput) descInput.value = '';
+            if (slipInput) slipInput.value = '';
             if (receivedInput) receivedInput.value = '';
             if (sentInput) sentInput.value = '';
             if (dateInput) dateInput.valueAsDate = new Date();
