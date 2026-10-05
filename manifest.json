@@ -1,14 +1,14 @@
 {
-  "short_name": "CEO",
+  "short_name": "Khan Petroleum",
   "name": "Khan Petroleum Service",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2845/2845899.png",
+      "src": "Icon.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2845/2845899.png",
+      "src": "Icon.png",
       "type": "image/png",
       "sizes": "512x512"
     }
