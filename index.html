@@ -20,19 +20,73 @@
 
     <style>
         * { box-sizing: border-box; }
-        html, body { height: 100%; margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f7f6; overflow: hidden; }
+        html, body { height: 100%; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f4f7f6; overflow: hidden; }
         .container { display: flex; flex-direction: column; height: 100vh; max-width: 900px; margin: 0 auto; background: #ffffff; padding: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-y: auto; position: relative; }
         .fixed-header { flex-shrink: 0; background: #ffffff; padding-bottom: 8px; border-bottom: 2px solid #eee; position: relative; }
         
+        /* 3D Blue Brand Title (-1px updated) */
+        .brand-title-main {
+            text-align: center;
+            font-size: clamp(24px, 2.5vw + 14px, 32px);
+            font-weight: 900;
+            color: #007bff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 6px 0;
+            text-shadow: 
+                0 1px 0 #0056b3,
+                0 2px 0 #004085,
+                0 3px 0 #002752,
+                0 4px 5px rgba(0, 0, 0, 0.35);
+        }
+
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
         h1 { color: #333; font-size: clamp(17px, 1.2vw + 10px, 22px); margin: 0; }
         
-        .header-right-btns { display: flex; align-items: center; gap: 6px; }
+        .header-right-btns { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+        }
+
+        .ceo-btns-mode {
+            width: 100% !important;
+            justify-content: space-between !important;
+            margin-top: 2px;
+        }
+
+        /* Monthly Summary Button (+2px font size) */
+        .summary-btn {
+            background-color: #fd7e14;
+            color: #ffffff;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: clamp(13px, 0.7vw + 9px, 15.5px);
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease;
+        }
+        .summary-btn:hover {
+            background-color: #e36a02;
+        }
 
         .account-select-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
         .account-select { padding: 4px 8px; font-size: clamp(12px, 0.8vw + 8px, 15px); border-radius: 4px; border: 1px solid #007bff; background-color: #e9f5ff; font-weight: bold; color: #007bff; cursor: pointer; }
-        
-        .search-toggle-btn { background-color: #007bff; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: clamp(11px, 0.7vw + 7px, 14px); font-weight: bold; }
+
+        .search-toggle-btn { 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 4px 10px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: clamp(11px, 0.7vw + 7px, 14px); 
+            font-weight: bold; 
+        }
         .search-toggle-btn:hover { background-color: #0056b3; }
         .search-toggle-btn.active { background-color: #dc3545; }
 
@@ -69,15 +123,35 @@
         .control-input { padding: 3px 6px; font-size: clamp(10.5px, 0.6vw + 7px, 13px); border-radius: 4px; border: 1px solid #007bff; background: #fff; color: #333; outline: none; }
         .reset-filter-btn { background: #6c757d; color: #fff; border: none; padding: 4px 8px; border-radius: 3px; font-size: clamp(10.5px, 0.6vw + 7px, 13px); cursor: pointer; font-weight: bold; flex-shrink: 0; line-height: 1; }
 
-        .table-portion { flex: 0 0 auto; height: 250px; overflow-y: auto; overflow-x: auto; margin-top: 5px; border-bottom: 1px solid #ddd; width: 100%; position: relative; }
+        .table-portion { 
+            flex: 1 1 auto; 
+            height: 250px; 
+            overflow-y: auto; 
+            overflow-x: auto; 
+            margin-top: 5px; 
+            border-bottom: 1px solid #ddd; 
+            width: 100%; 
+            position: relative; 
+            -webkit-overflow-scrolling: touch;
+        }
         
         .table-portion.large-scroll { 
-            height: auto !important; 
-            max-height: none !important;
+            height: calc(100vh - 270px) !important; 
+            max-height: calc(100vh - 270px) !important; 
             flex: 1 1 auto; 
             margin-bottom: 10px;
             border: 1px solid #007bff;
             border-radius: 4px;
+        }
+
+        .drilldown-scroll {
+            height: calc(100vh - 150px) !important;
+            max-height: calc(100vh - 150px) !important;
+            border: 1px solid #007bff !important;
+            border-radius: 4px !important;
+            overflow-y: auto !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
         }
 
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
@@ -86,7 +160,7 @@
         tr:nth-child(even) { background-color: #f9f9f9; }
         tbody tr { height: clamp(26px, 1vw + 20px, 32px); }
         td.clickable-val { cursor: pointer; font-weight: bold; color: #007bff; }
-        td.clickable-val:hover { background-color: #e2f0ff; text-decoration: underline; }
+        td.clickable-val:hover { background-color: #e2f0ff; }
         
         .slip-link { color: #007bff; font-weight: bold; text-decoration: underline; cursor: pointer; }
         .slip-link:hover { color: #0056b3; }
@@ -105,18 +179,17 @@
 
         .date-badge { background: #007bff; color: #fff; padding: 2px 5px; border-radius: 3px; font-size: clamp(9.5px, 0.6vw + 6px, 12px); }
         
-        .pdf-btn { background-color: #dc3545; color: white; border: none; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-size: clamp(10px, 0.6vw + 6.5px, 12.5px); font-weight: bold; }
+        .pdf-btn { background-color: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: clamp(10px, 0.6vw + 6.5px, 12.5px); font-weight: bold; }
         .pdf-btn:hover { background-color: #bd2130; }
 
-        .jpg-btn { background-color: #28a745; color: white; border: none; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-size: clamp(10px, 0.6vw + 6.5px, 12.5px); font-weight: bold; }
+        .jpg-btn { background-color: #28a745; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: clamp(10px, 0.6vw + 6.5px, 12.5px); font-weight: bold; }
         .jpg-btn:hover { background-color: #218838; }
 
         .footer-text { text-align: center; font-size: clamp(11px, 0.6vw + 7px, 13px); font-weight: bold; color: #333; margin-top: 15px; margin-bottom: 10px; padding-bottom: 10px; }
 
         .export-meta-footer { display: none; margin-top: 10px; font-size: 9px; color: #666; text-align: right; border-top: 1px dashed #ccc; padding-top: 4px; }
-        .export-mode-active .export-meta-footer { display: block !important; }
-        .watermark-overlay { display: none; position: absolute; top: 35%; left: 15%; width: 70%; text-align: center; font-size: 34px; color: rgba(0, 123, 255, 0.08); font-weight: bold; transform: rotate(-25deg); pointer-events: none; z-index: 0; }
-        .export-mode-active .watermark-overlay { display: block !important; }
+        .export-mode-active .export-meta-footer,
+        .ms-clean-export-active .export-meta-footer { display: block !important; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal-box { background: #fff; padding: 18px; border-radius: 8px; width: 90%; max-width: 380px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-align: center; font-family: Arial, sans-serif; }
@@ -134,7 +207,8 @@
 
         .export-mode-active,
         .export-mode-active.table-portion,
-        .export-mode-active.large-scroll {
+        .export-mode-active.large-scroll,
+        .export-mode-active.drilldown-scroll {
             height: auto !important;
             max-height: none !important;
             overflow: visible !important;
@@ -187,251 +261,515 @@
             font-size: 11px !important;
         }
 
-        #ceo-selected-details.pdf-export-mode th, 
-        #ceo-selected-details.pdf-export-mode td {
-            font-size: 12px !important;
-            padding: 4px 3px !important;
-            line-height: 1.2 !important;
-            white-space: normal;
-            word-break: keep-all !important;
-            word-wrap: break-word !important;
-        }
-        #ceo-selected-details.pdf-export-mode td:last-child {
-            white-space: nowrap !important;
-        }
-        #ceo-selected-details.pdf-export-mode .selected-details-header {
-            font-size: 16px !important;
-            padding-bottom: 4px !important;
-            margin-bottom: 4px !important;
-            position: static !important;
-        }
-        #ceo-selected-details.pdf-export-mode .date-badge {
-            font-size: 13px !important;
-            padding: 3px 6px !important;
+        /* Monthly Summary View */
+        #monthly-summary-view {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            padding: 4px 2px;
+            position: relative;
         }
 
-        #ceo-third-details.pdf-export-mode th, 
-        #ceo-third-details.pdf-export-mode td {
-            font-size: 12px !important;
-            padding: 4px 3px !important;
-            line-height: 1.2 !important;
-            white-space: normal;
-            word-break: keep-all !important;
-            word-wrap: break-word !important;
-        }
-        #ceo-third-details.pdf-export-mode .selected-details-header {
-            font-size: 16px !important;
-            padding-bottom: 4px !important;
-            margin-bottom: 4px !important;
-            position: static !important;
-        }
-        #ceo-third-details.pdf-export-mode .date-badge {
-            font-size: 13px !important;
-            padding: 3px 6px !important;
+        /* 3D Blue Brand Header for Khan Petroleum Service in Month Summary (-1px updated) */
+        .ms-brand-title {
+            text-align: center;
+            font-size: clamp(24px, 2.5vw + 14px, 32px);
+            font-weight: 900;
+            color: #007bff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 2px 0 8px 0;
+            text-shadow: 
+                0 1px 0 #0056b3,
+                0 2px 0 #004085,
+                0 3px 0 #002752,
+                0 4px 5px rgba(0, 0, 0, 0.35);
         }
 
-        .other-accounts-export.pdf-export-mode th, 
-        .other-accounts-export.pdf-export-mode td {
-            font-size: 13px !important;
-            padding: 4px 3px !important;
-            line-height: 1.2 !important;
-            word-break: keep-all !important;
-            word-wrap: break-word !important;
+        .ms-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+            gap: 6px;
+            position: relative;
+            z-index: 1;
+        }
+        .ms-title {
+            font-size: clamp(17px, 1.3vw + 10px, 21px);
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+            letter-spacing: 0.2px;
+        }
+        .ms-header-right-btns {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .ms-back-btn {
+            background-color: #6c757d;
+            color: #fff;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .ms-back-btn:hover { background-color: #5a6268; }
+        .ms-month-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            background: #f8faff;
+            padding: 6px 8px;
+            border-radius: 4px;
+            border: 1px dashed #007bff;
+            position: relative;
+            z-index: 1;
+        }
+        .ms-month-row label {
+            font-size: clamp(12px, 0.8vw + 8px, 15px);
+            color: #333;
+            font-weight: bold;
+            letter-spacing: 0.2px;
+        }
+        .ms-select {
+            padding: 4px 10px;
+            font-size: clamp(12px, 0.8vw + 8px, 14px);
+            border-radius: 4px;
+            border: 1px solid #007bff;
+            background: #fff;
+            font-weight: bold;
+            color: #007bff;
+            outline: none;
+        }
+        .ms-table-container {
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: calc(100vh - 290px);
+            margin-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+            z-index: 1;
+        }
+        .ms-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        .ms-table th, .ms-table td {
+            border: 1px solid #ddd;
+            padding: clamp(6px, 0.6vw + 3px, 9px) clamp(4px, 0.4vw + 2px, 8px);
+            font-size: clamp(11.5px, 0.8vw + 7px, 14px);
+            vertical-align: middle;
+            letter-spacing: 0.2px;
+        }
+        .ms-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr.ms-clickable-row {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        tr.ms-clickable-row:hover {
+            background-color: #e2f0ff !important;
         }
         
-        .other-accounts-export.pdf-export-mode .card h3,
-        .other-accounts-export.pdf-export-mode .card p {
-            font-size: 16px !important;
+        .ms-account-name-cell {
+            text-align: left;
+            font-weight: bold;
+            color: #007bff;
+            text-decoration: none !important;
+            letter-spacing: 0.2px;
+        }
+        .ms-table td.clickable-val {
+            color: #007bff;
+            font-weight: bold;
+            text-align: right;
+            cursor: pointer;
+            text-decoration: none !important;
+            letter-spacing: 0.2px;
+        }
+        
+        .ms-footer-wrapper {
+            display: flex;
+            width: 100%;
+            align-items: stretch;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+            margin-top: 4px;
+            position: relative;
+            z-index: 1;
+        }
+        .ms-footer-label-box {
+            background-color: #28a745;
+            color: #ffffff;
+            font-size: clamp(12px, 0.8vw + 8px, 14.5px);
+            font-weight: bold;
+            padding: 7px 10px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            text-align: left;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+        }
+        .ms-footer-amount-box {
+            background-color: #dc3545;
+            color: #ffffff;
+            font-size: clamp(12.5px, 0.9vw + 8px, 15px);
+            font-weight: bold;
+            padding: 7px 8px;
+            width: 30%;
+            min-width: 30%;
+            max-width: 30%;
+            text-align: right;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            word-break: break-all;
+            letter-spacing: 0.2px;
         }
 
-        .other-accounts-export.jpg-export-mode th,
-        .other-accounts-export.jpg-export-mode td {
-            font-size: 12px !important;
-            padding: 4px 2px !important;
+        .drilldown-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            padding-bottom: 6px;
+            gap: 6px;
         }
-        .other-accounts-export.jpg-export-mode .card h3,
-        .other-accounts-export.jpg-export-mode .card p {
-            font-size: 13px !important;
+        .drilldown-badge-row {
+            display: flex;
+            width: 100%;
+            align-items: stretch;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 6px;
+        }
+        .drilldown-badge-label {
+            background-color: #28a745;
+            color: #ffffff;
+            font-size: clamp(11.5px, 0.8vw + 7px, 14px);
+            font-weight: bold;
+            padding: 6px 10px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+        .drilldown-badge-amount {
+            background-color: #dc3545;
+            color: #ffffff;
+            font-size: clamp(12px, 0.9vw + 7.5px, 15px);
+            font-weight: bold;
+            padding: 6px 12px;
+            text-align: right;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
         }
 
-        .export-summary-container {
-            display: none;
-            margin-bottom: 12px;
+        .ms-clean-export-active {
+            width: 720px !important;
+            max-width: 720px !important;
+            background: #ffffff !important;
+            padding: 15px !important;
+            font-family: Arial, Helvetica, sans-serif !important;
+            position: relative !important;
         }
-        .export-mode-active .export-summary-container {
-            display: block !important;
+        .ms-clean-export-active * {
+            letter-spacing: normal !important;
+            word-spacing: normal !important;
+        }
+        .ms-clean-export-active .ms-table-container {
+            max-height: none !important;
+            overflow: visible !important;
+        }
+        /* Hide Select Month Box in PDF and JPG Export */
+        .ms-clean-export-active .ms-month-row {
+            display: none !important;
+        }
+
+        /* JPG Export Boosted Font Styles */
+        .ms-jpg-boost-mode .ms-brand-title {
+            font-size: 42px !important;
+        }
+        .ms-jpg-boost-mode .ms-title {
+            font-size: 29px !important;
+        }
+        .ms-jpg-boost-mode .ms-table th,
+        .ms-jpg-boost-mode .ms-table td {
+            font-size: 22.5px !important;
+            padding: 10px 8px !important;
+        }
+        .ms-jpg-boost-mode .ms-footer-label-box {
+            font-size: 22.5px !important;
+            padding: 10px 12px !important;
+        }
+        .ms-jpg-boost-mode .ms-footer-amount-box {
+            font-size: 23.5px !important;
+            padding: 10px 12px !important;
+        }
+        .ms-jpg-boost-mode .export-meta-footer {
+            font-size: 17px !important;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="fixed-header">
-            <div class="header-top">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <h1 id="page-title">Detail. CEO</h1>
-                    <div id="ceo-net-summary-header" style="font-size: 13px; font-weight: bold; background: #dc3545; color: #ffffff; padding: 4px 8px; border-radius: 4px; display: none;">
-                        Total: <span id="ceo-net-value">0</span>
+        <!-- Main Regular View Container -->
+        <div id="main-view-wrapper">
+            <!-- 3D Blue Brand Header for Main Screen -->
+            <div class="brand-title-main">Khan Petroleum Service</div>
+
+            <div class="fixed-header">
+                <!-- Drilldown Clean Header -->
+                <div id="drilldown-header" class="drilldown-top-bar" style="display: none;">
+                    <h1 id="drilldown-title">Detail.</h1>
+                    <button type="button" id="drilldown-back-btn" class="ms-back-btn">Back</button>
+                </div>
+
+                <!-- Drilldown Top Green & Red Expense Badge -->
+                <div id="drilldown-badge" class="drilldown-badge-row" style="display: none;">
+                    <div id="drilldown-badge-label" class="drilldown-badge-label">Total Expenses Month of</div>
+                    <div id="drilldown-badge-amount" class="drilldown-badge-amount">0</div>
+                </div>
+
+                <div id="default-header-top" class="header-top">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <h1 id="page-title">CEO's Expenses Details</h1>
+                        <div id="ceo-net-summary-header" style="font-size: 13px; font-weight: bold; background: #dc3545; color: #ffffff; padding: 4px 8px; border-radius: 4px; display: none;">
+                            Total: <span id="ceo-net-value">0</span>
+                        </div>
+                    </div>
+                    <div id="header-right-btns-box" class="header-right-btns ceo-btns-mode">
+                        <button type="button" id="summary-top-btn" class="summary-btn">Monthly Summary</button>
+                        <button type="button" id="search-toggle-btn" class="search-toggle-btn">Search</button>
+                        <button type="button" id="top-pdf-btn" class="pdf-btn" style="display: none;">PDF</button>
+                        <button type="button" id="top-jpg-btn" class="jpg-btn" style="display: none;">JPG</button>
                     </div>
                 </div>
-                <div class="header-right-btns">
-                    <button type="button" id="search-toggle-btn" class="search-toggle-btn" onclick="toggleSearchMode()">Search</button>
-                    <button type="button" id="top-pdf-btn" onclick="triggerDownload('table-container', 'Account_Details', 'pdf')" class="pdf-btn" style="display: none;">PDF</button>
-                    <button type="button" id="top-jpg-btn" onclick="triggerDownload('table-container', 'Account_Details', 'jpg')" class="jpg-btn" style="display: none;">JPG</button>
-                </div>
-            </div>
 
-            <div id="account-select-row" class="account-select-group" style="margin-bottom: 8px;">
-                <label for="account-filter" style="font-size: 12px; font-weight: bold; color: #333;">Select Account: </label>
-                <select id="account-filter" class="account-select">
-                    <option value="CEO">CEO</option>
-                    <option value="Musharaf Amanat">Musharaf Amanat</option>
-                    <option value="Farooq Shah Amanat">Farooq Shah Amanat</option>
-                    <option value="AC 53 Farooq Shah">AC 53 Farooq Shah</option>
-                    <option value="AC 44-C Iftikhar">AC 44-C Iftikhar</option>
-                    <option value="AC 49-B Fawad Khan">AC 49-B Fawad Khan</option>
-                    <option value="AC B-1 Farooq Shah">AC B-1 Farooq Shah</option>
-                    <option value="AC B-2 Farooq Shah">AC B-2 Farooq Shah</option>
-                    <option value="AC Abbott">AC Abbott</option>
-                    <option value="Bank 02% Musharaf">Bank 02% Musharaf</option>
-                    <option value="Depo Bachat">Depo Bachat</option>
-                    <option value="Office 02% Arif">Office 02% Arif</option>
-                    <option value="Altaf Rent A Car">Altaf Rent A Car</option>
-                </select>
-                <button type="button" id="row-pdf-btn" onclick="triggerDownload('table-container', 'Account_Details', 'pdf')" class="pdf-btn">PDF</button>
-                <button type="button" id="row-jpg-btn" onclick="triggerDownload('table-container', 'Account_Details', 'jpg')" class="jpg-btn">JPG</button>
-            </div>
-
-            <div id="search-container" class="search-container">
-                <input type="text" id="search-input" class="search-box" placeholder="Lafz ya detail likhein...">
-            </div>
-            
-            <div class="summary" id="first-summary-cards">
-                <div class="card received-card">
-                    <h3 id="card-one-label">Amount Received</h3>
-                    <p id="total-received">0</p>
-                </div>
-                <div class="card sent-card">
-                    <h3 id="card-two-label">Amount Sent</h3>
-                    <p id="total-sent">0</p>
-                </div>
-                <div class="card balance-card">
-                    <h3 id="card-three-label">Total</h3>
-                    <p id="total-balance">0</p>
-                </div>
-            </div>
-
-            <div class="summary" id="second-summary" style="display: none;">
-                <div class="card received-card">
-                    <h3>Amanat Received</h3>
-                    <p id="total-received-2">0</p>
-                </div>
-                <div class="card sent-card">
-                    <h3>Amanat Return</h3>
-                    <p id="total-sent-2">0</p>
-                </div>
-                <div class="card balance-card">
-                    <h3>Remaining Payable</h3>
-                    <p id="total-balance-2">0</p>
-                </div>
-            </div>
-
-            <div id="month-filter-container" class="controls-filter-row">
-                <div class="filter-line">
-                    <label for="month-filter">Select Month:</label>
-                    <select id="month-filter" class="control-input" style="flex: 1;">
-                        <option value="all">All Months</option>
+                <div id="account-select-row" class="account-select-group" style="margin-bottom: 8px;">
+                    <label for="account-filter" style="font-size: 12px; font-weight: bold; color: #333;">Select Account: </label>
+                    <select id="account-filter" class="account-select">
+                        <option value="CEO">CEO</option>
+                        <option value="Musharaf Amanat">Musharaf Amanat</option>
+                        <option value="Farooq Shah Amanat">Farooq Shah Amanat</option>
+                        <option value="AC 53 Farooq Shah">AC 53 Farooq Shah</option>
+                        <option value="AC 44-C Iftikhar">AC 44-C Iftikhar</option>
+                        <option value="AC 49-B Fawad Khan">AC 49-B Fawad Khan</option>
+                        <option value="AC B-1 Farooq Shah">AC B-1 Farooq Shah</option>
+                        <option value="AC B-2 Farooq Shah">AC B-2 Farooq Shah</option>
+                        <option value="AC Abbott">AC Abbott</option>
+                        <option value="Bank 02% Musharaf">Bank 02% Musharaf</option>
+                        <option value="Depo Bachat">Depo Bachat</option>
+                        <option value="Office 02% Arif">Office 02% Arif</option>
+                        <option value="Altaf Rent A Car">Altaf Rent A Car</option>
                     </select>
+                    <button type="button" id="row-pdf-btn" class="pdf-btn">PDF</button>
+                    <button type="button" id="row-jpg-btn" class="jpg-btn">JPG</button>
                 </div>
 
-                <div class="filter-line" style="flex-wrap: nowrap;">
-                    <label for="from-date-filter">From:</label>
-                    <input type="date" id="from-date-filter" class="control-input" style="flex: 1; min-width: 0;">
+                <div id="search-container" class="search-container">
+                    <input type="text" id="search-input" class="search-box" placeholder="Lafz ya detail likhein...">
+                </div>
+                
+                <div class="summary" id="first-summary-cards">
+                    <div class="card received-card">
+                        <h3 id="card-one-label">Amount Received</h3>
+                        <p id="total-received">0</p>
+                    </div>
+                    <div class="card sent-card">
+                        <h3 id="card-two-label">Amount Sent</h3>
+                        <p id="total-sent">0</p>
+                    </div>
+                    <div class="card balance-card">
+                        <h3 id="card-three-label">Total</h3>
+                        <p id="total-balance">0</p>
+                    </div>
+                </div>
 
-                    <label for="to-date-filter">To:</label>
-                    <input type="date" id="to-date-filter" class="control-input" style="flex: 1; min-width: 0;">
+                <div class="summary" id="second-summary" style="display: none;">
+                    <div class="card received-card">
+                        <h3>Amanat Received</h3>
+                        <p id="total-received-2">0</p>
+                    </div>
+                    <div class="card sent-card">
+                        <h3>Amanat Return</h3>
+                        <p id="total-sent-2">0</p>
+                    </div>
+                    <div class="card balance-card">
+                        <h3>Remaining Payable</h3>
+                        <p id="total-balance-2">0</p>
+                    </div>
+                </div>
 
-                    <button type="button" id="clear-dates-btn" class="reset-filter-btn" title="Reset Dates">✕</button>
+                <div id="month-filter-container" class="controls-filter-row">
+                    <div class="filter-line">
+                        <label for="month-filter">Select Month:</label>
+                        <select id="month-filter" class="control-input" style="flex: 1;">
+                            <option value="all">All Months</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-line" style="flex-wrap: nowrap;">
+                        <label for="from-date-filter">From:</label>
+                        <input type="date" id="from-date-filter" class="control-input" style="flex: 1; min-width: 0;">
+
+                        <label for="to-date-filter">To:</label>
+                        <input type="date" id="to-date-filter" class="control-input" style="flex: 1; min-width: 0;">
+
+                        <button type="button" id="clear-dates-btn" class="reset-filter-btn" title="Reset Dates">✕</button>
+                    </div>
+                </div>
+
+                <div id="loading" class="status">Loading data...</div>
+            </div>
+
+            <div id="table-container" class="table-portion">
+                <div id="main-export-title" class="export-header-title">All Accounts detail for CEO</div>
+                
+                <div id="export-summary-holder" class="export-summary-container"></div>
+
+                <table id="main-view-table">
+                    <thead>
+                        <tr id="table-header-row"></tr>
+                    </thead>
+                    <tbody id="expense-list"></tbody>
+                </table>
+
+                <div id="export-meta-footer" class="export-meta-footer">
+                    Report Generated on: <span id="export-timestamp-span">-</span>
                 </div>
             </div>
 
-            <div id="loading" class="status">Loading data...</div>
-        </div>
+            <div id="ceo-selected-details" class="selected-details-container" style="display: none;">
+                <div class="export-header-title">Accounts Details for CEO</div>
+                <div class="selected-details-header">
+                    <span>Selected Amount Details:</span>
+                    <div style="display: flex; gap: 4px; align-items: center;">
+                        <span id="selected-date-display" class="date-badge">Amount: 0</span>
+                        <button type="button" id="ceo-sel-pdf-btn" class="pdf-btn">PDF</button>
+                        <button type="button" id="ceo-sel-jpg-btn" class="jpg-btn">JPG</button>
+                    </div>
+                </div>
+                <table style="width: 100%; table-layout: fixed;">
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">Account Name</th>
+                            <th style="width: 45%;">Description</th>
+                            <th style="width: 25%;" id="dynamic-column-header" class="text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="selected-details-body">
+                        <tr>
+                            <td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <div id="table-container" class="table-portion">
-            <div class="watermark-overlay">KHAN PETROLEUM</div>
-            <div id="main-export-title" class="export-header-title">All Accounts detail for CEO</div>
-            
-            <div id="export-summary-holder" class="export-summary-container"></div>
+            <div id="ceo-third-details" class="selected-details-container" style="display: none; margin-top: 12px;">
+                <div class="export-header-title">Daily Accounts Details for CEO</div>
+                <div class="selected-details-header">
+                    <span>Selected Date Details:</span>
+                    <div style="display: flex; gap: 4px; align-items: center;">
+                        <span id="third-date-display" class="date-badge">Date: None</span>
+                        <button type="button" id="ceo-third-pdf-btn" class="pdf-btn">PDF</button>
+                        <button type="button" id="ceo-third-jpg-btn" class="jpg-btn">JPG</button>
+                    </div>
+                </div>
+                <table style="width: 100%; table-layout: fixed;">
+                    <thead>
+                        <tr id="third-table-header">
+                            <th style="width: 28%;">Account Name</th>
+                            <th style="width: 35%;">Description</th>
+                            <th style="width: 37%;">Amount Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="third-details-body">
+                        <tr>
+                            <td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-            <table id="main-view-table">
-                <thead>
-                    <tr id="table-header-row"></tr>
-                </thead>
-                <tbody id="expense-list"></tbody>
-            </table>
-
-            <div id="export-meta-footer" class="export-meta-footer">
-                Report Generated on: <span id="export-timestamp-span">-</span>
+            <div id="created-by-container" style="display: block; flex-shrink: 0;">
+                <div class="footer-text">Created by Sharifuddin</div>
             </div>
         </div>
 
-        <div id="ceo-selected-details" class="selected-details-container" style="display: none;">
-            <div class="export-header-title">Accounts Details for CEO</div>
-            <div class="selected-details-header">
-                <span>Selected Amount Details:</span>
-                <div style="display: flex; gap: 4px; align-items: center;">
-                    <span id="selected-date-display" class="date-badge">Amount: 0</span>
-                    <button type="button" onclick="downloadPDF('ceo-selected-details', 'Amount_Details')" class="pdf-btn">PDF</button>
-                    <button type="button" onclick="downloadJPG('ceo-selected-details', 'Amount_Details')" class="jpg-btn">JPG</button>
+        <!-- Monthly Summary View -->
+        <div id="monthly-summary-view">
+            <!-- 3D Blue Brand Heading in Month Summary -->
+            <div class="ms-brand-title">Khan Petroleum Service</div>
+
+            <div class="ms-header-row">
+                <div id="ms-title" class="ms-title">CEO's Expenses Detail</div>
+                <div class="ms-header-right-btns">
+                    <button type="button" id="ms-pdf-btn" class="pdf-btn">PDF</button>
+                    <button type="button" id="ms-jpg-btn" class="jpg-btn">JPG</button>
+                    <button type="button" id="ms-back-main-btn" class="ms-back-btn">Back</button>
                 </div>
             </div>
-            <table style="width: 100%; table-layout: fixed;">
-                <thead>
-                    <tr>
-                        <th style="width: 30%;">Account Name</th>
-                        <th style="width: 45%;">Description</th>
-                        <th style="width: 25%;" id="dynamic-column-header" class="text-right">Amount</th>
-                    </tr>
-                </thead>
-                <tbody id="selected-details-body">
-                    <tr>
-                        <td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
 
-        <div id="ceo-third-details" class="selected-details-container" style="display: none; margin-top: 12px;">
-            <div class="export-header-title">Daily Accounts Details for CEO</div>
-            <div class="selected-details-header">
-                <span>Selected Date Details:</span>
-                <div style="display: flex; gap: 4px; align-items: center;">
-                    <span id="third-date-display" class="date-badge">Date: None</span>
-                    <button type="button" onclick="downloadPDF('ceo-third-details', 'Date_Details')" class="pdf-btn">PDF</button>
-                    <button type="button" onclick="downloadJPG('ceo-third-details', 'Date_Details')" class="jpg-btn">JPG</button>
+            <div class="ms-month-row">
+                <label for="ms-month-select">Select Month:</label>
+                <select id="ms-month-select" class="ms-select"></select>
+            </div>
+
+            <div id="ms-table-container-export" class="ms-table-container">
+                <table class="ms-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%; text-align: center;">S.No.</th>
+                            <th style="width: 55%; text-align: left;">Account Name</th>
+                            <th style="width: 30%; text-align: right;">Expenses</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ms-table-body"></tbody>
+                </table>
+            </div>
+
+            <div>
+                <!-- Bar 1: Expenses -->
+                <div class="ms-footer-wrapper">
+                    <span id="ms-footer-label" class="ms-footer-label-box">In Month of total Exp.</span>
+                    <span id="ms-footer-amount" class="ms-footer-amount-box">0</span>
+                </div>
+                <!-- Bar 2: Till to date Remaining Payable -->
+                <div class="ms-footer-wrapper" style="margin-top: 5px;">
+                    <span id="ms-remaining-label" class="ms-footer-label-box" style="background-color: #007bff;">Till to date Remaining Payable</span>
+                    <span id="ms-remaining-amount" class="ms-footer-amount-box">0</span>
                 </div>
             </div>
-            <table style="width: 100%; table-layout: fixed;">
-                <thead>
-                    <tr id="third-table-header">
-                        <th style="width: 28%;">Account Name</th>
-                        <th style="width: 35%;">Description</th>
-                        <th style="width: 37%;">Amount Details</th>
-                    </tr>
-                </thead>
-                <tbody id="third-details-body">
-                    <tr>
-                        <td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
 
-        <div id="created-by-container" style="display: block; flex-shrink: 0;">
-            <div class="footer-text">Created by Sharifuddin</div>
+            <!-- Report Generated Footer for Monthly Summary Export -->
+            <div id="ms-export-meta-footer" class="export-meta-footer">
+                Report Generated on: <span id="ms-export-timestamp-span">-</span>
+            </div>
         </div>
     </div>
 
+    <!-- Export Modal -->
     <div id="exportModal" class="modal-overlay">
         <div class="modal-box">
             <h3>Export Options</h3>
@@ -449,9 +787,9 @@
             </div>
 
             <div class="modal-actions">
-                <button type="button" class="modal-btn btn-range" onclick="processExportRange()">ایکپورٹ منتخب روز (Selected Range)</button>
-                <button type="button" class="modal-btn btn-all" onclick="processExportAll()">ایکپورٹ تمام ڈیٹا (All Data)</button>
-                <button type="button" class="modal-btn btn-cancel" onclick="closeExportModal()">منسوخ کریں (Cancel)</button>
+                <button type="button" id="modal-btn-range" class="modal-btn btn-range">ایکپورٹ منتخب روز (Selected Range)</button>
+                <button type="button" id="modal-btn-all" class="modal-btn btn-all">ایکپورٹ تمام ڈیٹا (All Data)</button>
+                <button type="button" id="modal-btn-cancel" class="modal-btn btn-cancel">منسوخ کریں (Cancel)</button>
             </div>
         </div>
     </div>
@@ -485,11 +823,23 @@
         const searchInput = document.getElementById('search-input');
         const searchContainer = document.getElementById('search-container');
         const searchToggleBtn = document.getElementById('search-toggle-btn');
-        const accountSelectRow = document.getElementById('account-select-row');
+        const summaryTopBtn = document.getElementById('summary-top-btn');
+        const headerRightBtnsBox = document.getElementById('header-right-btns-box');
 
         const topPdfBtn = document.getElementById('top-pdf-btn');
         const topJpgBtn = document.getElementById('top-jpg-btn');
+        const rowPdfBtn = document.getElementById('row-pdf-btn');
+        const rowJpgBtn = document.getElementById('row-jpg-btn');
         
+        const defaultHeaderTop = document.getElementById('default-header-top');
+        const drilldownHeader = document.getElementById('drilldown-header');
+        const drilldownTitle = document.getElementById('drilldown-title');
+        const drilldownBadge = document.getElementById('drilldown-badge');
+        const drilldownBadgeLabel = document.getElementById('drilldown-badge-label');
+        const drilldownBadgeAmount = document.getElementById('drilldown-badge-amount');
+        const drilldownBackBtn = document.getElementById('drilldown-back-btn');
+        const accountSelectRow = document.getElementById('account-select-row');
+
         const pageTitle = document.getElementById('page-title');
         const ceoNetSummaryHeader = document.getElementById('ceo-net-summary-header');
         const ceoNetValue = document.getElementById('ceo-net-value');
@@ -534,9 +884,35 @@
         const fromSnoInput = document.getElementById('fromSno');
         const toSnoInput = document.getElementById('toSno');
 
+        // Monthly Summary Elements
+        const mainViewWrapper = document.getElementById('main-view-wrapper');
+        const monthlySummaryView = document.getElementById('monthly-summary-view');
+        const msTitle = document.getElementById('ms-title');
+        const msMonthSelect = document.getElementById('ms-month-select');
+        const msTableBody = document.getElementById('ms-table-body');
+        const msFooterLabel = document.getElementById('ms-footer-label');
+        const msFooterAmount = document.getElementById('ms-footer-amount');
+        const msRemainingAmount = document.getElementById('ms-remaining-amount');
+        const msBackMainBtn = document.getElementById('ms-back-main-btn');
+        const msPdfBtn = document.getElementById('ms-pdf-btn');
+        const msJpgBtn = document.getElementById('ms-jpg-btn');
+        const msExportTimestampSpan = document.getElementById('ms-export-timestamp-span');
+
         const monthNames = [
             "January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
+        ];
+
+        const allowedOrderedAccounts = [
+            'AC 53 Farooq Shah',
+            'AC 44-C Iftikhar',
+            'AC 49-B Fawad Khan',
+            'AC B-1 Farooq Shah',
+            'AC B-2 Farooq Shah',
+            'AC Abbott',
+            'Bank 02% Musharaf',
+            'Depo Bachat',
+            'Office 02% Arif'
         ];
 
         function getSystemCurrentYearMonth() {
@@ -549,6 +925,8 @@
         let allExpensesData = [];
         let currentExportTarget = { elementId: '', fileName: '', format: '' };
         let isSearchActive = false;
+        let isDrillDownMode = false;
+        let drillDownSelectedYM = '';
 
         function isAcAccount(accStr) {
             if (!accStr) return false;
@@ -644,9 +1022,7 @@
             });
 
             const sysYM = getSystemCurrentYearMonth();
-            const hasSysMonth = sorted.includes(sysYM);
-
-            if (hasSysMonth) {
+            if (sorted.includes(sysYM)) {
                 monthFilter.value = sysYM;
             } else if (sorted.length > 0) {
                 monthFilter.value = sorted[sorted.length - 1];
@@ -680,6 +1056,264 @@
             return true;
         }
 
+        // NAVIGATION LOGIC
+        window.openMonthlySummaryView = function(preserveMonth = '') {
+            isDrillDownMode = false;
+            mainViewWrapper.style.display = 'none';
+            monthlySummaryView.style.display = 'flex';
+            populateMsMonths(preserveMonth);
+            renderMonthlySummaryTable();
+        };
+
+        window.closeMonthlySummaryView = function() {
+            monthlySummaryView.style.display = 'none';
+            mainViewWrapper.style.display = 'block';
+            isDrillDownMode = false;
+            accountFilter.value = 'CEO';
+            populateMonthFilterForAccount('CEO');
+            renderData();
+        };
+
+        window.openAccountDetailsFromSummary = function(accName, ym) {
+            isDrillDownMode = true;
+            drillDownSelectedYM = ym;
+            monthlySummaryView.style.display = 'none';
+            mainViewWrapper.style.display = 'block';
+            
+            drilldownTitle.innerText = `Detail. ${accName}`;
+            accountFilter.value = accName;
+            populateMonthFilterForAccount(accName);
+            if (monthFilter) {
+                monthFilter.value = ym;
+            }
+            if (fromDateFilter) fromDateFilter.value = '';
+            if (toDateFilter) toDateFilter.value = '';
+            if (searchInput) searchInput.value = '';
+            
+            renderData();
+        };
+
+        window.exitDrillDownView = function() {
+            const monthToKeep = drillDownSelectedYM || (msMonthSelect ? msMonthSelect.value : '');
+            isDrillDownMode = false;
+            accountFilter.value = 'CEO';
+            populateMonthFilterForAccount('CEO');
+            renderData();
+            window.openMonthlySummaryView(monthToKeep);
+        };
+
+        if (summaryTopBtn) summaryTopBtn.onclick = () => window.openMonthlySummaryView();
+        if (msBackMainBtn) msBackMainBtn.onclick = window.closeMonthlySummaryView;
+        if (drilldownBackBtn) drilldownBackBtn.onclick = window.exitDrillDownView;
+
+        function stampMsExportTime() {
+            const now = new Date();
+            const d = String(now.getDate()).padStart(2, '0');
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const y = now.getFullYear();
+            const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            if (msExportTimestampSpan) {
+                msExportTimestampSpan.innerText = `${d}-${m}-${y}, ${time}`;
+            }
+        }
+
+        function getMonthLabelText() {
+            return msMonthSelect.options[msMonthSelect.selectedIndex] ? msMonthSelect.options[msMonthSelect.selectedIndex].text : msMonthSelect.value;
+        }
+
+        // Monthly Summary PDF Download (Title without brackets, month row hidden)
+        if (msPdfBtn) {
+            msPdfBtn.onclick = function() {
+                const el = document.getElementById('monthly-summary-view');
+                const monthText = getMonthLabelText();
+                
+                stampMsExportTime();
+                msPdfBtn.style.display = 'none';
+                msJpgBtn.style.display = 'none';
+                msBackMainBtn.style.display = 'none';
+                
+                // Set clean title for export without brackets
+                if (msTitle) msTitle.innerText = `CEO's Expenses Detail of ${monthText}`;
+                el.classList.add('ms-clean-export-active');
+
+                const opt = {
+                    margin:       [8, 8, 8, 8],
+                    filename:     `CEO_Expenses_Summary_${msMonthSelect.value}.pdf`,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { 
+                        scale: 2, 
+                        useCORS: true, 
+                        letterRendering: true,
+                        width: 720
+                    },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                html2pdf().set(opt).from(el).save().then(() => {
+                    el.classList.remove('ms-clean-export-active');
+                    msPdfBtn.style.display = 'inline-block';
+                    msJpgBtn.style.display = 'inline-block';
+                    msBackMainBtn.style.display = 'inline-block';
+                    // Restore simple title on live screen
+                    if (msTitle) msTitle.innerText = "CEO's Expenses Detail";
+                });
+            };
+        }
+
+        // Monthly Summary JPG Download (Title without brackets, +3px Font Boost)
+        if (msJpgBtn) {
+            msJpgBtn.onclick = function() {
+                const el = document.getElementById('monthly-summary-view');
+                const monthText = getMonthLabelText();
+
+                stampMsExportTime();
+                msPdfBtn.style.display = 'none';
+                msJpgBtn.style.display = 'none';
+                msBackMainBtn.style.display = 'none';
+                
+                // Set clean title for export without brackets
+                if (msTitle) msTitle.innerText = `CEO's Expenses Detail of ${monthText}`;
+                
+                el.classList.add('ms-clean-export-active');
+                el.classList.add('ms-jpg-boost-mode');
+
+                html2canvas(el, { 
+                    scale: 2, 
+                    useCORS: true, 
+                    letterRendering: true,
+                    width: 720 
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `CEO_Expenses_Summary_${msMonthSelect.value}.jpg`;
+                    link.href = canvas.toDataURL('image/jpeg', 0.98);
+                    link.click();
+
+                    el.classList.remove('ms-clean-export-active');
+                    el.classList.remove('ms-jpg-boost-mode');
+                    msPdfBtn.style.display = 'inline-block';
+                    msJpgBtn.style.display = 'inline-block';
+                    msBackMainBtn.style.display = 'inline-block';
+                    // Restore simple title on live screen
+                    if (msTitle) msTitle.innerText = "CEO's Expenses Detail";
+                });
+            };
+        }
+
+        function populateMsMonths(preserveMonth = '') {
+            const uniqueMonths = new Set();
+            allExpensesData.forEach(item => {
+                const d = item.expense.date;
+                if (d && d !== 'no-date') {
+                    const parts = d.split('-');
+                    if (parts.length >= 2) {
+                        uniqueMonths.add(`${parts[0]}-${parts[1]}`);
+                    }
+                }
+            });
+
+            const sorted = Array.from(uniqueMonths).sort();
+            msMonthSelect.innerHTML = '';
+
+            sorted.forEach(ym => {
+                const parts = ym.split('-');
+                const year = parts[0];
+                const month = parts[1];
+                const mIndex = parseInt(month, 10) - 1;
+                const label = `${monthNames[mIndex]} ${year}`;
+
+                const opt = document.createElement('option');
+                opt.value = ym;
+                opt.textContent = label;
+                msMonthSelect.appendChild(opt);
+            });
+
+            const sysYM = getSystemCurrentYearMonth();
+            if (preserveMonth && sorted.includes(preserveMonth)) {
+                msMonthSelect.value = preserveMonth;
+            } else if (sorted.includes(sysYM)) {
+                msMonthSelect.value = sysYM;
+            } else if (sorted.length > 0) {
+                msMonthSelect.value = sorted[sorted.length - 1];
+            }
+        }
+
+        function renderMonthlySummaryTable() {
+            const selectedYM = msMonthSelect.value;
+            if (!selectedYM) return;
+
+            const accountExpenseMap = {};
+            let totalMonthExpense = 0;
+
+            allExpensesData.forEach(item => {
+                const d = item.expense.date;
+                if (!d || d === 'no-date') return;
+
+                const parts = d.split('-');
+                if (parts.length >= 2 && `${parts[0]}-${parts[1]}` === selectedYM) {
+                    const rawAccount = (item.expense.account ? item.expense.account.trim() : '');
+                    
+                    const matchedStandardAccount = allowedOrderedAccounts.find(targetAcc => 
+                        isAccountMatch(rawAccount, targetAcc)
+                    );
+
+                    if (matchedStandardAccount) {
+                        const expAmount = item.expense.sent || 0;
+                        if (expAmount > 0) {
+                            if (!accountExpenseMap[matchedStandardAccount]) {
+                                accountExpenseMap[matchedStandardAccount] = 0;
+                            }
+                            accountExpenseMap[matchedStandardAccount] += expAmount;
+                            totalMonthExpense += expAmount;
+                        }
+                    }
+                }
+            });
+
+            msTableBody.innerHTML = '';
+            let sno = 1;
+
+            allowedOrderedAccounts.forEach(acc => {
+                const expenseVal = accountExpenseMap[acc] || 0;
+                if (expenseVal > 0) {
+                    const tr = document.createElement('tr');
+                    tr.className = 'ms-clickable-row';
+                    tr.title = `Click karein ${acc} ki details dekhne ke liye`;
+                    tr.innerHTML = `
+                        <td style="text-align: center; font-weight: bold; color: #333;">${sno++}</td>
+                        <td class="ms-account-name-cell">${acc}</td>
+                        <td class="clickable-val">${formatPlainNum(expenseVal)}</td>
+                    `;
+                    tr.addEventListener('click', () => {
+                        window.openAccountDetailsFromSummary(acc, selectedYM);
+                    });
+                    msTableBody.appendChild(tr);
+                }
+            });
+
+            if (sno === 1) {
+                msTableBody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #666; padding: 12px;">No expenses found for this month</td></tr>`;
+            }
+
+            const parts = selectedYM.split('-');
+            const year = parts[0];
+            const mIndex = parseInt(parts[1], 10) - 1;
+            const monthLabel = `${monthNames[mIndex]} ${year}`;
+
+            // Clean title on live screen without brackets or month clutter
+            if (msTitle) {
+                msTitle.innerText = "CEO's Expenses Detail";
+            }
+
+            msFooterLabel.innerText = `In Month of ${monthLabel} total Exp.`;
+            msFooterAmount.innerText = formatPlainNum(totalMonthExpense);
+
+            const overallAmanat = getOverallAmanatSummary();
+            if (msRemainingAmount) {
+                msRemainingAmount.innerText = formatPlainNum(overallAmanat.remainingPayable);
+            }
+        }
+
+        msMonthSelect.addEventListener('change', renderMonthlySummaryTable);
+
         window.toggleSearchMode = function() {
             isSearchActive = !isSearchActive;
 
@@ -690,8 +1324,13 @@
                 
                 monthFilterContainer.style.display = 'none';
 
-                topPdfBtn.style.display = 'inline-block';
-                topJpgBtn.style.display = 'inline-block';
+                if (accountFilter.value === 'CEO') {
+                    topPdfBtn.style.display = 'none';
+                    topJpgBtn.style.display = 'none';
+                } else {
+                    topPdfBtn.style.display = 'inline-block';
+                    topJpgBtn.style.display = 'inline-block';
+                }
 
                 searchInput.focus();
 
@@ -703,14 +1342,21 @@
                 searchToggleBtn.innerText = 'Search';
                 searchToggleBtn.classList.remove('active');
 
-                topPdfBtn.style.display = 'none';
-                topJpgBtn.style.display = 'none';
+                if (accountFilter.value !== 'CEO') {
+                    topPdfBtn.style.display = 'inline-block';
+                    topJpgBtn.style.display = 'inline-block';
+                } else {
+                    topPdfBtn.style.display = 'none';
+                    topJpgBtn.style.display = 'none';
+                }
 
                 searchInput.value = '';
                 createdByContainer.style.display = 'block';
             }
             renderData();
         };
+
+        if (searchToggleBtn) searchToggleBtn.onclick = window.toggleSearchMode;
 
         function prepareExportSummaries() {
             exportSummaryHolder.innerHTML = '';
@@ -756,7 +1402,7 @@
         };
 
         window.processExportAll = function() {
-            closeExportModal();
+            window.closeExportModal();
             executeExport(null, null);
         };
 
@@ -770,18 +1416,41 @@
                 return;
             }
 
-            closeExportModal();
+            window.closeExportModal();
             executeExport(fromVal, toVal);
         };
+
+        const modalBtnRange = document.getElementById('modal-btn-range');
+        const modalBtnAll = document.getElementById('modal-btn-all');
+        const modalBtnCancel = document.getElementById('modal-btn-cancel');
+
+        if (modalBtnRange) modalBtnRange.onclick = window.processExportRange;
+        if (modalBtnAll) modalBtnAll.onclick = window.processExportAll;
+        if (modalBtnCancel) modalBtnCancel.onclick = window.closeExportModal;
+
+        if (topPdfBtn) topPdfBtn.onclick = () => window.triggerDownload('table-container', 'Account_Details', 'pdf');
+        if (topJpgBtn) topJpgBtn.onclick = () => window.triggerDownload('table-container', 'Account_Details', 'jpg');
+        if (rowPdfBtn) rowPdfBtn.onclick = () => window.triggerDownload('table-container', 'Account_Details', 'pdf');
+        if (rowJpgBtn) rowJpgBtn.onclick = () => window.triggerDownload('table-container', 'Account_Details', 'jpg');
+
+        const ceoSelPdfBtn = document.getElementById('ceo-sel-pdf-btn');
+        const ceoSelJpgBtn = document.getElementById('ceo-sel-jpg-btn');
+        if (ceoSelPdfBtn) ceoSelPdfBtn.onclick = () => window.downloadPDF('ceo-selected-details', 'Amount_Details');
+        if (ceoSelJpgBtn) ceoSelJpgBtn.onclick = () => window.downloadJPG('ceo-selected-details', 'Amount_Details');
+
+        const ceoThirdPdfBtn = document.getElementById('ceo-third-pdf-btn');
+        const ceoThirdJpgBtn = document.getElementById('ceo-third-jpg-btn');
+        if (ceoThirdPdfBtn) ceoThirdPdfBtn.onclick = () => window.downloadPDF('ceo-third-details', 'Date_Details');
+        if (ceoThirdJpgBtn) ceoThirdJpgBtn.onclick = () => window.downloadJPG('ceo-third-details', 'Date_Details');
 
         function executeExport(fromSno, toSno) {
             const { elementId, fileName, format } = currentExportTarget;
             stampExportTime();
 
             if (format === 'pdf') {
-                downloadPDF(elementId, fileName, fromSno, toSno);
+                window.downloadPDF(elementId, fileName, fromSno, toSno);
             } else if (format === 'jpg') {
-                downloadJPG(elementId, fileName, fromSno, toSno);
+                window.downloadJPG(elementId, fileName, fromSno, toSno);
             }
         }
 
@@ -790,7 +1459,15 @@
             const selectedAccount = accountFilter.value;
             
             if (elementId === 'table-container') {
-                if (isSearchActive) {
+                if (isDrillDownMode) {
+                    const parts = (drillDownSelectedYM || (monthFilter ? monthFilter.value : '')).split('-');
+                    let monthLabel = '';
+                    if (parts.length >= 2) {
+                        const mIndex = parseInt(parts[1], 10) - 1;
+                        monthLabel = `${monthNames[mIndex]} ${parts[0]}`;
+                    }
+                    mainExportTitle.innerText = `Account Detail ${selectedAccount} (${monthLabel})`;
+                } else if (isSearchActive) {
                     const searchVal = searchInput.value.trim();
                     mainExportTitle.innerText = `${selectedAccount} Search (${searchVal || 'All'})`;
                 } else if (selectedAccount === 'CEO') {
@@ -831,7 +1508,7 @@
                 margin:       [8, 8, 8, 8],
                 filename:     `${fileName}_${selectedAccount}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+                html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
             };
@@ -852,7 +1529,15 @@
             const selectedAccount = accountFilter.value;
 
             if (elementId === 'table-container') {
-                if (isSearchActive) {
+                if (isDrillDownMode) {
+                    const parts = (drillDownSelectedYM || (monthFilter ? monthFilter.value : '')).split('-');
+                    let monthLabel = '';
+                    if (parts.length >= 2) {
+                        const mIndex = parseInt(parts[1], 10) - 1;
+                        monthLabel = `${monthNames[mIndex]} ${parts[0]}`;
+                    }
+                    mainExportTitle.innerText = `Account Detail ${selectedAccount} (${monthLabel})`;
+                } else if (isSearchActive) {
                     const searchVal = searchInput.value.trim();
                     mainExportTitle.innerText = `${selectedAccount} Search (${searchVal || 'All'})`;
                 } else if (selectedAccount === 'CEO') {
@@ -889,7 +1574,7 @@
             element.classList.add('export-mode-active');
             element.classList.add('jpg-export-mode');
 
-            html2canvas(element, { scale: 2, useCORS: true, scrollY: 0 }).then(canvas => {
+            html2canvas(element, { scale: 2, useCORS: true, letterRendering: true }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `${fileName}_${selectedAccount}.jpg`;
                 link.href = canvas.toDataURL('image/jpeg', 0.98);
@@ -986,8 +1671,6 @@
             });
 
             return {
-                amanatReceived: totalAmanatRec,
-                amanatReturn: totalAmanatRet,
                 remainingPayable: totalAmanatRec - totalAmanatRet
             };
         }
@@ -999,17 +1682,56 @@
             const fromDateVal = fromDateFilter ? fromDateFilter.value : '';
             const toDateVal = toDateFilter ? toDateFilter.value : '';
 
-            if (isSearchActive || isExcludedFromMonthFilter(selectedAccount)) {
+            // Handle Drill-Down Mode View & Scroll UI
+            if (isDrillDownMode) {
+                drilldownHeader.style.display = 'flex';
+                drilldownBadge.style.display = 'flex';
+                defaultHeaderTop.style.display = 'none';
+                accountSelectRow.style.display = 'none';
+                firstSummaryCards.style.display = 'none';
+                secondSummary.style.display = 'none';
                 monthFilterContainer.style.display = 'none';
+                searchContainer.style.display = 'none';
+                ceoSelectedDetails.style.display = 'none';
+                ceoThirdDetails.style.display = 'none';
+
+                tableContainer.classList.add('drilldown-scroll');
+                tableContainer.classList.remove('large-scroll');
+
+                const parts = (drillDownSelectedYM || currentSelectedMonth).split('-');
+                let monthLabel = '';
+                if (parts.length >= 2) {
+                    const mIndex = parseInt(parts[1], 10) - 1;
+                    monthLabel = `${monthNames[mIndex]} ${parts[0]}`;
+                }
+                drilldownBadgeLabel.innerText = `Total Expenses Month of ${monthLabel}`;
             } else {
-                monthFilterContainer.style.display = 'flex';
+                drilldownHeader.style.display = 'none';
+                drilldownBadge.style.display = 'none';
+                defaultHeaderTop.style.display = 'flex';
+                accountSelectRow.style.display = 'flex';
+                firstSummaryCards.style.display = 'flex';
+                tableContainer.classList.remove('drilldown-scroll');
+
+                if (isSearchActive || isExcludedFromMonthFilter(selectedAccount)) {
+                    monthFilterContainer.style.display = 'none';
+                } else {
+                    monthFilterContainer.style.display = 'flex';
+                }
             }
 
-            pageTitle.innerText = `Detail. ${selectedAccount}`;
             createdByContainer.style.display = 'block';
-            firstSummaryCards.style.display = 'flex';
 
-            if (selectedAccount === 'CEO') {
+            if (selectedAccount === 'CEO' && !isDrillDownMode) {
+                pageTitle.innerText = "CEO's Expenses Details";
+                headerRightBtnsBox.classList.add('ceo-btns-mode');
+                summaryTopBtn.style.display = 'inline-flex';
+                
+                topPdfBtn.style.display = 'none';
+                topJpgBtn.style.display = 'none';
+                rowPdfBtn.style.display = 'inline-block';
+                rowJpgBtn.style.display = 'inline-block';
+
                 secondSummary.style.display = 'flex';
                 cardOneLabel.innerText = 'Amount Received';
                 cardTwoLabel.innerText = 'Amount Sent';
@@ -1034,11 +1756,22 @@
                     <th style="width: 20%;" class="text-right">Amanat<br>Return</th>
                 `;
             } else {
-                if (ceoNetSummaryHeader) ceoNetSummaryHeader.style.display = 'none';
-                secondSummary.style.display = 'none';
+                if (!isDrillDownMode) {
+                    pageTitle.innerText = `Detail. ${selectedAccount}`;
+                    headerRightBtnsBox.classList.remove('ceo-btns-mode');
+                    summaryTopBtn.style.display = 'none';
 
-                ceoSelectedDetails.style.display = 'none';
-                ceoThirdDetails.style.display = 'none';
+                    topPdfBtn.style.display = 'inline-block';
+                    topJpgBtn.style.display = 'inline-block';
+                    rowPdfBtn.style.display = 'none';
+                    rowJpgBtn.style.display = 'none';
+
+                    secondSummary.style.display = 'none';
+                    ceoSelectedDetails.style.display = 'none';
+                    ceoThirdDetails.style.display = 'none';
+                }
+
+                if (ceoNetSummaryHeader) ceoNetSummaryHeader.style.display = 'none';
 
                 let colOneLabel = 'Total Received';
                 let colTwoLabel = 'Total Sent';
@@ -1064,7 +1797,9 @@
                 cardTwoLabel.innerText = colTwoLabel;
                 cardThreeLabel.innerText = colThreeLabel;
 
-                tableContainer.classList.add('large-scroll');
+                if (!isDrillDownMode) {
+                    tableContainer.classList.add('large-scroll');
+                }
                 
                 tableHeaderRow.innerHTML = `
                     <th style="width: 7%;">S.No</th>
@@ -1079,7 +1814,7 @@
             expenseList.innerHTML = '';
             let count = 1;
 
-            if (selectedAccount === 'CEO') {
+            if (selectedAccount === 'CEO' && !isDrillDownMode) {
                 const autoCeoData = getAutoCeoDataByDate(searchTerm, currentSelectedMonth, fromDateVal, toDateVal);
                 const sortedDates = Object.keys(autoCeoData).sort();
 
@@ -1162,6 +1897,7 @@
                 let totalReceived = 0;
                 let totalSent = 0;
                 const shouldFilterByMonth = !isExcludedFromMonthFilter(selectedAccount);
+                const activeMonth = isDrillDownMode ? (drillDownSelectedYM || currentSelectedMonth) : currentSelectedMonth;
 
                 allExpensesData.forEach((item) => {
                     const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
@@ -1175,7 +1911,7 @@
                         if (!matchSearch) return;
                     }
 
-                    if (!isSearchActive && shouldFilterByMonth && !checkDateInRange(itemDate, currentSelectedMonth, fromDateVal, toDateVal)) {
+                    if (!isSearchActive && shouldFilterByMonth && !checkDateInRange(itemDate, activeMonth, fromDateVal, toDateVal)) {
                         return;
                     }
 
@@ -1186,7 +1922,6 @@
                     totalReceived += recVal;
                     totalSent += sentVal;
 
-                    // Slip چیک کرنا: slipUrl یا slip فیلڈ موجود ہو تو View لنک، ورنہ '-'
                     const slipUrl = expense.slipUrl || expense.slip || '';
                     const slipHtml = slipUrl 
                         ? `<a href="${slipUrl}" target="_blank" class="slip-link">View</a>` 
@@ -1207,6 +1942,10 @@
                 totalReceivedDisplay.innerText = formatPlainNum(totalReceived);
                 totalSentDisplay.innerText = formatPlainNum(totalSent);
                 totalBalanceDisplay.innerText = formatPlainNum(totalReceived - totalSent);
+
+                if (isDrillDownMode) {
+                    drilldownBadgeAmount.innerText = formatPlainNum(totalSent);
+                }
             }
         }
 
@@ -1346,6 +2085,10 @@
 
             populateMonthFilterForAccount(accountFilter.value);
             renderData();
+
+            if (monthlySummaryView.style.display === 'flex') {
+                renderMonthlySummaryTable();
+            }
         });
 
         accountFilter.addEventListener('change', () => {
