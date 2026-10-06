@@ -24,7 +24,7 @@
         .container { display: flex; flex-direction: column; height: 100vh; max-width: 900px; margin: 0 auto; background: #ffffff; padding: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-y: auto; position: relative; }
         .fixed-header { flex-shrink: 0; background: #ffffff; padding-bottom: 8px; border-bottom: 2px solid #eee; position: relative; }
         
-        /* 3D Blue Brand Title (-1px updated) */
+        /* 3D Blue Brand Title */
         .brand-title-main {
             text-align: center;
             font-size: clamp(24px, 2.5vw + 14px, 32px);
@@ -55,7 +55,7 @@
             margin-top: 2px;
         }
 
-        /* Monthly Summary Button (+2px font size) */
+        /* Monthly Summary Button */
         .summary-btn {
             background-color: #fd7e14;
             color: #ffffff;
@@ -136,8 +136,8 @@
         }
         
         .table-portion.large-scroll { 
-            height: calc(100vh - 270px) !important; 
-            max-height: calc(100vh - 270px) !important; 
+            height: calc(100vh - 200px) !important; 
+            max-height: calc(100vh - 200px) !important; 
             flex: 1 1 auto; 
             margin-bottom: 10px;
             border: 1px solid #007bff;
@@ -271,7 +271,6 @@
             position: relative;
         }
 
-        /* 3D Blue Brand Header for Khan Petroleum Service in Month Summary (-1px updated) */
         .ms-brand-title {
             text-align: center;
             font-size: clamp(24px, 2.5vw + 14px, 32px);
@@ -501,12 +500,10 @@
             max-height: none !important;
             overflow: visible !important;
         }
-        /* Hide Select Month Box in PDF and JPG Export */
         .ms-clean-export-active .ms-month-row {
             display: none !important;
         }
 
-        /* JPG Export Boosted Font Styles */
         .ms-jpg-boost-mode .ms-brand-title {
             font-size: 42px !important;
         }
@@ -535,7 +532,6 @@
     <div class="container">
         <!-- Main Regular View Container -->
         <div id="main-view-wrapper">
-            <!-- 3D Blue Brand Header for Main Screen -->
             <div class="brand-title-main">Khan Petroleum Service</div>
 
             <div class="fixed-header">
@@ -719,7 +715,6 @@
 
         <!-- Monthly Summary View -->
         <div id="monthly-summary-view">
-            <!-- 3D Blue Brand Heading in Month Summary -->
             <div class="ms-brand-title">Khan Petroleum Service</div>
 
             <div class="ms-header-row">
@@ -750,19 +745,16 @@
             </div>
 
             <div>
-                <!-- Bar 1: Expenses -->
                 <div class="ms-footer-wrapper">
                     <span id="ms-footer-label" class="ms-footer-label-box">In Month of total Exp.</span>
                     <span id="ms-footer-amount" class="ms-footer-amount-box">0</span>
                 </div>
-                <!-- Bar 2: Till to date Remaining Payable -->
                 <div class="ms-footer-wrapper" style="margin-top: 5px;">
                     <span id="ms-remaining-label" class="ms-footer-label-box" style="background-color: #007bff;">Till to date Remaining Payable</span>
                     <span id="ms-remaining-amount" class="ms-footer-amount-box">0</span>
                 </div>
             </div>
 
-            <!-- Report Generated Footer for Monthly Summary Export -->
             <div id="ms-export-meta-footer" class="export-meta-footer">
                 Report Generated on: <span id="ms-export-timestamp-span">-</span>
             </div>
@@ -1121,7 +1113,6 @@
             return msMonthSelect.options[msMonthSelect.selectedIndex] ? msMonthSelect.options[msMonthSelect.selectedIndex].text : msMonthSelect.value;
         }
 
-        // Monthly Summary PDF Download (Title without brackets, month row hidden)
         if (msPdfBtn) {
             msPdfBtn.onclick = function() {
                 const el = document.getElementById('monthly-summary-view');
@@ -1132,7 +1123,6 @@
                 msJpgBtn.style.display = 'none';
                 msBackMainBtn.style.display = 'none';
                 
-                // Set clean title for export without brackets
                 if (msTitle) msTitle.innerText = `CEO's Expenses Detail of ${monthText}`;
                 el.classList.add('ms-clean-export-active');
 
@@ -1153,13 +1143,11 @@
                     msPdfBtn.style.display = 'inline-block';
                     msJpgBtn.style.display = 'inline-block';
                     msBackMainBtn.style.display = 'inline-block';
-                    // Restore simple title on live screen
                     if (msTitle) msTitle.innerText = "CEO's Expenses Detail";
                 });
             };
         }
 
-        // Monthly Summary JPG Download (Title without brackets, +3px Font Boost)
         if (msJpgBtn) {
             msJpgBtn.onclick = function() {
                 const el = document.getElementById('monthly-summary-view');
@@ -1170,7 +1158,6 @@
                 msJpgBtn.style.display = 'none';
                 msBackMainBtn.style.display = 'none';
                 
-                // Set clean title for export without brackets
                 if (msTitle) msTitle.innerText = `CEO's Expenses Detail of ${monthText}`;
                 
                 el.classList.add('ms-clean-export-active');
@@ -1192,7 +1179,6 @@
                     msPdfBtn.style.display = 'inline-block';
                     msJpgBtn.style.display = 'inline-block';
                     msBackMainBtn.style.display = 'inline-block';
-                    // Restore simple title on live screen
                     if (msTitle) msTitle.innerText = "CEO's Expenses Detail";
                 });
             };
@@ -1298,7 +1284,6 @@
             const mIndex = parseInt(parts[1], 10) - 1;
             const monthLabel = `${monthNames[mIndex]} ${year}`;
 
-            // Clean title on live screen without brackets or month clutter
             if (msTitle) {
                 msTitle.innerText = "CEO's Expenses Detail";
             }
@@ -1322,36 +1307,44 @@
                 searchToggleBtn.innerText = 'Cancel';
                 searchToggleBtn.classList.add('active');
                 
+                accountSelectRow.style.display = 'none';
                 monthFilterContainer.style.display = 'none';
 
-                if (accountFilter.value === 'CEO') {
-                    topPdfBtn.style.display = 'none';
-                    topJpgBtn.style.display = 'none';
-                } else {
-                    topPdfBtn.style.display = 'inline-block';
-                    topJpgBtn.style.display = 'inline-block';
-                }
+                topPdfBtn.style.display = 'inline-block';
+                topJpgBtn.style.display = 'inline-block';
+                rowPdfBtn.style.display = 'none';
+                rowJpgBtn.style.display = 'none';
 
-                searchInput.focus();
-
+                if (summaryTopBtn) summaryTopBtn.style.display = 'none';
+                if (ceoNetSummaryHeader) ceoNetSummaryHeader.style.display = 'none';
+                firstSummaryCards.style.display = 'none';
+                secondSummary.style.display = 'none';
                 ceoSelectedDetails.style.display = 'none';
                 ceoThirdDetails.style.display = 'none';
-                createdByContainer.style.display = 'block';
+
+                searchInput.focus();
             } else {
                 searchContainer.classList.remove('show');
                 searchToggleBtn.innerText = 'Search';
                 searchToggleBtn.classList.remove('active');
 
-                if (accountFilter.value !== 'CEO') {
-                    topPdfBtn.style.display = 'inline-block';
-                    topJpgBtn.style.display = 'inline-block';
-                } else {
+                accountSelectRow.style.display = 'flex';
+
+                if (accountFilter.value === 'CEO') {
                     topPdfBtn.style.display = 'none';
                     topJpgBtn.style.display = 'none';
+                    rowPdfBtn.style.display = 'inline-block';
+                    rowJpgBtn.style.display = 'inline-block';
+                    if (summaryTopBtn) summaryTopBtn.style.display = 'inline-flex';
+                } else {
+                    topPdfBtn.style.display = 'inline-block';
+                    topJpgBtn.style.display = 'inline-block';
+                    rowPdfBtn.style.display = 'none';
+                    rowJpgBtn.style.display = 'none';
+                    if (summaryTopBtn) summaryTopBtn.style.display = 'none';
                 }
 
                 searchInput.value = '';
-                createdByContainer.style.display = 'block';
             }
             renderData();
         };
@@ -1361,6 +1354,8 @@
         function prepareExportSummaries() {
             exportSummaryHolder.innerHTML = '';
             
+            if (isSearchActive) return;
+
             const selectedAccount = accountFilter.value;
             const card1 = firstSummaryCards.cloneNode(true);
             card1.style.display = 'flex';
@@ -1469,7 +1464,7 @@
                     mainExportTitle.innerText = `Account Detail ${selectedAccount} (${monthLabel})`;
                 } else if (isSearchActive) {
                     const searchVal = searchInput.value.trim();
-                    mainExportTitle.innerText = `${selectedAccount} Search (${searchVal || 'All'})`;
+                    mainExportTitle.innerText = `Detail for ${searchVal || 'Search'}`;
                 } else if (selectedAccount === 'CEO') {
                     mainExportTitle.innerText = `All Accounts detail for CEO`;
                 } else {
@@ -1478,7 +1473,7 @@
                 
                 prepareExportSummaries();
                 
-                if (selectedAccount !== 'CEO') {
+                if (selectedAccount !== 'CEO' && !isSearchActive) {
                     element.classList.add('other-accounts-export');
                 }
             }
@@ -1506,7 +1501,7 @@
 
             const opt = {
                 margin:       [8, 8, 8, 8],
-                filename:     `${fileName}_${selectedAccount}.pdf`,
+                filename:     `${fileName}_${isSearchActive ? 'Search' : selectedAccount}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
@@ -1539,7 +1534,7 @@
                     mainExportTitle.innerText = `Account Detail ${selectedAccount} (${monthLabel})`;
                 } else if (isSearchActive) {
                     const searchVal = searchInput.value.trim();
-                    mainExportTitle.innerText = `${selectedAccount} Search (${searchVal || 'All'})`;
+                    mainExportTitle.innerText = `Detail for ${searchVal || 'Search'}`;
                 } else if (selectedAccount === 'CEO') {
                     mainExportTitle.innerText = `All Accounts detail for CEO`;
                 } else {
@@ -1548,7 +1543,7 @@
                 
                 prepareExportSummaries();
                 
-                if (selectedAccount !== 'CEO') {
+                if (selectedAccount !== 'CEO' && !isSearchActive) {
                     element.classList.add('other-accounts-export');
                 }
             }
@@ -1576,7 +1571,7 @@
 
             html2canvas(element, { scale: 2, useCORS: true, letterRendering: true }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `${fileName}_${selectedAccount}.jpg`;
+                link.download = `${fileName}_${isSearchActive ? 'Search' : selectedAccount}.jpg`;
                 link.href = canvas.toDataURL('image/jpeg', 0.98);
                 link.click();
 
@@ -1605,7 +1600,7 @@
                 const desc = item.expense.desc ? item.expense.desc.trim() : '';
                 const date = item.expense.date || 'no-date';
 
-                if (!isSearchActive && !checkDateInRange(date, selectedYearMonth, fromDate, toDate)) {
+                if (!checkDateInRange(date, selectedYearMonth, fromDate, toDate)) {
                     return;
                 }
 
@@ -1671,6 +1666,8 @@
             });
 
             return {
+                amanatReceived: totalAmanatRec,
+                amanatReturn: totalAmanatRet,
                 remainingPayable: totalAmanatRec - totalAmanatRet
             };
         }
@@ -1682,7 +1679,69 @@
             const fromDateVal = fromDateFilter ? fromDateFilter.value : '';
             const toDateVal = toDateFilter ? toDateFilter.value : '';
 
-            // Handle Drill-Down Mode View & Scroll UI
+            createdByContainer.style.display = 'block';
+
+            // سرچ موڈ: پرانی فائل کے فارمیٹ کے مطابق رینڈرنگ
+            if (isSearchActive) {
+                pageTitle.innerText = "Search Details";
+                if (ceoNetSummaryHeader) ceoNetSummaryHeader.style.display = 'none';
+                firstSummaryCards.style.display = 'none';
+                secondSummary.style.display = 'none';
+                ceoSelectedDetails.style.display = 'none';
+                ceoThirdDetails.style.display = 'none';
+                monthFilterContainer.style.display = 'none';
+
+                tableContainer.classList.add('large-scroll');
+                tableContainer.classList.remove('drilldown-scroll');
+
+                tableHeaderRow.innerHTML = `
+                    <th style="width: 14%;">Date</th>
+                    <th style="width: 25%;">Account Name</th>
+                    <th style="width: 33%;">Description</th>
+                    <th style="width: 14%;" class="text-right">Amount</th>
+                    <th style="width: 14%;">Remarks</th>
+                `;
+
+                expenseList.innerHTML = '';
+
+                allExpensesData.forEach((item) => {
+                    const rawAccount = item.expense.account ? item.expense.account.trim() : 'Musharaf Amanat';
+                    const desc = item.expense.desc ? item.expense.desc.trim() : '';
+
+                    if (searchTerm) {
+                        const matchSearch = rawAccount.toLowerCase().includes(searchTerm) || 
+                                            desc.toLowerCase().includes(searchTerm);
+                        if (!matchSearch) return;
+                    }
+
+                    const expense = item.expense;
+                    const recVal = expense.received || 0;
+                    const sentVal = expense.sent || 0;
+                    let displayAmount = recVal > 0 ? recVal : sentVal;
+
+                    const isAc = isAcAccount(rawAccount);
+                    let remarkText = '';
+                    if (isAc) {
+                        remarkText = recVal > 0 ? 'Amount Rec.' : 'Amount Sent';
+                    } else {
+                        remarkText = recVal > 0 ? 'Amanat Rec.' : 'Amanat Return';
+                    }
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${formatDateToDMY(expense.date)}</td>
+                        <td style="text-align: left; font-weight: bold;">${rawAccount}</td>
+                        <td style="text-align: left;">${desc || '-'}</td>
+                        <td class="text-right" style="font-weight: bold; color: #007bff;">${formatPlainNum(displayAmount)}</td>
+                        <td style="font-size: 9px; font-weight: bold; color: #333;">${remarkText}</td>
+                    `;
+                    expenseList.appendChild(row);
+                });
+
+                return;
+            }
+
+            // عام ریگولر ویو اور ڈرل ڈاؤن ویو
             if (isDrillDownMode) {
                 drilldownHeader.style.display = 'flex';
                 drilldownBadge.style.display = 'flex';
@@ -1713,14 +1772,12 @@
                 firstSummaryCards.style.display = 'flex';
                 tableContainer.classList.remove('drilldown-scroll');
 
-                if (isSearchActive || isExcludedFromMonthFilter(selectedAccount)) {
+                if (isExcludedFromMonthFilter(selectedAccount)) {
                     monthFilterContainer.style.display = 'none';
                 } else {
                     monthFilterContainer.style.display = 'flex';
                 }
             }
-
-            createdByContainer.style.display = 'block';
 
             if (selectedAccount === 'CEO' && !isDrillDownMode) {
                 pageTitle.innerText = "CEO's Expenses Details";
@@ -1733,17 +1790,12 @@
                 rowJpgBtn.style.display = 'inline-block';
 
                 secondSummary.style.display = 'flex';
+                ceoSelectedDetails.style.display = 'block';
+                ceoThirdDetails.style.display = 'block';
+
                 cardOneLabel.innerText = 'Amount Received';
                 cardTwoLabel.innerText = 'Amount Sent';
                 cardThreeLabel.innerText = 'Total';
-                
-                if (!isSearchActive) {
-                    ceoSelectedDetails.style.display = 'block';
-                    ceoThirdDetails.style.display = 'block';
-                } else {
-                    ceoSelectedDetails.style.display = 'none';
-                    ceoThirdDetails.style.display = 'none';
-                }
 
                 tableContainer.classList.remove('large-scroll');
                 
@@ -1815,20 +1867,16 @@
             let count = 1;
 
             if (selectedAccount === 'CEO' && !isDrillDownMode) {
-                const autoCeoData = getAutoCeoDataByDate(searchTerm, currentSelectedMonth, fromDateVal, toDateVal);
+                const autoCeoData = getAutoCeoDataByDate('', currentSelectedMonth, fromDateVal, toDateVal);
                 const sortedDates = Object.keys(autoCeoData).sort();
 
                 let sumAmountReceived = 0;
                 let sumAmountSent = 0;
-                let sumAmanatReceived = 0;
-                let sumAmanatReturn = 0;
 
                 sortedDates.forEach(dateStr => {
                     const data = autoCeoData[dateStr];
                     sumAmountReceived += data.amountReceived;
                     sumAmountSent += data.amountSent;
-                    sumAmanatReceived += data.amanatReceived;
-                    sumAmanatReturn += data.amanatReturn;
 
                     const formattedDate = formatDateToDMY(dateStr);
                     const row = document.createElement('tr');
@@ -1866,17 +1914,7 @@
                     expenseList.appendChild(row);
                 });
 
-                let overallAmanat;
-                if (isSearchActive) {
-                    overallAmanat = {
-                        amanatReceived: sumAmanatReceived,
-                        amanatReturn: sumAmanatReturn,
-                        remainingPayable: sumAmanatReceived - sumAmanatReturn
-                    };
-                } else {
-                    overallAmanat = getOverallAmanatSummary();
-                }
-
+                const overallAmanat = getOverallAmanatSummary();
                 const totalBalance = sumAmountReceived - sumAmountSent;
                 const netValue = totalBalance - overallAmanat.remainingPayable;
 
@@ -1901,17 +1939,11 @@
 
                 allExpensesData.forEach((item) => {
                     const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
-                    const itemDesc = item.expense.desc ? item.expense.desc.toLowerCase() : '';
                     const itemDate = item.expense.date || '';
 
                     if (!isAccountMatch(itemAccount, selectedAccount)) return;
 
-                    if (searchTerm) {
-                        const matchSearch = itemDesc.includes(searchTerm) || itemAccount.includes(searchTerm);
-                        if (!matchSearch) return;
-                    }
-
-                    if (!isSearchActive && shouldFilterByMonth && !checkDateInRange(itemDate, activeMonth, fromDateVal, toDateVal)) {
+                    if (shouldFilterByMonth && !checkDateInRange(itemDate, activeMonth, fromDateVal, toDateVal)) {
                         return;
                     }
 
