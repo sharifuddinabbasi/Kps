@@ -24,21 +24,21 @@
         .container { display: flex; flex-direction: column; height: 100vh; max-width: 900px; margin: 0 auto; background: #ffffff; padding: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-y: auto; position: relative; }
         .fixed-header { flex-shrink: 0; background: #ffffff; padding-bottom: 8px; border-bottom: 2px solid #eee; position: relative; }
         
-        /* 3D Blue Brand Title */
+                        /* 3D Diesel Color Brand Title (Option B) */
         .brand-title-main {
             text-align: center;
-            font-size: clamp(20px, 2.5vw + 12px, 32px);
+            font-size: clamp(24px, 6vw, 34px);
             font-weight: 900;
-            color: #007bff;
+            color: #e5a108;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing:  0.5px;
             margin: 0 0 6px 0;
             white-space: nowrap;
             text-shadow: 
-                0 1px 0 #0056b3,
-                0 2px 0 #004085,
-                0 3px 0 #002752,
-                0 4px 5px rgba(0, 0, 0, 0.35);
+                0 1px 0 #b37402,
+                0 2px 0 #8c5700,
+                0 3px 0 #663d00,
+                0 4px 5px rgba(0, 0, 0, 0.45);
         }
 
         /* Top Action Buttons (Monthly Summary & Search) for CEO */
@@ -306,18 +306,18 @@
 
         .ms-brand-title {
             text-align: center;
-            font-size: clamp(20px, 2.5vw + 12px, 32px);
+            font-size: clamp(24px, 6vw, 34px);
             font-weight: 900;
-            color: #007bff;
+            color: #e5a108;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing:  0.5px;
             margin: 2px 0 8px 0;
             white-space: nowrap;
             text-shadow: 
-                0 1px 0 #0056b3,
-                0 2px 0 #004085,
-                0 3px 0 #002752,
-                0 4px 5px rgba(0, 0, 0, 0.35);
+                0 1px 0 #b37402,
+                0 2px 0 #8c5700,
+                0 3px 0 #663d00,
+                0 4px 5px rgba(0, 0, 0, 0.45);
         }
 
         .ms-header-row {
@@ -579,36 +579,83 @@
 
         /* PDF Export: Brand Title font +5px */
         .ms-pdf-boost-mode .ms-brand-title {
-            font-size: clamp(25px, 2.5vw + 17px, 37px) !important;
+            text-align: center;
+            font-size: clamp(24px, 6vw, 34px);
+            font-weight: 900;
+            color: #e5a108;
+            text-transform: uppercase;
+            letter-spacing:  0.5px;
+            margin: 2px 0 8px 0;
+            white-space: nowrap;
+            text-shadow: 
+                0 1px 0 #b37402,
+                0 2px 0 #8c5700,
+                0 3px 0 #663d00,
+                0 4px 5px rgba(0, 0, 0, 0.45);
         }
 
-        /* JPG Export Style */
+                /* JPG Export Style (Main Heading Unchanged, Others -3px) */
         .ms-jpg-boost-mode .ms-brand-title {
-            font-size: 38px !important;
+            text-align: center;
+            font-size: 48px !important;
+            font-weight: 900;
+            color: #e5a108;
+            text-transform: uppercase;
+            letter-spacing:  0.5px;
+            margin: 4px 0 10px 0;
+            white-space: nowrap;
+            text-shadow: 
+                0 1px 0 #b37402,
+                0 2px 0 #8c5700,
+                0 3px 0 #663d00,
+                0 4px 5px rgba(0, 0, 0, 0.45);
         }
         .ms-jpg-boost-mode .ms-title {
-            font-size: 29px !important;
+            font-size: 34px !important;
         }
         .ms-jpg-boost-mode .ms-table th,
         .ms-jpg-boost-mode .ms-table td {
-            font-size: 22.5px !important;
-            padding: 10px 8px !important;
+            font-size: 27.5px !important;
+            padding: 9px 8px !important;
         }
         .ms-jpg-boost-mode .ms-dues-table th,
         .ms-jpg-boost-mode .ms-dues-table td {
-            font-size: 20px !important;
+            font-size: 25px !important;
             padding: 8px 8px !important;
         }
+        /* Aligned perfectly: S.No (15%) + Account Name (55%) = 70% | Expenses (30%) */
+        .ms-jpg-boost-mode .ms-footer-wrapper {
+            display: flex !important;
+            width: 100% !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
         .ms-jpg-boost-mode .ms-footer-label-box {
-            font-size: 22.5px !important;
-            padding: 10px 12px !important;
+            margin-left: 0 !important;
+            width: 70% !important;
+            min-width: 70% !important;
+            max-width: 70% !important;
+            flex: 0 0 70% !important;
+            font-size: 24.5px !important;
+            padding: 9px 10px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            border-top-left-radius: 5px !important;
+            border-bottom-left-radius: 5px !important;
         }
         .ms-jpg-boost-mode .ms-footer-amount-box {
-            font-size: 23.5px !important;
-            padding: 10px 12px !important;
+            width: 30% !important;
+            min-width: 30% !important;
+            max-width: 30% !important;
+            flex: 0 0 30% !important;
+            font-size: 26px !important;
+            padding: 9px 6px !important;
+            white-space: nowrap !important;
+            border-top-right-radius: 5px !important;
+            border-bottom-right-radius: 5px !important;
         }
         .ms-jpg-boost-mode .export-meta-footer {
-            font-size: 17px !important;
+            font-size: 22px !important;
         }
     </style>
 </head>
