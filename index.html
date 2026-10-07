@@ -1194,7 +1194,6 @@
             if (toDateFilter) toDateFilter.value = '';
             if (searchInput) searchInput.value = '';
             
-            // Agar doosri list (dues table) se click ho to green patti hide rakhein
             window._isDuesDrillDown = isFromDues;
             
             renderData();
@@ -1412,7 +1411,6 @@
             msFooterLabel.innerText = `In Month of ${monthLabel} total Exp.`;
             msFooterAmount.innerText = formatPlainNum(totalMonthExpense);
 
-            // Render Dues Summary Table (Farooq Shah Amanat, Musharaf Amanat, Altaf Rent A Car)
             msDuesBody.innerHTML = '';
             let duesSno = 1;
 
@@ -1430,7 +1428,6 @@
 
                 let balance = recSum - sentSum;
 
-                // Agar balance 0 na ho sirf tabhi row show karein
                 if (balance !== 0) {
                     const tr = document.createElement('tr');
                     tr.className = 'ms-clickable-row';
@@ -1441,7 +1438,6 @@
                         <td class="dues-val clickable-val">${formatPlainNum(balance)}</td>
                     `;
                     tr.addEventListener('click', () => {
-                        // isFromDues = true bhej rahe hain taaki green patti hide rahe
                         window.openAccountDetailsFromSummary(accName, selectedYM, true);
                     });
                     msDuesBody.appendChild(tr);
@@ -1671,7 +1667,6 @@
 
                 hiddenRows.forEach(row => row.style.display = '');
 
-                // Export hone ke baad clone hui summaries ko hamesha saaf kar dein
                 if (exportSummaryHolder) exportSummaryHolder.innerHTML = '';
             });
         };
@@ -1740,7 +1735,6 @@
 
                 hiddenRows.forEach(row => row.style.display = '');
 
-                // Export hone ke baad clone hui summaries ko hamesha saaf kar dein
                 if (exportSummaryHolder) exportSummaryHolder.innerHTML = '';
             });
         };
@@ -1833,7 +1827,6 @@
         }
 
         function renderData() {
-            // Hamesha renderData chalte hi purana export holder empty kar dein
             if (exportSummaryHolder) exportSummaryHolder.innerHTML = '';
 
             const selectedAccount = accountFilter.value;
@@ -1844,7 +1837,7 @@
 
             createdByContainer.style.display = 'block';
 
-            // SEARCH MODE
+            // SEARCH MODE (UPDATED: Amount break issue fixed)
             if (isSearchActive) {
                 const isCeo = (selectedAccount === 'CEO');
                 pageTitle.innerText = isCeo ? "Search Details" : `Search: ${selectedAccount}`;
@@ -1862,11 +1855,11 @@
                 tableContainer.classList.remove('drilldown-scroll');
 
                 tableHeaderRow.innerHTML = `
-                    <th style="width: 14%;">Date</th>
-                    <th style="width: 25%;">Account Name</th>
-                    <th style="width: 33%;">Description</th>
-                    <th style="width: 14%;" class="text-right">Amount</th>
-                    <th style="width: 14%;">Remarks</th>
+                    <th style="width: 13%;">Date</th>
+                    <th style="width: 24%;">Account Name</th>
+                    <th style="width: 30%;">Description</th>
+                    <th style="width: 18%;" class="text-right">Amount</th>
+                    <th style="width: 15%;">Remarks</th>
                 `;
 
                 expenseList.innerHTML = '';
@@ -1906,7 +1899,7 @@
                         <td>${formatDateToDMY(expense.date)}</td>
                         <td style="text-align: left; font-weight: bold;">${rawAccount}</td>
                         <td style="text-align: left;">${desc || '-'}</td>
-                        <td class="text-right" style="font-weight: bold; color: #007bff;">${formatPlainNum(displayAmount)}</td>
+                        <td class="text-right" style="font-weight: bold; color: #007bff; white-space: nowrap;">${formatPlainNum(displayAmount)}</td>
                         <td style="font-size: 9px; font-weight: bold; color: #333;">${remarkText}</td>
                     `;
                     expenseList.appendChild(row);
@@ -1919,7 +1912,6 @@
             if (isDrillDownMode) {
                 drilldownHeader.style.display = 'flex';
                 
-                // Agar dues drill down hai to green patti hide hogi, warna show hogi
                 if (window._isDuesDrillDown) {
                     drilldownBadge.style.display = 'none';
                 } else {
