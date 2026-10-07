@@ -27,12 +27,13 @@
         /* 3D Blue Brand Title */
         .brand-title-main {
             text-align: center;
-            font-size: clamp(24px, 2.5vw + 14px, 32px);
+            font-size: clamp(20px, 2.5vw + 12px, 32px);
             font-weight: 900;
             color: #007bff;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin: 0 0 6px 0;
+            white-space: nowrap;
             text-shadow: 
                 0 1px 0 #0056b3,
                 0 2px 0 #004085,
@@ -40,20 +41,27 @@
                 0 4px 5px rgba(0, 0, 0, 0.35);
         }
 
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
-        h1 { color: #333; font-size: clamp(17px, 1.2vw + 10px, 22px); margin: 0; }
-        
-        .header-right-btns { 
-            display: flex; 
-            align-items: center; 
-            gap: 6px; 
+        /* Top Action Buttons (Monthly Summary & Search) for CEO */
+        .top-action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 8px;
+            width: 100%;
         }
 
-        .ceo-btns-mode {
-            width: 100% !important;
-            justify-content: space-between !important;
-            margin-top: 2px;
+        /* Account Title line under Service */
+        .header-top { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 8px; 
+            flex-wrap: nowrap; 
+            gap: 8px; 
+            width: 100%;
         }
+        h1 { color: #333; font-size: clamp(17px, 1.2vw + 10px, 22px); margin: 0; }
 
         /* Monthly Summary Button */
         .summary-btn {
@@ -74,18 +82,41 @@
             background-color: #e36a02;
         }
 
-        .account-select-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-        .account-select { padding: 4px 8px; font-size: clamp(12px, 0.8vw + 8px, 15px); border-radius: 4px; border: 1px solid #007bff; background-color: #e9f5ff; font-weight: bold; color: #007bff; cursor: pointer; }
+        .account-select-group { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            width: 100%;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .account-select-group label {
+            font-size: 12px; 
+            font-weight: bold; 
+            color: #333;
+            white-space: nowrap;
+        }
+        .account-select { 
+            padding: 4px 8px; 
+            font-size: clamp(12px, 0.8vw + 8px, 15px); 
+            border-radius: 4px; 
+            border: 1px solid #007bff; 
+            background-color: #e9f5ff; 
+            font-weight: bold; 
+            color: #007bff; 
+            cursor: pointer; 
+        }
 
         .search-toggle-btn { 
             background-color: #007bff; 
             color: white; 
             border: none; 
-            padding: 4px 10px; 
+            padding: 5px 14px; 
             border-radius: 4px; 
             cursor: pointer; 
-            font-size: clamp(11px, 0.7vw + 7px, 14px); 
+            font-size: clamp(12px, 0.7vw + 8px, 14.5px); 
             font-weight: bold; 
+            white-space: nowrap;
         }
         .search-toggle-btn:hover { background-color: #0056b3; }
         .search-toggle-btn.active { background-color: #dc3545; }
@@ -94,6 +125,8 @@
         .search-container.show { display: flex; gap: 8px; align-items: center; }
         .search-box { padding: 6px 10px; font-size: clamp(12px, 0.8vw + 8px, 15px); border-radius: 4px; border: 1px solid #ccc; flex: 1; outline: none; }
         .search-box:focus { border-color: #007bff; }
+        .search-cancel-btn { background-color: #dc3545; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-size: clamp(12px, 0.7vw + 8px, 14px); font-weight: bold; cursor: pointer; white-space: nowrap; }
+        .search-cancel-btn:hover { background-color: #bd2130; }
 
         .summary { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 5px; }
         .card { flex: 1 1 calc(33.333% - 8px); min-width: 80px; padding: 6px 4px; border-radius: 6px; text-align: center; color: white; }
@@ -132,7 +165,7 @@
             border-bottom: 1px solid #ddd; 
             width: 100%; 
             position: relative; 
-            -webkit-overflow-scrolling: touch;
+            -webkit-overflow-scrolling: touch; 
         }
         
         .table-portion.large-scroll { 
@@ -273,12 +306,13 @@
 
         .ms-brand-title {
             text-align: center;
-            font-size: clamp(24px, 2.5vw + 14px, 32px);
+            font-size: clamp(20px, 2.5vw + 12px, 32px);
             font-weight: 900;
             color: #007bff;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin: 2px 0 8px 0;
+            white-space: nowrap;
             text-shadow: 
                 0 1px 0 #0056b3,
                 0 2px 0 #004085,
@@ -353,7 +387,7 @@
             border-radius: 4px;
             overflow-x: auto;
             overflow-y: auto;
-            max-height: calc(100vh - 290px);
+            max-height: calc(100vh - 350px);
             margin-bottom: 8px;
             -webkit-overflow-scrolling: touch;
             position: relative;
@@ -390,17 +424,50 @@
         .ms-account-name-cell {
             text-align: left;
             font-weight: bold;
-            color: #007bff;
+            color: #333 !important;
             text-decoration: none !important;
             letter-spacing: 0.2px;
         }
         .ms-table td.clickable-val {
-            color: #007bff;
+            color: #dc3545 !important;
             font-weight: bold;
             text-align: right;
             cursor: pointer;
             text-decoration: none !important;
             letter-spacing: 0.2px;
+        }
+
+        /* Dues Summary Table Styling */
+        .ms-dues-table-container {
+            border: 1px solid #28a745;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin-bottom: 6px;
+            margin-top: 50px;
+            position: relative;
+            z-index: 1;
+        }
+        .ms-dues-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        .ms-dues-table th, .ms-dues-table td {
+            border: 1px solid #ddd;
+            padding: clamp(5px, 0.5vw + 2px, 7px) clamp(4px, 0.4vw + 2px, 8px);
+            font-size: clamp(11px, 0.7vw + 6px, 13.5px);
+            vertical-align: middle;
+        }
+        .ms-dues-table th {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            font-weight: bold;
+        }
+        .ms-dues-table td.dues-val {
+            font-weight: bold;
+            text-align: right;
+            color: #dc3545;
+            cursor: pointer;
         }
         
         .ms-footer-wrapper {
@@ -484,9 +551,13 @@
             justify-content: flex-end;
         }
 
+        /* Clean Export Mode (Full Height to prevent cutting) */
         .ms-clean-export-active {
             width: 720px !important;
             max-width: 720px !important;
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
             background: #ffffff !important;
             padding: 15px !important;
             font-family: Arial, Helvetica, sans-serif !important;
@@ -496,16 +567,24 @@
             letter-spacing: normal !important;
             word-spacing: normal !important;
         }
-        .ms-clean-export-active .ms-table-container {
+        .ms-clean-export-active .ms-table-container,
+        .ms-clean-export-active .ms-dues-table-container {
             max-height: none !important;
             overflow: visible !important;
+            height: auto !important;
         }
         .ms-clean-export-active .ms-month-row {
             display: none !important;
         }
 
+        /* PDF Export: Brand Title font +5px */
+        .ms-pdf-boost-mode .ms-brand-title {
+            font-size: clamp(25px, 2.5vw + 17px, 37px) !important;
+        }
+
+        /* JPG Export Style */
         .ms-jpg-boost-mode .ms-brand-title {
-            font-size: 42px !important;
+            font-size: 38px !important;
         }
         .ms-jpg-boost-mode .ms-title {
             font-size: 29px !important;
@@ -514,6 +593,11 @@
         .ms-jpg-boost-mode .ms-table td {
             font-size: 22.5px !important;
             padding: 10px 8px !important;
+        }
+        .ms-jpg-boost-mode .ms-dues-table th,
+        .ms-jpg-boost-mode .ms-dues-table td {
+            font-size: 20px !important;
+            padding: 8px 8px !important;
         }
         .ms-jpg-boost-mode .ms-footer-label-box {
             font-size: 22.5px !important;
@@ -547,6 +631,13 @@
                     <div id="drilldown-badge-amount" class="drilldown-badge-amount">0</div>
                 </div>
 
+                <!-- Top Buttons for CEO Account (Monthly Summary & Search) -->
+                <div id="top-action-bar" class="top-action-bar">
+                    <button type="button" id="summary-top-btn" class="summary-btn">Monthly Summary</button>
+                    <button type="button" id="search-toggle-btn-top" class="search-toggle-btn">Search</button>
+                </div>
+
+                <!-- Account Name Row (Directly below Khan Petroleum Service) -->
                 <div id="default-header-top" class="header-top">
                     <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                         <h1 id="page-title">CEO's Expenses Details</h1>
@@ -554,16 +645,12 @@
                             Total: <span id="ceo-net-value">0</span>
                         </div>
                     </div>
-                    <div id="header-right-btns-box" class="header-right-btns ceo-btns-mode">
-                        <button type="button" id="summary-top-btn" class="summary-btn">Monthly Summary</button>
-                        <button type="button" id="search-toggle-btn" class="search-toggle-btn">Search</button>
-                        <button type="button" id="top-pdf-btn" class="pdf-btn" style="display: none;">PDF</button>
-                        <button type="button" id="top-jpg-btn" class="jpg-btn" style="display: none;">JPG</button>
-                    </div>
+                    <button type="button" id="search-toggle-btn-title-right" class="search-toggle-btn" style="display: none;">Search</button>
                 </div>
 
-                <div id="account-select-row" class="account-select-group" style="margin-bottom: 8px;">
-                    <label for="account-filter" style="font-size: 12px; font-weight: bold; color: #333;">Select Account: </label>
+                <!-- Select Account Dropdown with PDF & JPG -->
+                <div id="account-select-row" class="account-select-group">
+                    <label for="account-filter">Select Account: </label>
                     <select id="account-filter" class="account-select">
                         <option value="CEO">CEO</option>
                         <option value="Musharaf Amanat">Musharaf Amanat</option>
@@ -583,8 +670,10 @@
                     <button type="button" id="row-jpg-btn" class="jpg-btn">JPG</button>
                 </div>
 
+                <!-- Search Input with dedicated Cancel Button -->
                 <div id="search-container" class="search-container">
                     <input type="text" id="search-input" class="search-box" placeholder="Lafz ya detail likhein...">
+                    <button type="button" id="search-inline-cancel-btn" class="search-cancel-btn">Cancel</button>
                 </div>
                 
                 <div class="summary" id="first-summary-cards">
@@ -749,7 +838,22 @@
                     <span id="ms-footer-label" class="ms-footer-label-box">In Month of total Exp.</span>
                     <span id="ms-footer-amount" class="ms-footer-amount-box">0</span>
                 </div>
-                <div class="ms-footer-wrapper" style="margin-top: 5px;">
+
+                <!-- Dues Summary Table (Farooq Shah Amanat, Musharaf Amanat, Altaf Rent A Car) - 50px gap -->
+                <div id="ms-dues-container" class="ms-dues-table-container">
+                    <table class="ms-dues-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%; text-align: center;">Sr.No.</th>
+                                <th style="width: 55%; text-align: left;">Account Name</th>
+                                <th style="width: 30%; text-align: right;">Dues</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ms-dues-body"></tbody>
+                    </table>
+                </div>
+
+                <div class="ms-footer-wrapper">
                     <span id="ms-remaining-label" class="ms-footer-label-box" style="background-color: #007bff;">Till to date Remaining Payable</span>
                     <span id="ms-remaining-amount" class="ms-footer-amount-box">0</span>
                 </div>
@@ -814,12 +918,12 @@
 
         const searchInput = document.getElementById('search-input');
         const searchContainer = document.getElementById('search-container');
-        const searchToggleBtn = document.getElementById('search-toggle-btn');
+        const searchToggleBtnTop = document.getElementById('search-toggle-btn-top');
+        const searchToggleBtnTitleRight = document.getElementById('search-toggle-btn-title-right');
+        const searchInlineCancelBtn = document.getElementById('search-inline-cancel-btn');
         const summaryTopBtn = document.getElementById('summary-top-btn');
-        const headerRightBtnsBox = document.getElementById('header-right-btns-box');
+        const topActionBar = document.getElementById('top-action-bar');
 
-        const topPdfBtn = document.getElementById('top-pdf-btn');
-        const topJpgBtn = document.getElementById('top-jpg-btn');
         const rowPdfBtn = document.getElementById('row-pdf-btn');
         const rowJpgBtn = document.getElementById('row-jpg-btn');
         
@@ -882,6 +986,8 @@
         const msTitle = document.getElementById('ms-title');
         const msMonthSelect = document.getElementById('ms-month-select');
         const msTableBody = document.getElementById('ms-table-body');
+        const msDuesContainer = document.getElementById('ms-dues-container');
+        const msDuesBody = document.getElementById('ms-dues-body');
         const msFooterLabel = document.getElementById('ms-footer-label');
         const msFooterAmount = document.getElementById('ms-footer-amount');
         const msRemainingAmount = document.getElementById('ms-remaining-amount');
@@ -905,6 +1011,12 @@
             'Bank 02% Musharaf',
             'Depo Bachat',
             'Office 02% Arif'
+        ];
+
+        const duesTargetAccounts = [
+            'Farooq Shah Amanat',
+            'Musharaf Amanat',
+            'Altaf Rent A Car'
         ];
 
         function getSystemCurrentYearMonth() {
@@ -1066,7 +1178,7 @@
             renderData();
         };
 
-        window.openAccountDetailsFromSummary = function(accName, ym) {
+        window.openAccountDetailsFromSummary = function(accName, ym, isFromDues = false) {
             isDrillDownMode = true;
             drillDownSelectedYM = ym;
             monthlySummaryView.style.display = 'none';
@@ -1082,12 +1194,16 @@
             if (toDateFilter) toDateFilter.value = '';
             if (searchInput) searchInput.value = '';
             
+            // Agar doosri list (dues table) se click ho to green patti hide rakhein
+            window._isDuesDrillDown = isFromDues;
+            
             renderData();
         };
 
         window.exitDrillDownView = function() {
             const monthToKeep = drillDownSelectedYM || (msMonthSelect ? msMonthSelect.value : '');
             isDrillDownMode = false;
+            window._isDuesDrillDown = false;
             accountFilter.value = 'CEO';
             populateMonthFilterForAccount('CEO');
             renderData();
@@ -1125,6 +1241,7 @@
                 
                 if (msTitle) msTitle.innerText = `CEO's Expenses Detail of ${monthText}`;
                 el.classList.add('ms-clean-export-active');
+                el.classList.add('ms-pdf-boost-mode');
 
                 const opt = {
                     margin:       [8, 8, 8, 8],
@@ -1134,12 +1251,14 @@
                         scale: 2, 
                         useCORS: true, 
                         letterRendering: true,
-                        width: 720
+                        width: 720,
+                        scrollY: 0
                     },
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
                 };
                 html2pdf().set(opt).from(el).save().then(() => {
                     el.classList.remove('ms-clean-export-active');
+                    el.classList.remove('ms-pdf-boost-mode');
                     msPdfBtn.style.display = 'inline-block';
                     msJpgBtn.style.display = 'inline-block';
                     msBackMainBtn.style.display = 'inline-block';
@@ -1167,7 +1286,9 @@
                     scale: 2, 
                     useCORS: true, 
                     letterRendering: true,
-                    width: 720 
+                    width: 720,
+                    scrollY: 0,
+                    windowHeight: el.scrollHeight + 100
                 }).then(canvas => {
                     const link = document.createElement('a');
                     link.download = `CEO_Expenses_Summary_${msMonthSelect.value}.jpg`;
@@ -1218,7 +1339,7 @@
             } else if (sorted.includes(sysYM)) {
                 msMonthSelect.value = sysYM;
             } else if (sorted.length > 0) {
-                msMonthSelect.value = sorted[sorted.length - 1];
+                monthFilter.value = sorted[sorted.length - 1];
             }
         }
 
@@ -1269,7 +1390,7 @@
                         <td class="clickable-val">${formatPlainNum(expenseVal)}</td>
                     `;
                     tr.addEventListener('click', () => {
-                        window.openAccountDetailsFromSummary(acc, selectedYM);
+                        window.openAccountDetailsFromSummary(acc, selectedYM, false);
                     });
                     msTableBody.appendChild(tr);
                 }
@@ -1291,6 +1412,48 @@
             msFooterLabel.innerText = `In Month of ${monthLabel} total Exp.`;
             msFooterAmount.innerText = formatPlainNum(totalMonthExpense);
 
+            // Render Dues Summary Table (Farooq Shah Amanat, Musharaf Amanat, Altaf Rent A Car)
+            msDuesBody.innerHTML = '';
+            let duesSno = 1;
+
+            duesTargetAccounts.forEach(accName => {
+                let recSum = 0;
+                let sentSum = 0;
+
+                allExpensesData.forEach(item => {
+                    const rawAcc = item.expense.account ? item.expense.account.trim() : '';
+                    if (isAccountMatch(rawAcc, accName)) {
+                        recSum += item.expense.received || 0;
+                        sentSum += item.expense.sent || 0;
+                    }
+                });
+
+                let balance = recSum - sentSum;
+
+                // Agar balance 0 na ho sirf tabhi row show karein
+                if (balance !== 0) {
+                    const tr = document.createElement('tr');
+                    tr.className = 'ms-clickable-row';
+                    tr.title = `Click karein ${accName} ki details dekhne ke liye`;
+                    tr.innerHTML = `
+                        <td style="text-align: center; font-weight: bold; color: #333;">${duesSno++}</td>
+                        <td class="ms-account-name-cell">${accName}</td>
+                        <td class="dues-val clickable-val">${formatPlainNum(balance)}</td>
+                    `;
+                    tr.addEventListener('click', () => {
+                        // isFromDues = true bhej rahe hain taaki green patti hide rahe
+                        window.openAccountDetailsFromSummary(accName, selectedYM, true);
+                    });
+                    msDuesBody.appendChild(tr);
+                }
+            });
+
+            if (duesSno === 1) {
+                msDuesContainer.style.display = 'none';
+            } else {
+                msDuesContainer.style.display = 'block';
+            }
+
             const overallAmanat = getOverallAmanatSummary();
             if (msRemainingAmount) {
                 msRemainingAmount.innerText = formatPlainNum(overallAmanat.remainingPayable);
@@ -1302,20 +1465,20 @@
         window.toggleSearchMode = function() {
             isSearchActive = !isSearchActive;
 
+            const isCeo = (accountFilter.value === 'CEO');
+            const activeBtn = isCeo ? searchToggleBtnTop : searchToggleBtnTitleRight;
+
             if (isSearchActive) {
                 searchContainer.classList.add('show');
-                searchToggleBtn.innerText = 'Cancel';
-                searchToggleBtn.classList.add('active');
+                if (activeBtn) {
+                    activeBtn.innerText = 'Cancel';
+                    activeBtn.classList.add('active');
+                }
                 
                 accountSelectRow.style.display = 'none';
                 monthFilterContainer.style.display = 'none';
+                if (topActionBar) topActionBar.style.display = 'none';
 
-                topPdfBtn.style.display = 'inline-block';
-                topJpgBtn.style.display = 'inline-block';
-                rowPdfBtn.style.display = 'none';
-                rowJpgBtn.style.display = 'none';
-
-                if (summaryTopBtn) summaryTopBtn.style.display = 'none';
                 if (ceoNetSummaryHeader) ceoNetSummaryHeader.style.display = 'none';
                 firstSummaryCards.style.display = 'none';
                 secondSummary.style.display = 'none';
@@ -1325,31 +1488,24 @@
                 searchInput.focus();
             } else {
                 searchContainer.classList.remove('show');
-                searchToggleBtn.innerText = 'Search';
-                searchToggleBtn.classList.remove('active');
-
-                accountSelectRow.style.display = 'flex';
-
-                if (accountFilter.value === 'CEO') {
-                    topPdfBtn.style.display = 'none';
-                    topJpgBtn.style.display = 'none';
-                    rowPdfBtn.style.display = 'inline-block';
-                    rowJpgBtn.style.display = 'inline-block';
-                    if (summaryTopBtn) summaryTopBtn.style.display = 'inline-flex';
-                } else {
-                    topPdfBtn.style.display = 'inline-block';
-                    topJpgBtn.style.display = 'inline-block';
-                    rowPdfBtn.style.display = 'none';
-                    rowJpgBtn.style.display = 'none';
-                    if (summaryTopBtn) summaryTopBtn.style.display = 'none';
+                if (searchToggleBtnTop) {
+                    searchToggleBtnTop.innerText = 'Search';
+                    searchToggleBtnTop.classList.remove('active');
+                }
+                if (searchToggleBtnTitleRight) {
+                    searchToggleBtnTitleRight.innerText = 'Search';
+                    searchToggleBtnTitleRight.classList.remove('active');
                 }
 
+                accountSelectRow.style.display = 'flex';
                 searchInput.value = '';
             }
             renderData();
         };
 
-        if (searchToggleBtn) searchToggleBtn.onclick = window.toggleSearchMode;
+        if (searchToggleBtnTop) searchToggleBtnTop.onclick = window.toggleSearchMode;
+        if (searchToggleBtnTitleRight) searchToggleBtnTitleRight.onclick = window.toggleSearchMode;
+        if (searchInlineCancelBtn) searchInlineCancelBtn.onclick = window.toggleSearchMode;
 
         function prepareExportSummaries() {
             exportSummaryHolder.innerHTML = '';
@@ -1423,8 +1579,6 @@
         if (modalBtnAll) modalBtnAll.onclick = window.processExportAll;
         if (modalBtnCancel) modalBtnCancel.onclick = window.closeExportModal;
 
-        if (topPdfBtn) topPdfBtn.onclick = () => window.triggerDownload('table-container', 'Account_Details', 'pdf');
-        if (topJpgBtn) topJpgBtn.onclick = () => window.triggerDownload('table-container', 'Account_Details', 'jpg');
         if (rowPdfBtn) rowPdfBtn.onclick = () => window.triggerDownload('table-container', 'Account_Details', 'pdf');
         if (rowJpgBtn) rowJpgBtn.onclick = () => window.triggerDownload('table-container', 'Account_Details', 'jpg');
 
@@ -1516,6 +1670,9 @@
                 element.classList.remove('other-accounts-export');
 
                 hiddenRows.forEach(row => row.style.display = '');
+
+                // Export hone ke baad clone hui summaries ko hamesha saaf kar dein
+                if (exportSummaryHolder) exportSummaryHolder.innerHTML = '';
             });
         };
 
@@ -1582,6 +1739,9 @@
                 element.classList.remove('other-accounts-export');
 
                 hiddenRows.forEach(row => row.style.display = '');
+
+                // Export hone ke baad clone hui summaries ko hamesha saaf kar dein
+                if (exportSummaryHolder) exportSummaryHolder.innerHTML = '';
             });
         };
 
@@ -1673,6 +1833,9 @@
         }
 
         function renderData() {
+            // Hamesha renderData chalte hi purana export holder empty kar dein
+            if (exportSummaryHolder) exportSummaryHolder.innerHTML = '';
+
             const selectedAccount = accountFilter.value;
             const searchTerm = searchInput.value.trim().toLowerCase();
             const currentSelectedMonth = monthFilter ? monthFilter.value : 'all';
@@ -1681,15 +1844,19 @@
 
             createdByContainer.style.display = 'block';
 
-            // سرچ موڈ: پرانی فائل کے فارمیٹ کے مطابق رینڈرنگ
+            // SEARCH MODE
             if (isSearchActive) {
-                pageTitle.innerText = "Search Details";
+                const isCeo = (selectedAccount === 'CEO');
+                pageTitle.innerText = isCeo ? "Search Details" : `Search: ${selectedAccount}`;
+
                 if (ceoNetSummaryHeader) ceoNetSummaryHeader.style.display = 'none';
                 firstSummaryCards.style.display = 'none';
                 secondSummary.style.display = 'none';
                 ceoSelectedDetails.style.display = 'none';
                 ceoThirdDetails.style.display = 'none';
                 monthFilterContainer.style.display = 'none';
+                if (topActionBar) topActionBar.style.display = 'none';
+                if (searchToggleBtnTitleRight) searchToggleBtnTitleRight.style.display = 'none';
 
                 tableContainer.classList.add('large-scroll');
                 tableContainer.classList.remove('drilldown-scroll');
@@ -1708,6 +1875,10 @@
                     const rawAccount = item.expense.account ? item.expense.account.trim() : 'Musharaf Amanat';
                     const desc = item.expense.desc ? item.expense.desc.trim() : '';
 
+                    if (!isCeo && !isAccountMatch(rawAccount, selectedAccount)) {
+                        return;
+                    }
+
                     if (searchTerm) {
                         const matchSearch = rawAccount.toLowerCase().includes(searchTerm) || 
                                             desc.toLowerCase().includes(searchTerm);
@@ -1717,6 +1888,9 @@
                     const expense = item.expense;
                     const recVal = expense.received || 0;
                     const sentVal = expense.sent || 0;
+                    
+                    if (recVal === 0 && sentVal === 0) return;
+
                     let displayAmount = recVal > 0 ? recVal : sentVal;
 
                     const isAc = isAcAccount(rawAccount);
@@ -1741,11 +1915,20 @@
                 return;
             }
 
-            // عام ریگولر ویو اور ڈرل ڈاؤن ویو
+            // DRILLDOWN / REGULAR VIEW
             if (isDrillDownMode) {
                 drilldownHeader.style.display = 'flex';
-                drilldownBadge.style.display = 'flex';
+                
+                // Agar dues drill down hai to green patti hide hogi, warna show hogi
+                if (window._isDuesDrillDown) {
+                    drilldownBadge.style.display = 'none';
+                } else {
+                    drilldownBadge.style.display = 'flex';
+                }
+
                 defaultHeaderTop.style.display = 'none';
+                if (topActionBar) topActionBar.style.display = 'none';
+                if (searchToggleBtnTitleRight) searchToggleBtnTitleRight.style.display = 'none';
                 accountSelectRow.style.display = 'none';
                 firstSummaryCards.style.display = 'none';
                 secondSummary.style.display = 'none';
@@ -1780,14 +1963,10 @@
             }
 
             if (selectedAccount === 'CEO' && !isDrillDownMode) {
+                // CEO VIEW
+                if (topActionBar) topActionBar.style.display = 'flex';
+                if (searchToggleBtnTitleRight) searchToggleBtnTitleRight.style.display = 'none';
                 pageTitle.innerText = "CEO's Expenses Details";
-                headerRightBtnsBox.classList.add('ceo-btns-mode');
-                summaryTopBtn.style.display = 'inline-flex';
-                
-                topPdfBtn.style.display = 'none';
-                topJpgBtn.style.display = 'none';
-                rowPdfBtn.style.display = 'inline-block';
-                rowJpgBtn.style.display = 'inline-block';
 
                 secondSummary.style.display = 'flex';
                 ceoSelectedDetails.style.display = 'block';
@@ -1808,15 +1987,11 @@
                     <th style="width: 20%;" class="text-right">Amanat<br>Return</th>
                 `;
             } else {
+                // OTHER ACCOUNTS VIEW
                 if (!isDrillDownMode) {
                     pageTitle.innerText = `Detail. ${selectedAccount}`;
-                    headerRightBtnsBox.classList.remove('ceo-btns-mode');
-                    summaryTopBtn.style.display = 'none';
-
-                    topPdfBtn.style.display = 'inline-block';
-                    topJpgBtn.style.display = 'inline-block';
-                    rowPdfBtn.style.display = 'none';
-                    rowJpgBtn.style.display = 'none';
+                    if (topActionBar) topActionBar.style.display = 'none';
+                    if (searchToggleBtnTitleRight) searchToggleBtnTitleRight.style.display = 'inline-block';
 
                     secondSummary.style.display = 'none';
                     ceoSelectedDetails.style.display = 'none';
@@ -2124,6 +2299,7 @@
         });
 
         accountFilter.addEventListener('change', () => {
+            if (exportSummaryHolder) exportSummaryHolder.innerHTML = '';
             populateMonthFilterForAccount(accountFilter.value);
             if (fromDateFilter) fromDateFilter.value = '';
             if (toDateFilter) toDateFilter.value = '';
