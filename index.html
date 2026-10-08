@@ -383,7 +383,7 @@
             outline: none;
         }
         .ms-table-container {
-            border: 1px solid #007bff;
+            border: 1px solid #28a745;
             border-radius: 4px;
             overflow-x: auto;
             overflow-y: auto;
@@ -406,11 +406,13 @@
             letter-spacing: 0.2px;
         }
         .ms-table th {
-            background-color: #f2f2f2;
+            background-color: #e8f5e9;
+            color: #2e7d32;
             font-weight: bold;
             position: sticky;
             top: 0;
             z-index: 10;
+            text-shadow: 0 1px 0 #ffffff, 0 2px 2px rgba(46, 125, 50, 0.35);
         }
         tr:nth-child(even) { background-color: #f9f9f9; }
         tr.ms-clickable-row {
@@ -427,6 +429,7 @@
             color: #333 !important;
             text-decoration: none !important;
             letter-spacing: 0.2px;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 1px rgba(0, 0, 0, 0.2);
         }
         .ms-table td.clickable-val {
             color: #dc3545 !important;
@@ -435,11 +438,12 @@
             cursor: pointer;
             text-decoration: none !important;
             letter-spacing: 0.2px;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 1px 2px rgba(220, 53, 69, 0.25);
         }
 
         /* Dues Summary Table Styling */
         .ms-dues-table-container {
-            border: 1px solid #28a745;
+            border: 1px solid #007bff;
             border-radius: 4px;
             overflow-x: auto;
             margin-bottom: 6px;
@@ -459,15 +463,17 @@
             vertical-align: middle;
         }
         .ms-dues-table th {
-            background-color: #e8f5e9;
-            color: #2e7d32;
+            background-color: #e9f5ff;
+            color: #007bff;
             font-weight: bold;
+            text-shadow: 0 1px 0 #ffffff, 0 2px 2px rgba(0, 123, 255, 0.35);
         }
         .ms-dues-table td.dues-val {
             font-weight: bold;
             text-align: right;
             color: #dc3545;
             cursor: pointer;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 1px 2px rgba(220, 53, 69, 0.25);
         }
         
         .ms-footer-wrapper {
@@ -493,13 +499,14 @@
             text-align: left;
             letter-spacing: 0.2px;
             white-space: nowrap;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7), 0 2px 3px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 255, 255, 0.5);
         }
         .ms-footer-amount-box {
             background-color: #dc3545;
             color: #ffffff;
             font-size: clamp(12.5px, 0.9vw + 8px, 15px);
             font-weight: bold;
-            padding: 7px 8px;
+            padding: 7px 14px;
             width: 30%;
             min-width: 30%;
             max-width: 30%;
@@ -507,8 +514,10 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            word-break: break-all;
+            word-break: normal;
+            white-space: nowrap;
             letter-spacing: 0.2px;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7), 0 2px 4px rgba(0, 0, 0, 0.7), 0 0 10px rgba(255, 255, 255, 0.5);
         }
 
         .drilldown-top-bar {
@@ -642,6 +651,7 @@
             overflow: hidden !important;
             border-top-left-radius: 5px !important;
             border-bottom-left-radius: 5px !important;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 4px rgba(0, 0, 0, 0.65), 0 0 12px rgba(255, 255, 255, 0.6) !important;
         }
         .ms-jpg-boost-mode .ms-footer-amount-box {
             width: 30% !important;
@@ -649,10 +659,11 @@
             max-width: 30% !important;
             flex: 0 0 30% !important;
             font-size: 26px !important;
-            padding: 9px 6px !important;
+            padding: 9px 12px !important;
             white-space: nowrap !important;
             border-top-right-radius: 5px !important;
             border-bottom-right-radius: 5px !important;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.6) !important;
         }
         .ms-jpg-boost-mode .export-meta-footer {
             font-size: 22px !important;
@@ -901,7 +912,7 @@
                 </div>
 
                 <div class="ms-footer-wrapper">
-                    <span id="ms-remaining-label" class="ms-footer-label-box" style="background-color: #007bff;">Till to date Remaining Payable</span>
+                    <span id="ms-remaining-label" class="ms-footer-label-box" style="background-color: #007bff;">In Month of total Dues</span>
                     <span id="ms-remaining-amount" class="ms-footer-amount-box">0</span>
                 </div>
             </div>
@@ -1037,6 +1048,7 @@
         const msDuesBody = document.getElementById('ms-dues-body');
         const msFooterLabel = document.getElementById('ms-footer-label');
         const msFooterAmount = document.getElementById('ms-footer-amount');
+        const msRemainingLabel = document.getElementById('ms-remaining-label');
         const msRemainingAmount = document.getElementById('ms-remaining-amount');
         const msBackMainBtn = document.getElementById('ms-back-main-btn');
         const msPdfBtn = document.getElementById('ms-pdf-btn');
@@ -1129,8 +1141,9 @@
             return acc.includes('altaf rent a car') || acc.includes('altaf rent');
         }
 
-        function populateMonthFilterForAccount(selectedAccount) {
+        function populateMonthFilterForAccount(selectedAccount, resetToDefault = false) {
             if (!monthFilter) return;
+            const currentSelectedVal = monthFilter.value;
             const uniqueYearMonths = new Set();
 
             allExpensesData.forEach(item => {
@@ -1169,7 +1182,10 @@
             });
 
             const sysYM = getSystemCurrentYearMonth();
-            if (sorted.includes(sysYM)) {
+
+            if (!resetToDefault && currentSelectedVal && (currentSelectedVal === 'all' || sorted.includes(currentSelectedVal))) {
+                monthFilter.value = currentSelectedVal;
+            } else if (sorted.includes(sysYM)) {
                 monthFilter.value = sysYM;
             } else if (sorted.length > 0) {
                 monthFilter.value = sorted[sorted.length - 1];
@@ -1452,6 +1468,9 @@
             }
 
             msFooterLabel.innerText = `In Month of ${monthLabel} total Exp.`;
+            if (msRemainingLabel) {
+                msRemainingLabel.innerText = `In Month of ${monthLabel} total Dues`;
+            }
             msFooterAmount.innerText = formatPlainNum(totalMonthExpense);
 
             msDuesBody.innerHTML = '';
@@ -2392,7 +2411,7 @@
 
         accountFilter.addEventListener('change', () => {
             if (exportSummaryHolder) exportSummaryHolder.innerHTML = '';
-            populateMonthFilterForAccount(accountFilter.value);
+            populateMonthFilterForAccount(accountFilter.value, true);
             if (fromDateFilter) fromDateFilter.value = '';
             if (toDateFilter) toDateFilter.value = '';
             if (searchInput) searchInput.value = '';

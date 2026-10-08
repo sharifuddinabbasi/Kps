@@ -449,8 +449,9 @@
             return acc.includes('altaf rent a car') || acc.includes('altaf rent');
         }
 
-        function populateMonthFilterForAccount(selectedAccount) {
+        function populateMonthFilterForAccount(selectedAccount, resetToDefault = false) {
             if (!monthFilter) return;
+            const currentSelectedVal = monthFilter.value;
             const uniqueYearMonths = new Set();
 
             allExpensesData.forEach(item => {
@@ -489,9 +490,10 @@
             });
 
             const sysYM = getSystemCurrentYearMonth();
-            const hasSysMonth = sorted.includes(sysYM);
 
-            if (hasSysMonth) {
+            if (!resetToDefault && currentSelectedVal && (currentSelectedVal === 'all' || sorted.includes(currentSelectedVal))) {
+                monthFilter.value = currentSelectedVal;
+            } else if (sorted.includes(sysYM)) {
                 monthFilter.value = sysYM;
             } else if (sorted.length > 0) {
                 monthFilter.value = sorted[sorted.length - 1];
@@ -1150,12 +1152,12 @@
                 return dateA.localeCompare(dateB);
             });
 
-            populateMonthFilterForAccount(accountFilter.value);
+            populateMonthFilterForAccount(accountFilter.value, false);
             renderData();
         });
 
         accountFilter.addEventListener('change', () => {
-            populateMonthFilterForAccount(accountFilter.value);
+            populateMonthFilterForAccount(accountFilter.value, false);
             if (fromDateFilter) fromDateFilter.value = '';
             if (toDateFilter) toDateFilter.value = '';
             renderData();
@@ -1176,7 +1178,7 @@
             clearDatesBtn.addEventListener('click', () => {
                 if (fromDateFilter) fromDateFilter.value = '';
                 if (toDateFilter) toDateFilter.value = '';
-                populateMonthFilterForAccount(accountFilter.value);
+                populateMonthFilterForAccount(accountFilter.value, false);
                 renderData();
             });
         }
