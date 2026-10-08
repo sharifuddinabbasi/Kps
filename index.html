@@ -198,8 +198,8 @@
         .slip-link { color: #007bff; font-weight: bold; text-decoration: underline; cursor: pointer; }
         .slip-link:hover { color: #0056b3; }
 
-        .text-right { text-align: right !important; padding-right: 6px !important; }
-        th.text-right { text-align: right !important; padding-right: 6px !important; }
+        .text-right { text-align: right !important; padding-right: 4px !important; white-space: nowrap !important; }
+        th.text-right { text-align: right !important; padding-right: 4px !important; white-space: nowrap !important; }
 
         .status { margin-bottom: 5px; color: #666; font-size: clamp(10px, 0.6vw + 7px, 12px); }
 
@@ -2097,11 +2097,11 @@
                 
                 tableHeaderRow.innerHTML = `
                     <th style="width: 7%;">S.No</th>
-                    <th style="width: 13%;">Date</th>
-                    <th style="width: 38%;">Description</th>
-                    <th style="width: 10%;">Slip</th>
-                    <th style="width: 16%;" class="text-right">${firstColHeader}</th>
-                    <th style="width: 16%;" class="text-right">${secondColHeader}</th>
+                    <th style="width: 12%;">Date</th>
+                    <th style="width: 35%;">Description</th>
+                    <th style="width: 8%;">Slip</th>
+                    <th style="width: 19%;" class="text-right">${firstColHeader}</th>
+                    <th style="width: 19%;" class="text-right">${secondColHeader}</th>
                 `;
             }
 
@@ -2215,8 +2215,8 @@
                                 <td>${vDate}</td>
                                 <td style="text-align: left; font-weight: bold; color: #555;">Old dues Month of ${prevMonthName}</td>
                                 <td>-</td>
-                                <td class="text-right" style="font-weight: bold;">${formatPlainNum(prevBalance)}</td>
-                                <td class="text-right">0</td>
+                                <td class="text-right" style="font-weight: bold; white-space: nowrap;">${formatPlainNum(prevBalance)}</td>
+                                <td class="text-right" style="white-space: nowrap;">0</td>
                             `;
                             expenseList.appendChild(vRow);
                         }
