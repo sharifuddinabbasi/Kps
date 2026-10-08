@@ -434,6 +434,7 @@
         .ms-table td.clickable-val {
             color: #dc3545 !important;
             font-weight: bold;
+            font-size: clamp(13.5px, 0.9vw + 8px, 16px);
             text-align: right;
             cursor: pointer;
             text-decoration: none !important;
@@ -470,6 +471,7 @@
         }
         .ms-dues-table td.dues-val {
             font-weight: bold;
+            font-size: clamp(13px, 0.85vw + 7.5px, 15.5px);
             text-align: right;
             color: #dc3545;
             cursor: pointer;
@@ -490,26 +492,28 @@
         .ms-footer-label-box {
             background-color: #28a745;
             color: #ffffff;
-            font-size: clamp(12px, 0.8vw + 8px, 14.5px);
+            font-size: clamp(11.5px, 0.8vw + 7.5px, 14px);
             font-weight: bold;
             padding: 7px 10px;
-            flex: 1;
+            flex: 1 1 auto;
+            min-width: 0;
             display: flex;
             align-items: center;
             text-align: left;
             letter-spacing: 0.2px;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7), 0 2px 3px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 255, 255, 0.5);
         }
-        .ms-footer-amount-box {
+                .ms-footer-amount-box {
             background-color: #dc3545;
             color: #ffffff;
-            font-size: clamp(12.5px, 0.9vw + 8px, 15px);
+            font-size: clamp(14px, 1vw + 9.5px, 16.5px);
             font-weight: bold;
-            padding: 7px 14px;
-            width: 30%;
-            min-width: 30%;
-            max-width: 30%;
+            padding: 7px 10px;
+            flex: 0 0 auto;
+            min-width: 35%;
             text-align: right;
             display: flex;
             align-items: center;
@@ -632,7 +636,11 @@
             font-size: 25px !important;
             padding: 8px 8px !important;
         }
-        /* Aligned perfectly: S.No (15%) + Account Name (55%) = 70% | Expenses (30%) */
+        .ms-jpg-boost-mode .ms-table td.clickable-val,
+        .ms-jpg-boost-mode .ms-dues-table td.dues-val {
+            font-size: 29px !important;
+        }
+        /* Aligned perfectly: S.No (15%) + Account Name (50%) = 65% | Amount (35%) */
         .ms-jpg-boost-mode .ms-footer-wrapper {
             display: flex !important;
             width: 100% !important;
@@ -641,10 +649,10 @@
         }
         .ms-jpg-boost-mode .ms-footer-label-box {
             margin-left: 0 !important;
-            width: 70% !important;
-            min-width: 70% !important;
-            max-width: 70% !important;
-            flex: 0 0 70% !important;
+            width: 65% !important;
+            min-width: 65% !important;
+            max-width: 65% !important;
+            flex: 0 0 65% !important;
             font-size: 24.5px !important;
             padding: 9px 10px !important;
             white-space: nowrap !important;
@@ -654,12 +662,12 @@
             text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 4px rgba(0, 0, 0, 0.65), 0 0 12px rgba(255, 255, 255, 0.6) !important;
         }
         .ms-jpg-boost-mode .ms-footer-amount-box {
-            width: 30% !important;
-            min-width: 30% !important;
-            max-width: 30% !important;
-            flex: 0 0 30% !important;
-            font-size: 26px !important;
-            padding: 9px 12px !important;
+            width: 35% !important;
+            min-width: 35% !important;
+            max-width: 35% !important;
+            flex: 0 0 35% !important;
+            font-size: 32px !important;
+            padding: 9px 8px !important;
             white-space: nowrap !important;
             border-top-right-radius: 5px !important;
             border-bottom-right-radius: 5px !important;
@@ -883,8 +891,8 @@
                     <thead>
                         <tr>
                             <th style="width: 15%; text-align: center;">S.No.</th>
-                            <th style="width: 55%; text-align: left;">Account Name</th>
-                            <th style="width: 30%; text-align: right;">Expenses</th>
+                            <th style="width: 50%; text-align: left;">Account Name</th>
+                            <th style="width: 35%; text-align: right;">Expenses</th>
                         </tr>
                     </thead>
                     <tbody id="ms-table-body"></tbody>
@@ -903,8 +911,8 @@
                         <thead>
                             <tr>
                                 <th style="width: 15%; text-align: center;">Sr.No.</th>
-                                <th style="width: 55%; text-align: left;">Account Name</th>
-                                <th style="width: 30%; text-align: right;">Dues</th>
+                                <th style="width: 50%; text-align: left;">Account Name</th>
+                                <th style="width: 35%; text-align: right;">Dues</th>
                             </tr>
                         </thead>
                         <tbody id="ms-dues-body"></tbody>
