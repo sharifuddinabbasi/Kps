@@ -159,6 +159,8 @@
         .action-btns { display: flex; gap: 2px; justify-content: center; }
         .edit-btn { background-color: #ffc107; color: #000; border: none; padding: 3px 4px; border-radius: 3px; cursor: pointer; font-size: clamp(8.5px, 0.5vw + 5px, 11px); font-weight: bold; }
         .delete-btn { background-color: #dc3545; color: white; border: none; padding: 3px 4px; border-radius: 3px; cursor: pointer; font-size: clamp(8.5px, 0.5vw + 5px, 11px); font-weight: bold; }
+        .up-btn { background-color: #17a2b8; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: clamp(8px, 0.4vw + 5px, 10.5px); font-weight: bold; line-height: 1.1; }
+        .down-btn { background-color: #6f42c1; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: clamp(8px, 0.4vw + 5px, 10.5px); font-weight: bold; line-height: 1.1; }
         .status { margin-bottom: 5px; color: #666; font-size: clamp(10px, 0.6vw + 7px, 12px); }
         
         .selected-details-container { flex: 0 0 auto; margin-top: 8px; padding: 0 6px 6px 6px; background: #eef6ff; border: 1px solid #007bff; border-radius: 4px; width: 100%; max-height: 600px; overflow-y: auto; position: relative; }
@@ -444,11 +446,7 @@
 
         function isExcludedFromMonthFilter(accName) {
             const acc = accName.toLowerCase().trim();
-            return (acc.includes('farooq shah') && !acc.includes('ac')) ||
-                   (acc.includes('frooq shah') && !acc.includes('ac')) ||
-                   acc.includes('musharaf amanat') || acc.includes('mushraf amanat') ||
-                   acc === 'musharaf' || acc === 'amanat musharaf' ||
-                   acc.includes('altaf rent a car') || acc.includes('altaf rent');
+            return acc.includes('altaf rent a car') || acc.includes('altaf rent');
         }
 
         function populateMonthFilterForAccount(selectedAccount) {
@@ -776,6 +774,60 @@
                 let totalSent = 0;
                 const shouldFilterByMonth = !isExcludedFromMonthFilter(selectedAccount);
 
+                const isAmanatTarget = (selectedAccount === 'Farooq Shah Amanat' || selectedAccount === 'Musharaf Amanat');
+                let prevBalance = 0;
+                let prevMonthName = '';
+                let vDateFormatted = '';
+                let showVirtualRow = false;
+
+                if (isAmanatTarget && currentSelectedMonth && currentSelectedMonth !== 'all' && !fromDateVal && !toDateVal) {
+                    const parts = currentSelectedMonth.split('-');
+                    if (parts.length >= 2) {
+                        const y = parseInt(parts[0], 10);
+                        const m = parseInt(parts[1], 10);
+                        let prevM = m - 1;
+                        let prevY = y;
+                        if (prevM === 0) {
+                            prevM = 12;
+                            prevY = y - 1;
+                        }
+                        prevMonthName = monthNames[prevM - 1];
+                        const startOfCurrentMonth = `${y}-${String(m).padStart(2, '0')}-01`;
+
+                        allExpensesData.forEach(item => {
+                            const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
+                            const itemDate = item.expense.date || '';
+                            if (isAccountMatch(itemAccount, selectedAccount)) {
+                                if (itemDate && itemDate < startOfCurrentMonth) {
+                                    prevBalance += (item.expense.received || 0) - (item.expense.sent || 0);
+                                }
+                            }
+                        });
+
+                        if (prevBalance !== 0) {
+                            showVirtualRow = true;
+                            vDateFormatted = `01-${String(m).padStart(2, '0')}<br>${y}`;
+                        }
+                    }
+                }
+
+                if (showVirtualRow) {
+                    totalReceived += prevBalance;
+                    const vRow = document.createElement('tr');
+                    vRow.style.backgroundColor = '#fdfbf7';
+                    vRow.innerHTML = `
+                        <td>${count++}</td>
+                        <td>${vDateFormatted}</td>
+                        <td class="desc-cell" style="font-weight: bold; color: #555;">Old dues Month of ${prevMonthName}</td>
+                        <td>-</td>
+                        <td class="text-right" style="font-weight: bold;">${formatPlainNum(prevBalance)}</td>
+                        <td class="text-right">0</td>
+                        <td class="action-col">-</td>
+                    `;
+                    expenseList.appendChild(vRow);
+                }
+
+                const filteredItems = [];
                 allExpensesData.forEach((item) => {
                     const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
                     const itemDate = item.expense.date || '';
@@ -785,40 +837,83 @@
                     }
 
                     if (isAccountMatch(itemAccount, selectedAccount)) {
-                        const expense = item.expense;
-                        const id = item.id;
-                        const recVal = expense.received || 0;
-                        const sentVal = expense.sent || 0;
-                        
-                        totalReceived += recVal;
-                        totalSent += sentVal;
-
-                        const slipVal = expense.slip || expense.slipUrl || '';
-                        const slipHtml = slipVal 
-                            ? `<a href="${slipVal}" target="_blank" class="slip-link">View</a>` 
-                            : '-';
-
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${count++}</td>
-                            <td>${formatDateToDMY(expense.date)}</td>
-                            <td class="desc-cell">${expense.desc || ''}</td>
-                            <td>${slipHtml}</td>
-                            <td class="text-right">${formatPlainNum(recVal)}</td>
-                            <td class="text-right">${formatPlainNum(sentVal)}</td>
-                            <td class="action-col">
-                                <div class="action-btns">
-                                    <button class="edit-btn" data-id="${id}" data-date="${expense.date || ''}" data-desc="${expense.desc || ''}" data-slip="${slipVal}" data-received="${recVal}" data-sent="${sentVal}">Edit</button>
-                                    <button class="delete-btn" data-id="${id}">Del</button>
-                                </div>
-                            </td>
-                        `;
-                        expenseList.appendChild(row);
+                        filteredItems.push(item);
                     }
+                });
+
+                filteredItems.forEach((item, index) => {
+                    const expense = item.expense;
+                    const id = item.id;
+                    const recVal = expense.received || 0;
+                    const sentVal = expense.sent || 0;
+                    
+                    totalReceived += recVal;
+                    totalSent += sentVal;
+
+                    const slipVal = expense.slip || expense.slipUrl || '';
+                    const slipHtml = slipVal 
+                        ? `<a href="${slipVal}" target="_blank" class="slip-link">View</a>` 
+                        : '-';
+
+                    const currentDate = expense.date || '';
+                    const prevDate = index > 0 ? (filteredItems[index - 1].expense.date || '') : null;
+                    const nextDate = index < filteredItems.length - 1 ? (filteredItems[index + 1].expense.date || '') : null;
+
+                    const upBtnHtml = (prevDate !== null && prevDate === currentDate)
+                        ? `<button class="up-btn" data-index="${index}" title="Move Up">U</button>`
+                        : '';
+
+                    const downBtnHtml = (nextDate !== null && nextDate === currentDate)
+                        ? `<button class="down-btn" data-index="${index}" title="Move Down">D</button>`
+                        : '';
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${count++}</td>
+                        <td>${formatDateToDMY(expense.date)}</td>
+                        <td class="desc-cell">
+                            <div style="display: flex; flex-direction: column; gap: 2px;">
+                                <span style="word-break: break-word;">${expense.desc || ''}</span>
+                                ${(upBtnHtml || downBtnHtml) ? `
+                                <div style="display: flex; gap: 3px; align-items: center; margin-top: 2px;">
+                                    ${upBtnHtml}
+                                    ${downBtnHtml}
+                                </div>` : ''}
+                            </div>
+                        </td>
+                        <td>${slipHtml}</td>
+                        <td class="text-right">${formatPlainNum(recVal)}</td>
+                        <td class="text-right">${formatPlainNum(sentVal)}</td>
+                        <td class="action-col">
+                            <div class="action-btns">
+                                <button class="edit-btn" data-id="${id}" data-date="${expense.date || ''}" data-desc="${expense.desc || ''}" data-slip="${slipVal}" data-received="${recVal}" data-sent="${sentVal}">Edit</button>
+                                <button class="delete-btn" data-id="${id}">Del</button>
+                            </div>
+                        </td>
+                    `;
+                    expenseList.appendChild(row);
                 });
 
                 const nextSnoCell = document.getElementById('next-sno');
                 if (nextSnoCell) nextSnoCell.innerText = count;
+
+                document.querySelectorAll('.up-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const idx = parseInt(e.target.getAttribute('data-index'), 10);
+                        if (idx > 0) {
+                            await swapExpensesData(filteredItems[idx], filteredItems[idx - 1]);
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.down-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const idx = parseInt(e.target.getAttribute('data-index'), 10);
+                        if (idx < filteredItems.length - 1) {
+                            await swapExpensesData(filteredItems[idx], filteredItems[idx + 1]);
+                        }
+                    });
+                });
 
                 document.querySelectorAll('.delete-btn').forEach(btn => {
                     btn.addEventListener('click', async (e) => {
@@ -993,6 +1088,23 @@
                 tr3.innerHTML = rowHtml;
                 thirdDetailsBody.appendChild(tr3);
             });
+        }
+
+                async function swapExpensesData(itemA, itemB) {
+            const dataForA = {
+                desc: itemB.expense.desc || '',
+                slip: (itemB.expense.slip || itemB.expense.slipUrl || '').trim(),
+                received: itemB.expense.received || 0,
+                sent: itemB.expense.sent || 0
+            };
+            const dataForB = {
+                desc: itemA.expense.desc || '',
+                slip: (itemA.expense.slip || itemA.expense.slipUrl || '').trim(),
+                received: itemA.expense.received || 0,
+                sent: itemA.expense.sent || 0
+            };
+            await updateDoc(doc(db, "ceo_expenses", itemA.id), dataForA);
+            await updateDoc(doc(db, "ceo_expenses", itemB.id), dataForB);
         }
 
         async function handleAddRecord() {

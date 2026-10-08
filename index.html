@@ -1126,11 +1126,7 @@
 
         function isExcludedFromMonthFilter(accName) {
             const acc = accName.toLowerCase().trim();
-            return (acc.includes('farooq shah') && !acc.includes('ac')) ||
-                   (acc.includes('frooq shah') && !acc.includes('ac')) ||
-                   acc.includes('musharaf amanat') || acc.includes('mushraf amanat') ||
-                   acc === 'musharaf' || acc === 'amanat musharaf' ||
-                   acc.includes('altaf rent a car') || acc.includes('altaf rent');
+            return acc.includes('altaf rent a car') || acc.includes('altaf rent');
         }
 
         function populateMonthFilterForAccount(selectedAccount) {
@@ -1461,21 +1457,35 @@
             msDuesBody.innerHTML = '';
             let duesSno = 1;
 
+            let totalMonthDues = 0;
+
             duesTargetAccounts.forEach(accName => {
                 let recSum = 0;
                 let sentSum = 0;
 
                 allExpensesData.forEach(item => {
                     const rawAcc = item.expense.account ? item.expense.account.trim() : '';
+                    const d = item.expense.date || '';
+
+                    // Selected month ke aakhir tak ka balance (historical + selected month)
                     if (isAccountMatch(rawAcc, accName)) {
-                        recSum += item.expense.received || 0;
-                        sentSum += item.expense.sent || 0;
+                        if (d && d !== 'no-date') {
+                            const itemYM = d.substring(0, 7);
+                            if (itemYM <= selectedYM) {
+                                recSum += item.expense.received || 0;
+                                sentSum += item.expense.sent || 0;
+                            }
+                        } else {
+                            recSum += item.expense.received || 0;
+                            sentSum += item.expense.sent || 0;
+                        }
                     }
                 });
 
                 let balance = recSum - sentSum;
 
                 if (balance !== 0) {
+                    totalMonthDues += balance;
                     const tr = document.createElement('tr');
                     tr.className = 'ms-clickable-row';
                     tr.title = `Click karein ${accName} ki details dekhne ke liye`;
@@ -1497,9 +1507,8 @@
                 msDuesContainer.style.display = 'block';
             }
 
-            const overallAmanat = getOverallAmanatSummary();
             if (msRemainingAmount) {
-                msRemainingAmount.innerText = formatPlainNum(overallAmanat.remainingPayable);
+                msRemainingAmount.innerText = formatPlainNum(totalMonthDues);
             }
         }
 
@@ -2150,6 +2159,50 @@
                 let totalSent = 0;
                 const shouldFilterByMonth = !isExcludedFromMonthFilter(selectedAccount);
                 const activeMonth = isDrillDownMode ? (drillDownSelectedYM || currentSelectedMonth) : currentSelectedMonth;
+
+                const isAmanatTarget = (selectedAccount === 'Farooq Shah Amanat' || selectedAccount === 'Musharaf Amanat');
+                
+                if (isAmanatTarget && activeMonth && activeMonth !== 'all' && !fromDateVal && !toDateVal) {
+                    const parts = activeMonth.split('-');
+                    if (parts.length >= 2) {
+                        const y = parseInt(parts[0], 10);
+                        const m = parseInt(parts[1], 10);
+                        let prevM = m - 1;
+                        let prevY = y;
+                        if (prevM === 0) {
+                            prevM = 12;
+                            prevY = y - 1;
+                        }
+                        const prevMonthName = monthNames[prevM - 1];
+                        const startOfCurrentMonth = `${y}-${String(m).padStart(2, '0')}-01`;
+
+                        let prevBalance = 0;
+                        allExpensesData.forEach(item => {
+                            const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
+                            const itemDate = item.expense.date || '';
+                            if (isAccountMatch(itemAccount, selectedAccount)) {
+                                if (itemDate && itemDate < startOfCurrentMonth) {
+                                    prevBalance += (item.expense.received || 0) - (item.expense.sent || 0);
+                                }
+                            }
+                        });
+
+                        if (prevBalance !== 0) {
+                            totalReceived += prevBalance;
+                            const vDate = `01-${String(m).padStart(2, '0')}<br>${y}`;
+                            const vRow = document.createElement('tr');
+                            vRow.innerHTML = `
+                                <td>${count++}</td>
+                                <td>${vDate}</td>
+                                <td style="text-align: left; font-weight: bold; color: #555;">Old dues Month of ${prevMonthName}</td>
+                                <td>-</td>
+                                <td class="text-right" style="font-weight: bold;">${formatPlainNum(prevBalance)}</td>
+                                <td class="text-right">0</td>
+                            `;
+                            expenseList.appendChild(vRow);
+                        }
+                    }
+                }
 
                 allExpensesData.forEach((item) => {
                     const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
