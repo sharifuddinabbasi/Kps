@@ -99,7 +99,7 @@
 
         @media (max-width: 768px) {
             table.scrollable-table { 
-                min-width: 400px !important; 
+                min-width: 480px !important; 
             }
         }
         
@@ -675,12 +675,13 @@
                 mainDataTable.classList.add('scrollable-table');
 
                 tableHeaderRow.innerHTML = `
-                    <th style="width: 7%;">S.No</th>
-                    <th style="width: 9%;">Date</th>
-                    <th style="width: 30%;">Description</th>
-                    <th style="width: 7%;">Slip</th>
-                    <th style="width: 16%;" class="text-right">${firstColHeader}</th>
-                    <th style="width: 16%;" class="text-right">${secondColHeader}</th>
+                    <th style="width: 6%;">S.No</th>
+                    <th style="width: 8%;">Date</th>
+                    <th style="width: 24%;">Description</th>
+                    <th style="width: 6%;">Slip</th>
+                    <th style="width: 13%;" class="text-right">${firstColHeader}</th>
+                    <th style="width: 13%;" class="text-right">${secondColHeader}</th>
+                    <th style="width: 15%;" class="text-right">Sub Total</th>
                     <th style="width: 15%;" class="action-col">Action</th>
                 `;
                 addRowFormTr.innerHTML = `
@@ -690,6 +691,7 @@
                     <td><input type="text" id="slip" placeholder="URL"></td>
                     <td><input type="number" id="received" placeholder="${firstColHeader}" step="1"></td>
                     <td><input type="number" id="sent" placeholder="${secondColHeader}" step="1"></td>
+                    <td>-</td>
                     <td class="action-col"><button type="button" id="submit-btn" class="add-btn">Add</button></td>
                 `;
 
@@ -772,7 +774,9 @@
             } else {
                 let totalReceived = 0;
                 let totalSent = 0;
+                let runningSubTotal = 0;
                 const shouldFilterByMonth = !isExcludedFromMonthFilter(selectedAccount);
+                const isAmanatAcc = !isAcAccount(selectedAccount);
 
                 const isAmanatTarget = (selectedAccount === 'Farooq Shah Amanat' || selectedAccount === 'Musharaf Amanat');
                 let prevBalance = 0;
@@ -813,6 +817,7 @@
 
                 if (showVirtualRow) {
                     totalReceived += prevBalance;
+                    runningSubTotal += prevBalance;
                     const vRow = document.createElement('tr');
                     vRow.style.backgroundColor = '#fdfbf7';
                     vRow.innerHTML = `
@@ -822,6 +827,7 @@
                         <td>-</td>
                         <td class="text-right" style="font-weight: bold;">${formatPlainNum(prevBalance)}</td>
                         <td class="text-right">0</td>
+                        <td class="text-right" style="font-weight: bold; color: #dc3545;">${formatPlainNum(runningSubTotal)}</td>
                         <td class="action-col">-</td>
                     `;
                     expenseList.appendChild(vRow);
@@ -849,6 +855,12 @@
                     
                     totalReceived += recVal;
                     totalSent += sentVal;
+
+                    if (isAmanatAcc) {
+                        runningSubTotal = runningSubTotal + recVal - sentVal;
+                    } else {
+                        runningSubTotal = runningSubTotal + sentVal - recVal;
+                    }
 
                     const slipVal = expense.slip || expense.slipUrl || '';
                     const slipHtml = slipVal 
@@ -883,6 +895,7 @@
                         <td>${slipHtml}</td>
                         <td class="text-right">${formatPlainNum(recVal)}</td>
                         <td class="text-right">${formatPlainNum(sentVal)}</td>
+                        <td class="text-right" style="font-weight: bold; color: #dc3545;">${formatPlainNum(runningSubTotal)}</td>
                         <td class="action-col">
                             <div class="action-btns">
                                 <button class="edit-btn" data-id="${id}" data-date="${expense.date || ''}" data-desc="${expense.desc || ''}" data-slip="${slipVal}" data-received="${recVal}" data-sent="${sentVal}">Edit</button>
