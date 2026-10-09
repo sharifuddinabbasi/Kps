@@ -449,9 +449,8 @@
             return acc.includes('altaf rent a car') || acc.includes('altaf rent');
         }
 
-        function populateMonthFilterForAccount(selectedAccount, resetToDefault = false) {
+        function populateMonthFilterForAccount(selectedAccount, resetToDefault = true) {
             if (!monthFilter) return;
-            const currentSelectedVal = monthFilter.value;
             const uniqueYearMonths = new Set();
 
             allExpensesData.forEach(item => {
@@ -474,7 +473,7 @@
             });
 
             const sorted = Array.from(uniqueYearMonths).sort();
-            monthFilter.innerHTML = '<option value="all">All Months</option>';
+            monthFilter.innerHTML = '';
 
             sorted.forEach(ym => {
                 const parts = ym.split('-');
@@ -491,13 +490,12 @@
 
             const sysYM = getSystemCurrentYearMonth();
 
-            if (!resetToDefault && currentSelectedVal && (currentSelectedVal === 'all' || sorted.includes(currentSelectedVal))) {
-                monthFilter.value = currentSelectedVal;
-            } else if (sorted.includes(sysYM)) {
+            if (sorted.includes(sysYM)) {
                 monthFilter.value = sysYM;
             } else if (sorted.length > 0) {
                 monthFilter.value = sorted[sorted.length - 1];
             } else {
+                monthFilter.innerHTML = '<option value="all">All Months</option>';
                 monthFilter.value = 'all';
             }
         }
@@ -878,8 +876,7 @@
                                 <span style="word-break: break-word;">${expense.desc || ''}</span>
                                 ${(upBtnHtml || downBtnHtml) ? `
                                 <div style="display: flex; gap: 3px; align-items: center; margin-top: 2px;">
-                                    ${upBtnHtml}
-                                    ${downBtnHtml}
+                                    ${upBtnHtml}${downBtnHtml}
                                 </div>` : ''}
                             </div>
                         </td>
@@ -1092,7 +1089,7 @@
             });
         }
 
-                async function swapExpensesData(itemA, itemB) {
+        async function swapExpensesData(itemA, itemB) {
             const dataForA = {
                 desc: itemB.expense.desc || '',
                 slip: (itemB.expense.slip || itemB.expense.slipUrl || '').trim(),
@@ -1152,12 +1149,12 @@
                 return dateA.localeCompare(dateB);
             });
 
-            populateMonthFilterForAccount(accountFilter.value, false);
+            populateMonthFilterForAccount(accountFilter.value, true);
             renderData();
         });
 
         accountFilter.addEventListener('change', () => {
-            populateMonthFilterForAccount(accountFilter.value, false);
+            populateMonthFilterForAccount(accountFilter.value, true);
             if (fromDateFilter) fromDateFilter.value = '';
             if (toDateFilter) toDateFilter.value = '';
             renderData();
@@ -1178,7 +1175,7 @@
             clearDatesBtn.addEventListener('click', () => {
                 if (fromDateFilter) fromDateFilter.value = '';
                 if (toDateFilter) toDateFilter.value = '';
-                populateMonthFilterForAccount(accountFilter.value, false);
+                populateMonthFilterForAccount(accountFilter.value, true);
                 renderData();
             });
         }

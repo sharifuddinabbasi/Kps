@@ -24,7 +24,7 @@
         .container { display: flex; flex-direction: column; height: 100vh; max-width: 900px; margin: 0 auto; background: #ffffff; padding: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-y: auto; position: relative; }
         .fixed-header { flex-shrink: 0; background: #ffffff; padding-bottom: 8px; border-bottom: 2px solid #eee; position: relative; }
         
-                        /* 3D Diesel Color Brand Title (Option B) */
+        /* 3D Diesel Color Brand Title (Option B) */
         .brand-title-main {
             text-align: center;
             font-size: clamp(24px, 6vw, 34px);
@@ -169,8 +169,8 @@
         }
         
         .table-portion.large-scroll { 
-            height: calc(100vh - 200px) !important; 
-            max-height: calc(100vh - 200px) !important; 
+            height: calc(100vh - 280px) !important; 
+            max-height: calc(100vh - 280px) !important; 
             flex: 1 1 auto; 
             margin-bottom: 10px;
             border: 1px solid #007bff;
@@ -188,15 +188,16 @@
         }
 
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th, td { border: 1px solid #ddd; padding: clamp(4px, 0.4vw + 2px, 6px) clamp(1px, 0.3vw + 1px, 4px); text-align: center; font-size: clamp(10px, 0.7vw + 6px, 12.5px); white-space: normal; overflow: hidden; word-wrap: break-word; word-break: keep-all; hyphens: none; vertical-align: middle; }
+        th, td { border: 1px solid #ddd; padding: clamp(4px, 0.4vw + 2px, 6px) clamp(1px, 0.3vw + 1px, 4px); text-align: center; font-size: clamp(10px, 0.7vw + 6px, 12.5px); white-space: normal; overflow: hidden; word-wrap: break-word; word-break: normal; hyphens: none; vertical-align: middle; }
         th { background-color: #f2f2f2; font-weight: bold; position: sticky; top: 0; z-index: 10; line-height: 1.1; }
         tr:nth-child(even) { background-color: #f9f9f9; }
         tbody tr { height: clamp(26px, 1vw + 20px, 32px); }
-        td.clickable-val { cursor: pointer; font-weight: bold; color: #007bff; }
-        td.clickable-val:hover { background-color: #e2f0ff; }
+        td.clickable-val { cursor: pointer; font-weight: bold; color: #007bff; text-decoration: none !important; }
+        td.clickable-val:hover { background-color: #e2f0ff; text-decoration: none !important; }
         
-        .slip-link { color: #007bff; font-weight: bold; text-decoration: underline; cursor: pointer; }
-        .slip-link:hover { color: #0056b3; }
+        .slip-link { color: #007bff; font-weight: bold; text-decoration: none !important; cursor: pointer; }
+        .slip-link:hover { color: #0056b3; text-decoration: none !important; }
+        a { text-decoration: none !important; }
 
         .text-right { text-align: right !important; padding-right: 4px !important; white-space: nowrap !important; }
         th.text-right { text-align: right !important; padding-right: 4px !important; white-space: nowrap !important; }
@@ -248,6 +249,12 @@
             width: 100% !important;
             box-sizing: border-box !important;
             border: none !important;
+            word-spacing: normal !important;
+            letter-spacing: normal !important;
+        }
+        .export-mode-active * {
+            word-spacing: normal !important;
+            letter-spacing: normal !important;
         }
         .export-mode-active table {
             width: 100% !important;
@@ -506,7 +513,7 @@
             text-overflow: ellipsis;
             text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7), 0 2px 3px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 255, 255, 0.5);
         }
-                .ms-footer-amount-box {
+        .ms-footer-amount-box {
             background-color: #dc3545;
             color: #ffffff;
             font-size: clamp(14px, 1vw + 9.5px, 16.5px);
@@ -607,7 +614,7 @@
                 0 4px 5px rgba(0, 0, 0, 0.45);
         }
 
-                /* JPG Export Style (Main Heading Unchanged, Others -3px) */
+        /* JPG Export Style (Main Heading Unchanged, Others -3px) */
         .ms-jpg-boost-mode .ms-brand-title {
             text-align: center;
             font-size: 48px !important;
@@ -1152,6 +1159,11 @@
         function populateMonthFilterForAccount(selectedAccount, resetToDefault = false) {
             if (!monthFilter) return;
             const currentSelectedVal = monthFilter.value;
+            
+            if (selectedAccount === 'CEO' && (!currentSelectedVal || currentSelectedVal === 'all')) {
+                resetToDefault = true;
+            }
+
             const uniqueYearMonths = new Set();
 
             allExpensesData.forEach(item => {
@@ -1181,7 +1193,7 @@
                 const year = parts[0];
                 const month = parts[1];
                 const mIndex = parseInt(month, 10) - 1;
-                const label = `${monthNames[mIndex]} ${year}`;
+                const label = `${monthNames[mIndex]}${year}`;
 
                 const opt = document.createElement('option');
                 opt.value = ym;
@@ -1287,7 +1299,7 @@
             const y = now.getFullYear();
             const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             if (msExportTimestampSpan) {
-                msExportTimestampSpan.innerText = `${d}-${m}-${y}, ${time}`;
+                msExportTimestampSpan.innerText = `${d}-${m}-${y},${time}`;
             }
         }
 
@@ -1391,7 +1403,7 @@
                 const year = parts[0];
                 const month = parts[1];
                 const mIndex = parseInt(month, 10) - 1;
-                const label = `${monthNames[mIndex]} ${year}`;
+                const label = `${monthNames[mIndex]}${year}`;
 
                 const opt = document.createElement('option');
                 opt.value = ym;
@@ -1469,7 +1481,7 @@
             const parts = selectedYM.split('-');
             const year = parts[0];
             const mIndex = parseInt(parts[1], 10) - 1;
-            const monthLabel = `${monthNames[mIndex]} ${year}`;
+            const monthLabel = `${monthNames[mIndex]}${year}`;
 
             if (msTitle) {
                 msTitle.innerText = "CEO's Expenses Detail";
@@ -1610,7 +1622,7 @@
             const y = now.getFullYear();
             const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             if (exportTimestampSpan) {
-                exportTimestampSpan.innerText = `${d}-${m}-${y}, ${time}`;
+                exportTimestampSpan.innerText = `${d}-${m}-${y},${time}`;
             }
         }
 
@@ -1692,7 +1704,7 @@
                     let monthLabel = '';
                     if (parts.length >= 2) {
                         const mIndex = parseInt(parts[1], 10) - 1;
-                        monthLabel = `${monthNames[mIndex]} ${parts[0]}`;
+                        monthLabel = `${monthNames[mIndex]}${parts[0]}`;
                     }
                     mainExportTitle.innerText = `Account Detail ${selectedAccount} (${monthLabel})`;
                 } else if (isSearchActive) {
@@ -1764,7 +1776,7 @@
                     let monthLabel = '';
                     if (parts.length >= 2) {
                         const mIndex = parseInt(parts[1], 10) - 1;
-                        monthLabel = `${monthNames[mIndex]} ${parts[0]}`;
+                        monthLabel = `${monthNames[mIndex]}${parts[0]}`;
                     }
                     mainExportTitle.innerText = `Account Detail ${selectedAccount} (${monthLabel})`;
                 } else if (isSearchActive) {
@@ -2019,7 +2031,7 @@
                 let monthLabel = '';
                 if (parts.length >= 2) {
                     const mIndex = parseInt(parts[1], 10) - 1;
-                    monthLabel = `${monthNames[mIndex]} ${parts[0]}`;
+                    monthLabel = `${monthNames[mIndex]}${parts[0]}`;
                 }
                 drilldownBadgeLabel.innerText = `Total Expenses Month of ${monthLabel}`;
             } else {
@@ -2106,10 +2118,9 @@
                 tableHeaderRow.innerHTML = `
                     <th style="width: 7%;">S.No</th>
                     <th style="width: 12%;">Date</th>
-                    <th style="width: 35%;">Description</th>
-                    <th style="width: 8%;">Slip</th>
-                    <th style="width: 19%;" class="text-right">${firstColHeader}</th>
-                    <th style="width: 19%;" class="text-right">${secondColHeader}</th>
+                    <th style="width: 46%;">Description</th>
+                    <th style="width: 17%;" class="text-right">${firstColHeader}</th>
+                    <th style="width: 17%;" class="text-right">${secondColHeader}</th>
                 `;
             }
 
@@ -2222,7 +2233,6 @@
                                 <td>${count++}</td>
                                 <td>${vDate}</td>
                                 <td style="text-align: left; font-weight: bold; color: #555;">Old dues Month of ${prevMonthName}</td>
-                                <td>-</td>
                                 <td class="text-right" style="font-weight: bold; white-space: nowrap;">${formatPlainNum(prevBalance)}</td>
                                 <td class="text-right" style="white-space: nowrap;">0</td>
                             `;
@@ -2249,16 +2259,16 @@
                     totalSent += sentVal;
 
                     const slipUrl = expense.slipUrl || expense.slip || '';
-                    const slipHtml = slipUrl 
-                        ? `<a href="${slipUrl}" target="_blank" class="slip-link">View</a>` 
-                        : '-';
+                    const descText = expense.desc || '';
+                    const descHtml = slipUrl 
+                        ? `<a href="${slipUrl}" target="_blank" class="slip-link" title="View Slip">${descText || 'View Slip'}</a>` 
+                        : (descText || '-');
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${count++}</td>
                         <td>${formatDateToDMY(expense.date)}</td>
-                        <td style="text-align: left;">${expense.desc || ''}</td>
-                        <td>${slipHtml}</td>
+                        <td style="text-align: left;">${descHtml}</td>
                         <td class="text-right">${formatPlainNum(recVal)}</td>
                         <td class="text-right">${formatPlainNum(sentVal)}</td>
                     `;
@@ -2418,7 +2428,7 @@
         });
 
         accountFilter.addEventListener('change', () => {
-            if (exportSummaryHolder) exportSummaryHolder.innerHTML = '';
+            if (exportSummaryHolder) exportSummaryHolder.innerHTML = ``;
             populateMonthFilterForAccount(accountFilter.value, true);
             if (fromDateFilter) fromDateFilter.value = '';
             if (toDateFilter) toDateFilter.value = '';
