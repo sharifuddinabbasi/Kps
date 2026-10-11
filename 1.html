@@ -693,7 +693,7 @@
                     <button type="button" id="drilldown-back-btn" class="ms-back-btn" style="background-color: #6c757d; color: #fff; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">Back</button>
                 </div>
 
-                <!-- Drilldown Top Blue Expense Badge for Dues / Green for Expenses -->
+                <!-- Drilldown Top Badge (Dynamic Color/Text based on selection) -->
                 <div id="drilldown-badge" class="drilldown-badge-row" style="display: none;">
                     <div id="drilldown-badge-label" class="drilldown-badge-label">Total Expenses Month of</div>
                     <div id="drilldown-badge-amount" class="drilldown-badge-amount">0</div>
@@ -1456,7 +1456,11 @@
             renderMonthlySummaryTable();
             if (monthFilter) {
                 monthFilter.value = selectedYM;
-                renderData();
+                // If we are currently in drill-down mode, update drillDownSelectedYM so click details match newly selected month
+                if (isDrillDownMode) {
+                    drillDownSelectedYM = selectedYM;
+                    renderData();
+                }
             }
         });
 
@@ -1912,7 +1916,6 @@
             if (isDrillDownMode) {
                 drilldownHeader.style.display = 'flex';
                 
-                // Show blue badge if dues drilldown, green badge if expense drilldown
                 drilldownBadge.style.display = 'flex';
                 const badgeLabel = drilldownBadge.querySelector('.drilldown-badge-label');
                 const badgeAmount = drilldownBadge.querySelector('.drilldown-badge-amount');
