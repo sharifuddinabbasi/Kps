@@ -282,16 +282,23 @@
             font-size: 11px !important;
         }
 
-        /* Monthly Summary Section Styling */
+        /* Monthly Summary Section Styling with Green Border on All Four Sides */
         #monthly-summary-section {
             display: flex;
             flex-direction: column;
             width: 100%;
-            padding: 4px 2px;
-            margin-bottom: 30px;
+            padding: 8px;
+            margin-bottom: 15px;
             background: #fff;
-            border-bottom: 3px solid #007bff;
-            padding-bottom: 15px;
+            border: 3px solid #28a745;
+            border-radius: 6px;
+        }
+
+        .monthly-summary-divider {
+            width: 100%;
+            height: 3px;
+            background-color: #007bff;
+            margin-bottom: 15px;
         }
 
         .ms-header-row {
@@ -505,7 +512,7 @@
             margin-bottom: 6px;
         }
         .drilldown-badge-label {
-            background-color: #28a745;
+            background-color: #007bff;
             color: #ffffff;
             font-size: clamp(11.5px, 0.8vw + 7px, 14px);
             font-weight: bold;
@@ -664,7 +671,7 @@
                         </table>
                     </div>
 
-                    <div class="ms-footer-wrapper" style="margin-bottom: 24px;">
+                    <div class="ms-footer-wrapper" style="margin-bottom: 6px;">
                         <span id="ms-remaining-label" class="ms-footer-label-box" style="background-color: #007bff;">In Month of total Dues</span>
                         <span id="ms-remaining-amount" class="ms-footer-amount-box">0</span>
                     </div>
@@ -675,6 +682,9 @@
                 </div>
             </div>
 
+            <!-- Blue dividing line below Monthly Summary section -->
+            <div class="monthly-summary-divider"></div>
+
             <!-- CEO ACCOUNT VIEW SECTION -->
             <div class="fixed-header">
                 <!-- Drilldown Clean Header -->
@@ -683,7 +693,7 @@
                     <button type="button" id="drilldown-back-btn" class="ms-back-btn" style="background-color: #6c757d; color: #fff; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">Back</button>
                 </div>
 
-                <!-- Drilldown Top Green & Red Expense Badge -->
+                <!-- Drilldown Top Blue Expense Badge for Dues / Green for Expenses -->
                 <div id="drilldown-badge" class="drilldown-badge-row" style="display: none;">
                     <div id="drilldown-badge-label" class="drilldown-badge-label">Total Expenses Month of</div>
                     <div id="drilldown-badge-amount" class="drilldown-badge-amount">0</div>
@@ -1819,7 +1829,7 @@
 
             createdByContainer.style.display = 'block';
 
-            // SEARCH MODE (Updated to support clickable description links in blue colour)
+            // SEARCH MODE
             if (isSearchActive) {
                 const isCeo = (selectedAccount === 'CEO');
                 pageTitle.innerText = isCeo ? "Search Details" : `Search: ${selectedAccount}`;
@@ -1902,10 +1912,24 @@
             if (isDrillDownMode) {
                 drilldownHeader.style.display = 'flex';
                 
+                // Show blue badge if dues drilldown, green badge if expense drilldown
+                drilldownBadge.style.display = 'flex';
+                const badgeLabel = drilldownBadge.querySelector('.drilldown-badge-label');
+                const badgeAmount = drilldownBadge.querySelector('.drilldown-badge-amount');
+
+                const parts = (drillDownSelectedYM || currentSelectedMonth).split('-');
+                let monthLabel = '';
+                if (parts.length >= 2) {
+                    const mIndex = parseInt(parts[1], 10) - 1;
+                    monthLabel = `${monthNames[mIndex]}${parts[0]}`;
+                }
+
                 if (window._isDuesDrillDown) {
-                    drilldownBadge.style.display = 'none';
+                    badgeLabel.style.backgroundColor = '#007bff';
+                    badgeLabel.innerText = `Total Dues Month of ${monthLabel}`;
                 } else {
-                    drilldownBadge.style.display = 'flex';
+                    badgeLabel.style.backgroundColor = '#28a745';
+                    badgeLabel.innerText = `Total Expenses Month of ${monthLabel}`;
                 }
 
                 defaultHeaderTop.style.display = 'none';
@@ -1919,14 +1943,6 @@
 
                 tableContainer.classList.add('drilldown-scroll');
                 tableContainer.classList.remove('large-scroll');
-
-                const parts = (drillDownSelectedYM || currentSelectedMonth).split('-');
-                let monthLabel = '';
-                if (parts.length >= 2) {
-                    const mIndex = parseInt(parts[1], 10) - 1;
-                    monthLabel = `${monthNames[mIndex]}${parts[0]}`;
-                }
-                drilldownBadgeLabel.innerText = `Total Expenses Month of ${monthLabel}`;
             } else {
                 drilldownHeader.style.display = 'none';
                 drilldownBadge.style.display = 'none';
@@ -2161,7 +2177,11 @@
                 totalBalanceDisplay.innerText = formatPlainNum(totalReceived - totalSent);
 
                 if (isDrillDownMode) {
-                    drilldownBadgeAmount.innerText = formatPlainNum(totalSent);
+                    if (window._isDuesDrillDown) {
+                        drilldownBadgeAmount.innerText = formatPlainNum(totalReceived - totalSent);
+                    } else {
+                        drilldownBadgeAmount.innerText = formatPlainNum(totalSent);
+                    }
                 }
             }
         }
