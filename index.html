@@ -282,16 +282,22 @@
             font-size: 11px !important;
         }
 
-        /* Monthly Summary Section Styling with Green Border on All Four Sides */
+        /* Monthly Summary Section Styling with Golden (outer), White (1px), Green, White (1px), Red (inner) */
         #monthly-summary-section {
             display: flex;
             flex-direction: column;
             width: 100%;
             padding: 8px;
-            margin-bottom: 15px;
+            margin-top: 15px;
+            margin-bottom: 25px;
             background: #fff;
-            border: 3px solid #28a745;
-            border-radius: 6px;
+            border: 2px solid #e5a108;
+            box-shadow: 
+                0 0 0 1px #ffffff, 
+                0 0 0 3px #28a745, 
+                0 0 0 4px #ffffff, 
+                0 0 0 6px #dc3545;
+            border-radius: 12px;
         }
 
         .monthly-summary-divider {
@@ -693,7 +699,7 @@
                     <button type="button" id="drilldown-back-btn" class="ms-back-btn" style="background-color: #6c757d; color: #fff; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">Back</button>
                 </div>
 
-                <!-- Drilldown Top Badge (Dynamic Color/Text based on selection) -->
+                <!-- Drilldown Top Badge -->
                 <div id="drilldown-badge" class="drilldown-badge-row" style="display: none;">
                     <div id="drilldown-badge-label" class="drilldown-badge-label">Total Expenses Month of</div>
                     <div id="drilldown-badge-amount" class="drilldown-badge-amount">0</div>
@@ -728,7 +734,7 @@
                     <button type="button" id="row-jpg-btn" class="jpg-btn">JPG</button>
                 </div>
 
-                <!-- Search Input with dedicated Cancel Button (Updated search logic to also search Amount) -->
+                <!-- Search Input with dedicated Cancel Button -->
                 <div id="search-container" class="search-container">
                     <input type="text" id="search-input" class="search-box" placeholder="Lafz, detail ya amount likhein...">
                     <button type="button" id="search-inline-cancel-btn" class="search-cancel-btn">Cancel</button>
@@ -1414,7 +1420,7 @@
                                     sentSum += item.expense.sent || 0;
                                 }
                             } else {
-                                recSum += item.expense.received || 0;
+                                rawAcc += item.expense.received || 0;
                                 sentSum += item.expense.sent || 0;
                             }
                         }
@@ -1459,14 +1465,44 @@
                 if (isDrillDownMode) {
                     drillDownSelectedYM = selectedYM;
                     renderData();
+                } else {
+                    renderData();
                 }
             }
         });
+
+        // Synchronize CEO month filter change to Monthly Summary dropdown
+        if (monthFilter) {
+            monthFilter.addEventListener('change', () => {
+                const selectedVal = monthFilter.value;
+                if (msMonthSelect && msMonthSelect.value !== selectedVal) {
+                    msMonthSelect.value = selectedVal;
+                    renderMonthlySummaryTable();
+                }
+                if (fromDateFilter) fromDateFilter.value = '';
+                if (toDateFilter) toDateFilter.value = '';
+                if (!isDrillDownMode) {
+                    renderData();
+                }
+            });
+        }
 
         window.toggleSearchMode = function() {
             isSearchActive = !isSearchActive;
 
             if (isSearchActive) {
+                // Clear drilldown state and match search month to the top Monthly Summary selected month
+                isDrillDownMode = false;
+                window._isDuesDrillDown = false;
+                accountFilter.value = 'CEO';
+                
+                const currentMsMonth = msMonthSelect ? msMonthSelect.value : 'all';
+                if (monthFilter) monthFilter.value = currentMsMonth;
+
+                if (fromDateFilter) fromDateFilter.value = '';
+                if (toDateFilter) toDateFilter.value = '';
+
+                searchContainer.style.display = 'flex';
                 searchContainer.classList.add('show');
                 searchToggleBtnTop.innerText = 'Cancel';
                 searchToggleBtnTop.classList.add('active');
@@ -1481,6 +1517,7 @@
 
                 searchInput.focus();
             } else {
+                searchContainer.style.display = 'none';
                 searchContainer.classList.remove('show');
                 searchToggleBtnTop.innerText = 'Search';
                 searchToggleBtnTop.classList.remove('active');
@@ -1488,6 +1525,7 @@
                 accountSelectRow.style.display = 'flex';
                 monthFilterContainer.style.display = 'flex';
                 searchInput.value = '';
+                populateMonthFilterForAccount(accountFilter.value);
             }
             renderData();
         };
@@ -1826,13 +1864,13 @@
 
             const selectedAccount = accountFilter.value;
             const searchTerm = searchInput.value.trim().toLowerCase();
-            const currentSelectedMonth = msMonthSelect ? msMonthSelect.value : (monthFilter ? monthFilter.value : 'all');
+            const currentSelectedMonth = monthFilter ? monthFilter.value : 'all';
             const fromDateVal = fromDateFilter ? fromDateFilter.value : '';
             const toDateVal = toDateFilter ? toDateFilter.value : '';
 
             createdByContainer.style.display = 'block';
 
-            // SEARCH MODE (Updated to also search exact or partial amount numbers)
+            // SEARCH MODE
             if (isSearchActive) {
                 const isCeo = (selectedAccount === 'CEO');
                 pageTitle.innerText = isCeo ? "Search Details" : `Search: ${selectedAccount}`;
@@ -2331,6 +2369,7 @@
         });
 
         accountFilter.addEventListener('change', () => {
+            if (isDrillDownMode) return;
             if (exportSummaryHolder) exportSummaryHolder.innerHTML = ``;
             populateMonthFilterForAccount(accountFilter.value, true);
             if (fromDateFilter) fromDateFilter.value = '';
