@@ -449,7 +449,7 @@
             return acc.includes('altaf rent a car') || acc.includes('altaf rent');
         }
 
-        function populateMonthFilterForAccount(selectedAccount, resetToDefault = true) {
+        function populateMonthFilterForAccount(selectedAccount) {
             if (!monthFilter) return;
             const uniqueYearMonths = new Set();
 
@@ -473,7 +473,7 @@
             });
 
             const sorted = Array.from(uniqueYearMonths).sort();
-            monthFilter.innerHTML = '';
+            monthFilter.innerHTML = '<option value="all">All Months</option>';
 
             sorted.forEach(ym => {
                 const parts = ym.split('-');
@@ -495,7 +495,6 @@
             } else if (sorted.length > 0) {
                 monthFilter.value = sorted[sorted.length - 1];
             } else {
-                monthFilter.innerHTML = '<option value="all">All Months</option>';
                 monthFilter.value = 'all';
             }
         }
@@ -1162,12 +1161,12 @@
                 return dateA.localeCompare(dateB);
             });
 
-            populateMonthFilterForAccount(accountFilter.value, true);
+            populateMonthFilterForAccount(accountFilter.value);
             renderData();
         });
 
         accountFilter.addEventListener('change', () => {
-            populateMonthFilterForAccount(accountFilter.value, true);
+            populateMonthFilterForAccount(accountFilter.value);
             if (fromDateFilter) fromDateFilter.value = '';
             if (toDateFilter) toDateFilter.value = '';
             renderData();
@@ -1188,7 +1187,7 @@
             clearDatesBtn.addEventListener('click', () => {
                 if (fromDateFilter) fromDateFilter.value = '';
                 if (toDateFilter) toDateFilter.value = '';
-                populateMonthFilterForAccount(accountFilter.value, true);
+                populateMonthFilterForAccount(accountFilter.value);
                 renderData();
             });
         }
