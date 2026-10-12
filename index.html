@@ -728,9 +728,9 @@
                     <button type="button" id="row-jpg-btn" class="jpg-btn">JPG</button>
                 </div>
 
-                <!-- Search Input with dedicated Cancel Button -->
+                <!-- Search Input with dedicated Cancel Button (Updated search logic to also search Amount) -->
                 <div id="search-container" class="search-container">
-                    <input type="text" id="search-input" class="search-box" placeholder="Lafz ya detail likhein...">
+                    <input type="text" id="search-input" class="search-box" placeholder="Lafz, detail ya amount likhein...">
                     <button type="button" id="search-inline-cancel-btn" class="search-cancel-btn">Cancel</button>
                 </div>
                 
@@ -1456,7 +1456,6 @@
             renderMonthlySummaryTable();
             if (monthFilter) {
                 monthFilter.value = selectedYM;
-                // If we are currently in drill-down mode, update drillDownSelectedYM so click details match newly selected month
                 if (isDrillDownMode) {
                     drillDownSelectedYM = selectedYM;
                     renderData();
@@ -1827,13 +1826,13 @@
 
             const selectedAccount = accountFilter.value;
             const searchTerm = searchInput.value.trim().toLowerCase();
-            const currentSelectedMonth = monthFilter ? monthFilter.value : 'all';
+            const currentSelectedMonth = msMonthSelect ? msMonthSelect.value : (monthFilter ? monthFilter.value : 'all');
             const fromDateVal = fromDateFilter ? fromDateFilter.value : '';
             const toDateVal = toDateFilter ? toDateFilter.value : '';
 
             createdByContainer.style.display = 'block';
 
-            // SEARCH MODE
+            // SEARCH MODE (Updated to also search exact or partial amount numbers)
             if (isSearchActive) {
                 const isCeo = (selectedAccount === 'CEO');
                 pageTitle.innerText = isCeo ? "Search Details" : `Search: ${selectedAccount}`;
@@ -1860,6 +1859,8 @@
                     const rawAccount = item.expense.account ? item.expense.account.trim() : 'Musharaf Amanat';
                     const desc = item.expense.desc ? item.expense.desc.trim() : '';
                     const itemDate = item.expense.date || '';
+                    const recVal = item.expense.received || 0;
+                    const sentVal = item.expense.sent || 0;
 
                     if (!isCeo && !isAccountMatch(rawAccount, selectedAccount)) {
                         return;
@@ -1871,14 +1872,14 @@
                     }
 
                     if (searchTerm) {
+                        const displayAmount = recVal > 0 ? recVal : sentVal;
                         const matchSearch = rawAccount.toLowerCase().includes(searchTerm) || 
-                                            desc.toLowerCase().includes(searchTerm);
+                                            desc.toLowerCase().includes(searchTerm) ||
+                                            String(displayAmount).includes(searchTerm) ||
+                                            String(recVal).includes(searchTerm) ||
+                                            String(sentVal).includes(searchTerm);
                         if (!matchSearch) return;
                     }
-
-                    const expense = item.expense;
-                    const recVal = expense.received || 0;
-                    const sentVal = expense.sent || 0;
                     
                     if (recVal === 0 && sentVal === 0) return;
 
@@ -1892,15 +1893,14 @@
                         remarkText = recVal > 0 ? 'Amanat Rec.' : 'Amanat Return';
                     }
 
-                    const slipUrl = expense.slipUrl || expense.slip || '';
-                    const descText = expense.desc || '';
+                    const slipUrl = item.expense.slipUrl || item.expense.slip || '';
                     const descHtml = slipUrl 
-                        ? `<a href="${slipUrl}" target="_blank" class="slip-link" title="View Slip">${descText || 'View Slip'}</a>` 
-                        : (descText || '-');
+                        ? `<a href="${slipUrl}" target="_blank" class="slip-link" title="View Slip">${desc || 'View Slip'}</a>` 
+                        : (desc || '-');
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${formatDateToDMY(expense.date)}</td>
+                        <td>${formatDateToDMY(item.expense.date)}</td>
                         <td style="text-align: left; font-weight: bold;">${rawAccount}</td>
                         <td style="text-align: left;">${descHtml}</td>
                         <td class="text-right" style="font-weight: bold; color: #007bff; white-space: nowrap;">${formatPlainNum(displayAmount)}</td>
