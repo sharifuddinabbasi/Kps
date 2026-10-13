@@ -282,22 +282,40 @@
             font-size: 11px !important;
         }
 
-        /* Monthly Summary Section Styling with Golden (outer), White (1px), Green, White (1px), Red (inner) */
+        /* Monthly Summary Section Styling: Outer Red, White, Green, White, Inner Golden */
         #monthly-summary-section {
             display: flex;
             flex-direction: column;
             width: 100%;
-            padding: 8px;
+            padding: 2px;
             margin-top: 15px;
             margin-bottom: 25px;
-            background: #fff;
-            border: 2px solid #e5a108;
-            box-shadow: 
-                0 0 0 1px #ffffff, 
-                0 0 0 3px #28a745, 
-                0 0 0 4px #ffffff, 
-                0 0 0 6px #dc3545;
+            background: #dc3545; /* 1. Outer Red Border */
             border-radius: 12px;
+        }
+        .ms-border-layer-1 {
+            background: #ffffff; /* 2. White 1px Layer */
+            padding: 1px;
+            border-radius: 10px;
+        }
+        .ms-border-layer-2 {
+            background: #28a745; /* 3. Green Layer */
+            padding: 2px;
+            border-radius: 8px;
+        }
+        .ms-border-layer-3 {
+            background: #ffffff; /* 4. White 1px Layer */
+            padding: 1px;
+            border-radius: 6px;
+        }
+        .ms-border-layer-4 {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            padding: 8px;
+            background: #fff;
+            border: 2px solid #e5a108; /* 5. Inner Golden Border */
+            border-radius: 5px;
         }
 
         .monthly-summary-divider {
@@ -547,10 +565,12 @@
             height: auto !important;
             max-height: none !important;
             overflow: visible !important;
-            background: #ffffff !important;
-            padding: 15px !important;
+            background: #dc3545 !important;
+            padding: 2px !important;
             font-family: Arial, Helvetica, sans-serif !important;
             position: relative !important;
+            box-sizing: border-box !important;
+            border-radius: 12px !important;
         }
         .ms-clean-export-active * {
             letter-spacing: normal !important;
@@ -630,61 +650,69 @@
         <div id="main-view-wrapper">
             <div class="brand-title-main">Khan Petroleum Service</div>
 
-            <!-- INTEGRATED MONTHLY SUMMARY SECTION -->
+            <!-- INTEGRATED MONTHLY SUMMARY SECTION WITH CORRECTED BORDER LAYERS -->
             <div id="monthly-summary-section">
-                <div class="ms-header-row">
-                    <div id="ms-title" class="ms-title">CEO's Expenses Detail</div>
-                    <div class="ms-header-right-btns">
-                        <button type="button" id="ms-pdf-btn" class="pdf-btn">PDF</button>
-                        <button type="button" id="ms-jpg-btn" class="jpg-btn">JPG</button>
+                <div class="ms-border-layer-1">
+                    <div class="ms-border-layer-2">
+                        <div class="ms-border-layer-3">
+                            <div class="ms-border-layer-4">
+                                <div class="ms-header-row">
+                                    <div id="ms-title" class="ms-title">CEO's Expenses Detail</div>
+                                    <div class="ms-header-right-btns">
+                                        <button type="button" id="ms-pdf-btn" class="pdf-btn">PDF</button>
+                                        <button type="button" id="ms-jpg-btn" class="jpg-btn">JPG</button>
+                                    </div>
+                                </div>
+
+                                <div class="ms-month-row">
+                                    <label for="ms-month-select">Select Month:</label>
+                                    <select id="ms-month-select" class="ms-select"></select>
+                                </div>
+
+                                <div id="ms-table-container-export" class="ms-table-container">
+                                    <table class="ms-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 15%; text-align: center;">S.No.</th>
+                                                <th style="width: 50%; text-align: left;">Account Name</th>
+                                                <th style="width: 35%; text-align: right;">Expenses</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="ms-table-body"></tbody>
+                                    </table>
+                                </div>
+
+                                <div>
+                                    <div class="ms-footer-wrapper">
+                                        <span id="ms-footer-label" class="ms-footer-label-box">In Month of total Exp.</span>
+                                        <span id="ms-footer-amount" class="ms-footer-amount-box">0</span>
+                                    </div>
+
+                                    <div id="ms-dues-container" class="ms-dues-table-container" style="display: none;">
+                                        <table class="ms-dues-table">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 15%; text-align: center;">Sr.No.</th>
+                                                    <th style="width: 50%; text-align: left;">Account Name</th>
+                                                    <th style="width: 35%; text-align: right;">Dues</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="ms-dues-body"></tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="ms-footer-wrapper" style="margin-bottom: 6px;">
+                                        <span id="ms-remaining-label" class="ms-footer-label-box" style="background-color: #007bff;">In Month of total Dues</span>
+                                        <span id="ms-remaining-amount" class="ms-footer-amount-box">0</span>
+                                    </div>
+                                </div>
+
+                                <div id="ms-export-meta-footer" class="export-meta-footer">
+                                    Report Generated on: <span id="ms-export-timestamp-span">-</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-                <div class="ms-month-row">
-                    <label for="ms-month-select">Select Month:</label>
-                    <select id="ms-month-select" class="ms-select"></select>
-                </div>
-
-                <div id="ms-table-container-export" class="ms-table-container">
-                    <table class="ms-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 15%; text-align: center;">S.No.</th>
-                                <th style="width: 50%; text-align: left;">Account Name</th>
-                                <th style="width: 35%; text-align: right;">Expenses</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ms-table-body"></tbody>
-                    </table>
-                </div>
-
-                <div>
-                    <div class="ms-footer-wrapper">
-                        <span id="ms-footer-label" class="ms-footer-label-box">In Month of total Exp.</span>
-                        <span id="ms-footer-amount" class="ms-footer-amount-box">0</span>
-                    </div>
-
-                    <div id="ms-dues-container" class="ms-dues-table-container" style="display: none;">
-                        <table class="ms-dues-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 15%; text-align: center;">Sr.No.</th>
-                                    <th style="width: 50%; text-align: left;">Account Name</th>
-                                    <th style="width: 35%; text-align: right;">Dues</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ms-dues-body"></tbody>
-                        </table>
-                    </div>
-
-                    <div class="ms-footer-wrapper" style="margin-bottom: 6px;">
-                        <span id="ms-remaining-label" class="ms-footer-label-box" style="background-color: #007bff;">In Month of total Dues</span>
-                        <span id="ms-remaining-amount" class="ms-footer-amount-box">0</span>
-                    </div>
-                </div>
-
-                <div id="ms-export-meta-footer" class="export-meta-footer">
-                    Report Generated on: <span id="ms-export-timestamp-span">-</span>
                 </div>
             </div>
 
@@ -1420,7 +1448,7 @@
                                     sentSum += item.expense.sent || 0;
                                 }
                             } else {
-                                rawAcc += item.expense.received || 0;
+                                recSum += item.expense.received || 0;
                                 sentSum += item.expense.sent || 0;
                             }
                         }
@@ -1491,10 +1519,8 @@
             isSearchActive = !isSearchActive;
 
             if (isSearchActive) {
-                // Clear drilldown state and match search month to the top Monthly Summary selected month
                 isDrillDownMode = false;
                 window._isDuesDrillDown = false;
-                accountFilter.value = 'CEO';
                 
                 const currentMsMonth = msMonthSelect ? msMonthSelect.value : 'all';
                 if (monthFilter) monthFilter.value = currentMsMonth;
@@ -1507,7 +1533,6 @@
                 searchToggleBtnTop.innerText = 'Cancel';
                 searchToggleBtnTop.classList.add('active');
                 
-                accountSelectRow.style.display = 'none';
                 monthFilterContainer.style.display = 'none';
 
                 firstSummaryCards.style.display = 'none';
@@ -1522,7 +1547,6 @@
                 searchToggleBtnTop.innerText = 'Search';
                 searchToggleBtnTop.classList.remove('active');
 
-                accountSelectRow.style.display = 'flex';
                 monthFilterContainer.style.display = 'flex';
                 searchInput.value = '';
                 populateMonthFilterForAccount(accountFilter.value);
@@ -1867,12 +1891,12 @@
             const currentSelectedMonth = monthFilter ? monthFilter.value : 'all';
             const fromDateVal = fromDateFilter ? fromDateFilter.value : '';
             const toDateVal = toDateFilter ? toDateFilter.value : '';
+            const isCeo = (selectedAccount === 'CEO');
 
             createdByContainer.style.display = 'block';
 
             // SEARCH MODE
             if (isSearchActive) {
-                const isCeo = (selectedAccount === 'CEO');
                 pageTitle.innerText = isCeo ? "Search Details" : `Search: ${selectedAccount}`;
 
                 firstSummaryCards.style.display = 'none';
@@ -1900,6 +1924,7 @@
                     const recVal = item.expense.received || 0;
                     const sentVal = item.expense.sent || 0;
 
+                    // UPDATED: Agar CEO select nahi hai, to sirf selected account ka data match ho[span_1](start_span)[span_1](end_span)
                     if (!isCeo && !isAccountMatch(rawAccount, selectedAccount)) {
                         return;
                     }
