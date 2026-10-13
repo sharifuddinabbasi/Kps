@@ -613,7 +613,8 @@
 
                 if (!isAccountMatch(itemAccount)) return;
 
-                if (!isSearchActive && !checkDateInRange(itemDate, currentSelectedMonth, fromDateVal, toDateVal)) {
+                // Yahan !isSearchActive ko hata diya gaya hai taake search ke waqt bhi month filter kaam kare[span_1](start_span)[span_1](end_span)
+                if (!checkDateInRange(itemDate, currentSelectedMonth, fromDateVal, toDateVal)) {
                     return;
                 }
 
