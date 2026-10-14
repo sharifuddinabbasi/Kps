@@ -757,6 +757,7 @@
                         <option value="Depo Bachat">Depo Bachat</option>
                         <option value="Office 02% Arif">Office 02% Arif</option>
                         <option value="Altaf Rent A Car">Altaf Rent A Car</option>
+                        <option value="Sharif A/C">Sharif A/C</option>
                     </select>
                     <button type="button" id="row-pdf-btn" class="pdf-btn">PDF</button>
                     <button type="button" id="row-jpg-btn" class="jpg-btn">JPG</button>
@@ -1063,7 +1064,8 @@
                 acc === 'musharaf' || acc === 'amanat musharaf' ||
                 (acc.includes('farooq shah') && !acc.includes('ac')) ||
                 (acc.includes('frooq shah') && !acc.includes('ac')) ||
-                acc.includes('altaf rent a car') || acc.includes('altaf rent')) {
+                acc.includes('altaf rent a car') || acc.includes('altaf rent') ||
+                acc.includes('sharif a/c') || acc === 'sharif a/c' || acc.includes('sharif')) {
                 return false;
             }
 
@@ -1073,7 +1075,7 @@
         function isAccountMatch(itemAccount, selectedAccount) {
             const acc = itemAccount.toLowerCase().trim();
             if (selectedAccount === 'Musharaf Amanat') {
-                return acc.includes('musharaf amanat') || acc.includes('mushraf amanat') || acc === 'musharaf' || acc === '' || acc === 'amanat musharaf';
+                return (acc.includes('musharaf amanat') || acc.includes('mushraf amanat') || acc === 'musharaf' || acc === '' || acc === 'amanat musharaf') && !acc.includes('sharif');
             } else if (selectedAccount === 'Farooq Shah Amanat') {
                 return (acc.includes('farooq shah') || acc.includes('frooq shah')) && !acc.includes('ac');
             } else if (selectedAccount === 'AC 53 Farooq Shah') {
@@ -1093,16 +1095,18 @@
             } else if (selectedAccount === 'Depo Bachat') {
                 return acc.includes('depo bachat') || acc.includes('bachat');
             } else if (selectedAccount === 'Office 02% Arif') {
-                return acc.includes('office 02%') || acc.includes('office 02% arif') || acc.includes('arif');
+                return (acc.includes('office 02%') || acc.includes('office 02% arif') || acc === 'arif') && !acc.includes('sharif');
             } else if (selectedAccount === 'Altaf Rent A Car') {
                 return acc.includes('altaf rent a car') || acc.includes('altaf rent');
+            } else if (selectedAccount === 'Sharif A/C') {
+                return acc === 'sharif a/c' || acc.includes('sharif a/c') || acc === 'sharif';
             }
             return false;
         }
 
         function isExcludedFromMonthFilter(accName) {
             const acc = accName.toLowerCase().trim();
-            return acc.includes('altaf rent a car') || acc.includes('altaf rent');
+            return acc.includes('altaf rent a car') || acc.includes('altaf rent') || acc.includes('sharif a/c') || acc.includes('sharif');
         }
 
         function populateMonthFilterForAccount(selectedAccount, resetToDefault = false) {
@@ -1121,6 +1125,7 @@
 
                 let match = false;
                 if (selectedAccount === 'CEO') {
+                    if (itemAccount.includes('sharif')) return;
                     match = true;
                 } else {
                     match = isAccountMatch(itemAccount, selectedAccount);
@@ -1308,6 +1313,9 @@
             const uniqueMonths = new Set();
             allExpensesData.forEach(item => {
                 const d = item.expense.date;
+                const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
+                if (itemAccount.includes('sharif')) return;
+
                 if (d && d !== 'no-date') {
                     const parts = d.split('-');
                     if (parts.length >= 2) {
@@ -1356,12 +1364,13 @@
                 const d = item.expense.date;
                 if (!d || d === 'no-date') return;
 
+                const rawAccount = (item.expense.account ? item.expense.account.trim() : '');
+                if (rawAccount.toLowerCase().includes('sharif')) return;
+
                 const parts = d.split('-');
                 if (parts.length >= 2) {
                     const itemYM = `${parts[0]}-${parts[1]}`;
                     if (selectedYM === 'all' || itemYM === selectedYM) {
-                        const rawAccount = (item.expense.account ? item.expense.account.trim() : '');
-                        
                         const matchedStandardAccount = allowedOrderedAccounts.find(targetAcc => 
                             isAccountMatch(rawAccount, targetAcc)
                         );
@@ -1434,6 +1443,7 @@
 
                 allExpensesData.forEach(item => {
                     const rawAcc = item.expense.account ? item.expense.account.trim() : '';
+                    if (rawAcc.toLowerCase().includes('sharif')) return;
                     const d = item.expense.date || '';
 
                     if (isAccountMatch(rawAcc, accName)) {
@@ -1499,7 +1509,6 @@
             }
         });
 
-        // Synchronize CEO month filter change to Monthly Summary dropdown
         if (monthFilter) {
             monthFilter.addEventListener('change', () => {
                 const selectedVal = monthFilter.value;
@@ -1808,6 +1817,8 @@
 
             allExpensesData.forEach(item => {
                 const rawAccount = item.expense.account ? item.expense.account.trim() : '';
+                if (rawAccount.toLowerCase().includes('sharif')) return;
+
                 const desc = item.expense.desc ? item.expense.desc.trim() : '';
                 const date = item.expense.date || 'no-date';
 
@@ -1869,6 +1880,8 @@
 
             allExpensesData.forEach(item => {
                 const rawAccount = item.expense.account ? item.expense.account.trim() : '';
+                if (rawAccount.toLowerCase().includes('sharif')) return;
+
                 const isAc = isAcAccount(rawAccount);
                 if (!isAc) {
                     totalAmanatRec += item.expense.received || 0;
@@ -1919,12 +1932,14 @@
 
                 allExpensesData.forEach((item) => {
                     const rawAccount = item.expense.account ? item.expense.account.trim() : 'Musharaf Amanat';
+                    if (!isCeo && rawAccount.toLowerCase().includes('sharif') && selectedAccount !== 'Sharif A/C') return;
+                    if (isCeo && rawAccount.toLowerCase().includes('sharif')) return;
+
                     const desc = item.expense.desc ? item.expense.desc.trim() : '';
                     const itemDate = item.expense.date || '';
                     const recVal = item.expense.received || 0;
                     const sentVal = item.expense.sent || 0;
 
-                    // UPDATED: Agar CEO select nahi hai, to sirf selected account ka data match ho[span_1](start_span)[span_1](end_span)
                     if (!isCeo && !isAccountMatch(rawAccount, selectedAccount)) {
                         return;
                     }
@@ -2067,6 +2082,12 @@
                     colThreeLabel = 'Remaining Charges';
                     firstColHeader = 'Charges';
                     secondColHeader = 'Pay';
+                } else if (selectedAccount === 'Sharif A/C') {
+                    colOneLabel = 'Total Received';
+                    colTwoLabel = 'Total Sent';
+                    colThreeLabel = 'Total Balance';
+                    firstColHeader = 'Received';
+                    secondColHeader = 'Sent';
                 } else if (!isAcAccount(selectedAccount)) {
                     colOneLabel = 'Total Received';
                     colTwoLabel = 'Total Return';
@@ -2161,7 +2182,11 @@
                 const activeMonth = isDrillDownMode ? (drillDownSelectedYM || currentSelectedMonth) : currentSelectedMonth;
 
                 const isAmanatTarget = (selectedAccount === 'Farooq Shah Amanat' || selectedAccount === 'Musharaf Amanat');
-                
+                let prevBalance = 0;
+                let prevMonthName = '';
+                let vDateFormatted = '';
+                let showVirtualRow = false;
+
                 if (isAmanatTarget && activeMonth && activeMonth !== 'all' && !fromDateVal && !toDateVal) {
                     const parts = activeMonth.split('-');
                     if (parts.length >= 2) {
@@ -2173,10 +2198,9 @@
                             prevM = 12;
                             prevY = y - 1;
                         }
-                        const prevMonthName = monthNames[prevM - 1];
+                        prevMonthName = monthNames[prevM - 1];
                         const startOfCurrentMonth = `${y}-${String(m).padStart(2, '0')}-01`;
 
-                        let prevBalance = 0;
                         allExpensesData.forEach(item => {
                             const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
                             const itemDate = item.expense.date || '';
@@ -2188,20 +2212,24 @@
                         });
 
                         if (prevBalance !== 0) {
-                            totalReceived += prevBalance;
-                            const shortY = String(y).slice(-2);
-                            const vDate = `01-${String(m).padStart(2, '0')}-${shortY}`;
-                            const vRow = document.createElement('tr');
-                            vRow.innerHTML = `
-                                <td>${count++}</td>
-                                <td>${vDate}</td>
-                                <td style="text-align: left; font-weight: bold; color: #555;">Old dues Month of ${prevMonthName}</td>
-                                <td class="text-right" style="font-weight: bold; white-space: nowrap;">${formatPlainNum(prevBalance)}</td>
-                                <td class="text-right" style="white-space: nowrap;">0</td>
-                            `;
-                            expenseList.appendChild(vRow);
+                            showVirtualRow = true;
+                            vDateFormatted = `01-${String(m).padStart(2, '0')}-${String(y).slice(-2)}`;
                         }
                     }
+                }
+
+                if (showVirtualRow) {
+                    totalReceived += prevBalance;
+                    const vRow = document.createElement('tr');
+                    vRow.style.backgroundColor = '#fdfbf7';
+                    vRow.innerHTML = `
+                        <td>${count++}</td>
+                        <td>${vDateFormatted}</td>
+                        <td style="text-align: left; font-weight: bold; color: #555;">Old dues Month of ${prevMonthName}</td>
+                        <td class="text-right" style="font-weight: bold; white-space: nowrap;">${formatPlainNum(prevBalance)}</td>
+                        <td class="text-right" style="white-space: nowrap;">0</td>
+                    `;
+                    expenseList.appendChild(vRow);
                 }
 
                 allExpensesData.forEach((item) => {

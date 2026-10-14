@@ -202,6 +202,7 @@
                         <option value="Depo Bachat">Depo Bachat</option>
                         <option value="Office 02% Arif">Office 02% Arif</option>
                         <option value="Altaf Rent A Car">Altaf Rent A Car</option>
+                        <option value="Sharif A/C">Sharif A/C</option>
                     </select>
                 </div>
             </div>
@@ -407,7 +408,8 @@
                 acc === 'musharaf' || acc === 'amanat musharaf' ||
                 (acc.includes('farooq shah') && !acc.includes('ac')) ||
                 (acc.includes('frooq shah') && !acc.includes('ac')) ||
-                acc.includes('altaf rent a car') || acc.includes('altaf rent')) {
+                acc.includes('altaf rent a car') || acc.includes('altaf rent') ||
+                acc.includes('sharif a/c') || acc === 'sharif a/c' || acc.includes('sharif')) {
                 return false;
             }
 
@@ -417,7 +419,7 @@
         function isAccountMatch(itemAccount, selectedAccount) {
             const acc = itemAccount.toLowerCase().trim();
             if (selectedAccount === 'Musharaf Amanat') {
-                return acc.includes('musharaf amanat') || acc.includes('mushraf amanat') || acc === 'musharaf' || acc === '' || acc === 'amanat musharaf';
+                return (acc.includes('musharaf amanat') || acc.includes('mushraf amanat') || acc === 'musharaf' || acc === '' || acc === 'amanat musharaf') && !acc.includes('sharif');
             } else if (selectedAccount === 'Farooq Shah Amanat') {
                 return (acc.includes('farooq shah') || acc.includes('frooq shah')) && !acc.includes('ac');
             } else if (selectedAccount === 'AC 53 Farooq Shah') {
@@ -437,16 +439,18 @@
             } else if (selectedAccount === 'Depo Bachat') {
                 return acc.includes('depo bachat') || acc.includes('bachat');
             } else if (selectedAccount === 'Office 02% Arif') {
-                return acc.includes('office 02%') || acc.includes('office 02% arif') || acc.includes('arif');
+                return (acc.includes('office 02%') || acc.includes('office 02% arif') || acc === 'arif') && !acc.includes('sharif');
             } else if (selectedAccount === 'Altaf Rent A Car') {
                 return acc.includes('altaf rent a car') || acc.includes('altaf rent');
+            } else if (selectedAccount === 'Sharif A/C') {
+                return acc === 'sharif a/c' || acc.includes('sharif a/c') || acc === 'sharif';
             }
             return false;
         }
 
         function isExcludedFromMonthFilter(accName) {
             const acc = accName.toLowerCase().trim();
-            return acc.includes('altaf rent a car') || acc.includes('altaf rent');
+            return acc.includes('altaf rent a car') || acc.includes('altaf rent') || acc.includes('sharif a/c') || acc.includes('sharif');
         }
 
         function populateMonthFilterForAccount(selectedAccount) {
@@ -459,6 +463,7 @@
 
                 let match = false;
                 if (selectedAccount === 'CEO') {
+                    if (itemAccount.includes('sharif')) return;
                     match = true;
                 } else {
                     match = isAccountMatch(itemAccount, selectedAccount);
@@ -536,6 +541,8 @@
 
             allExpensesData.forEach(item => {
                 const rawAccount = item.expense.account ? item.expense.account.trim() : '';
+                if (rawAccount.toLowerCase().includes('sharif')) return;
+
                 const date = item.expense.date || 'no-date';
 
                 if (!checkDateInRange(date, selectedYearMonth, fromDate, toDate)) {
@@ -590,6 +597,8 @@
 
             allExpensesData.forEach(item => {
                 const rawAccount = item.expense.account ? item.expense.account.trim() : '';
+                if (rawAccount.toLowerCase().includes('sharif')) return;
+
                 const isAc = isAcAccount(rawAccount);
                 if (!isAc) {
                     totalAmanatRec += item.expense.received || 0;
@@ -654,6 +663,12 @@
                     colThreeLabel = 'Remaining Charges';
                     firstColHeader = 'Charges';
                     secondColHeader = 'Pay';
+                } else if (selectedAccount === 'Sharif A/C') {
+                    colOneLabel = 'Total Received';
+                    colTwoLabel = 'Total Sent';
+                    colThreeLabel = 'Total Balance';
+                    firstColHeader = 'Received';
+                    secondColHeader = 'Sent';
                 } else if (!isAcAccount(selectedAccount)) {
                     colOneLabel = 'Total Received';
                     colTwoLabel = 'Total Return';
@@ -956,6 +971,9 @@
                         if (selectedAccount === 'Altaf Rent A Car') {
                             promptRec = "Nayi Charges Raqam:";
                             promptSent = "Nayi Pay Raqam:";
+                        } else if (selectedAccount === 'Sharif A/C') {
+                            promptRec = "Nayi Received Raqam:";
+                            promptSent = "Nayi Sent Raqam:";
                         }
 
                         const newRec = prompt(promptRec, oldRec);
