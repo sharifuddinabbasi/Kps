@@ -192,6 +192,24 @@
         .selected-details-container th, 
         .selected-details-container td { font-size: clamp(9px, 0.6vw + 5px, 11.5px); }
 
+        #ceo-third-details table {
+            width: 100% !important;
+            table-layout: fixed !important;
+        }
+        #ceo-third-details th {
+            font-size: clamp(8.5px, 0.5vw + 5px, 10.5px) !important;
+            padding: 4px 1px !important;
+            line-height: 1.1 !important;
+        }
+        #ceo-third-details td {
+            font-size: clamp(9px, 0.55vw + 5.5px, 11px) !important;
+            padding: 4px 2px !important;
+        }
+        #ceo-third-details td.text-right {
+            padding-right: 3px !important;
+            font-size: clamp(9px, 0.6vw + 5.5px, 11.5px) !important;
+        }
+
         .date-badge { background: #007bff; color: #fff; padding: 2px 5px; border-radius: 3px; font-size: clamp(9.5px, 0.6vw + 6px, 12px); }
         
         .pdf-btn { background-color: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: clamp(10px, 0.6vw + 6.5px, 12.5px); font-weight: bold; }
@@ -290,21 +308,21 @@
             padding: 2px;
             margin-top: 15px;
             margin-bottom: 25px;
-            background: #dc3545; /* 1. Outer Red Border */
+            background: #dc3545;
             border-radius: 12px;
         }
         .ms-border-layer-1 {
-            background: #ffffff; /* 2. White 1px Layer */
+            background: #ffffff;
             padding: 1px;
             border-radius: 10px;
         }
         .ms-border-layer-2 {
-            background: #28a745; /* 3. Green Layer */
+            background: #28a745;
             padding: 2px;
             border-radius: 8px;
         }
         .ms-border-layer-3 {
-            background: #ffffff; /* 4. White 1px Layer */
+            background: #ffffff;
             padding: 1px;
             border-radius: 6px;
         }
@@ -314,7 +332,7 @@
             width: 100%;
             padding: 8px;
             background: #fff;
-            border: 2px solid #e5a108; /* 5. Inner Golden Border */
+            border: 2px solid #e5a108;
             border-radius: 5px;
         }
 
@@ -851,9 +869,9 @@
                 <table style="width: 100%; table-layout: fixed;">
                     <thead>
                         <tr>
-                            <th style="width: 25%;">Account Name</th>
-                            <th style="width: 50%;">Description</th>
-                            <th style="width: 25%;" id="dynamic-column-header" class="text-right">Amount</th>
+                            <th style="width: 28%;">Account Name</th>
+                            <th style="width: 44%;">Description</th>
+                            <th style="width: 28%;" id="dynamic-column-header" class="text-right">Amount</th>
                         </tr>
                     </thead>
                     <tbody id="selected-details-body">
@@ -878,8 +896,8 @@
                     <thead>
                         <tr id="third-table-header">
                             <th style="width: 25%;">Account Name</th>
-                            <th style="width: 45%;">Description</th>
-                            <th style="width: 30%;">Amount Details</th>
+                            <th style="width: 25%;">Description</th>
+                            <th style="width: 50%;">Amount Details</th>
                         </tr>
                     </thead>
                     <tbody id="third-details-body">
@@ -2314,8 +2332,8 @@
             thirdDateDisplay.innerText = `Date: None`;
             thirdTableHeader.innerHTML = `
                 <th style="width: 25%;">Account Name</th>
-                <th style="width: 45%;">Description</th>
-                <th style="width: 30%;">Amount Details</th>
+                <th style="width: 25%;">Description</th>
+                <th style="width: 50%;">Amount Details</th>
             `;
             thirdDetailsBody.innerHTML = `<tr><td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td></tr>`;
         }
@@ -2347,19 +2365,22 @@
             if (activeCols.length === 0) {
                 thirdTableHeader.innerHTML = `
                     <th style="width: 25%;">Account Name</th>
-                    <th style="width: 45%;">Description</th>
-                    <th style="width: 30%;">Amount Details</th>
+                    <th style="width: 25%;">Description</th>
+                    <th style="width: 50%;">Amount Details</th>
                 `;
                 thirdDetailsBody.innerHTML = `<tr><td colspan="3" style="color:#666; padding: 8px;">No non-zero records found</td></tr>`;
                 return;
             }
 
             let numActive = activeCols.length;
-            let dynamicColWidth = (30 / numActive).toFixed(1) + '%';
+            let accWidth = 24;
+            let descWidth = 24;
+            let remainingWidth = 100 - accWidth - descWidth;
+            let dynamicColWidth = (remainingWidth / numActive).toFixed(2) + '%';
 
-            let headerHtml = `<th style="width: 25%;">Account Name</th><th style="width: 45%;">Description</th>`;
+            let headerHtml = `<th style="width: ${accWidth}%;">Account Name</th><th style="width: ${descWidth}%;">Description</th>`;
             activeCols.forEach(col => {
-                headerHtml += `<th style="width: ${dynamicColWidth};" class="text-right">${col.label}</th>`;
+                headerHtml += `<th style="width: ${dynamicColWidth}; text-align: center;">${col.label}</th>`;
             });
             thirdTableHeader.innerHTML = headerHtml;
 
@@ -2381,8 +2402,8 @@
                 if (!hasValue) return;
 
                 let rowHtml = `
-                    <td style="text-align: left; font-weight: bold;">${item.account}</td>
-                    <td style="text-align: left;">${item.desc || '-'}</td>
+                    <td style="text-align: left; font-weight: bold; word-break: break-word;">${item.account}</td>
+                    <td style="text-align: left; word-break: break-word;">${item.desc || '-'}</td>
                 `;
 
                 activeCols.forEach(col => {

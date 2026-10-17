@@ -17,7 +17,10 @@
     <style>
         * { box-sizing: border-box; }
         html, body { height: 100%; margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f7f6; overflow: hidden; }
-        .container { display: flex; flex-direction: column; height: 100vh; max-width: 1000px; margin: 0 auto; background: #ffffff; padding: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; }
+        
+        /* درستگی: overflow-y: auto کیا گیا ہے تاکہ موبائل پر پوری اسکرین آسانی سے اسکرول ہو سکے */
+        .container { display: flex; flex-direction: column; height: 100vh; max-width: 1000px; margin: 0 auto; background: #ffffff; padding: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-y: auto; position: relative; }
+        
         .fixed-header { flex-shrink: 0; background: #ffffff; padding-bottom: 6px; border-bottom: 2px solid #ddd; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
         h1 { color: #333; font-size: clamp(16px, 1vw + 10px, 21px); margin: 0; }
@@ -303,9 +306,9 @@
             <table style="width: 100%; table-layout: fixed;">
                 <thead>
                     <tr id="third-table-header">
-                        <th style="width: 28%;">Account Name</th>
-                        <th style="width: 35%;">Description</th>
-                        <th style="width: 37%;">Amount Details</th>
+                        <th style="width: 25%;">Account Name</th>
+                        <th style="width: 25%;">Description</th>
+                        <th style="width: 50%;">Amount Details</th>
                     </tr>
                 </thead>
                 <tbody id="third-details-body">
@@ -1031,9 +1034,9 @@
 
             thirdDateDisplay.innerText = `Date: None`;
             thirdTableHeader.innerHTML = `
-                <th style="width: 28%;">Account Name</th>
-                <th style="width: 35%;">Description</th>
-                <th style="width: 37%;">Amount Details</th>
+                <th style="width: 25%;">Account Name</th>
+                <th style="width: 25%;">Description</th>
+                <th style="width: 50%;">Amount Details</th>
             `;
             thirdDetailsBody.innerHTML = `<tr><td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td></tr>`;
         }
@@ -1064,20 +1067,23 @@
 
             if (activeCols.length === 0) {
                 thirdTableHeader.innerHTML = `
-                    <th style="width: 28%;">Account Name</th>
-                    <th style="width: 35%;">Description</th>
-                    <th style="width: 37%;">Amount Details</th>
+                    <th style="width: 25%;">Account Name</th>
+                    <th style="width: 25%;">Description</th>
+                    <th style="width: 50%;">Amount Details</th>
                 `;
                 thirdDetailsBody.innerHTML = `<tr><td colspan="3" style="color:#666; padding: 8px;">No non-zero records found</td></tr>`;
                 return;
             }
 
             let numActive = activeCols.length;
-            let dynamicColWidth = (37 / numActive).toFixed(1) + '%';
+            let accWidth = 24;
+            let descWidth = 24;
+            let remainingWidth = 100 - accWidth - descWidth;
+            let dynamicColWidth = (remainingWidth / numActive).toFixed(2) + '%';
 
-            let headerHtml = `<th style="width: 28%;">Account Name</th><th style="width: 35%;">Description</th>`;
+            let headerHtml = `<th style="width: ${accWidth}%;">Account Name</th><th style="width: ${descWidth}%;">Description</th>`;
             activeCols.forEach(col => {
-                headerHtml += `<th style="width: ${dynamicColWidth};" class="text-right">${col.label}</th>`;
+                headerHtml += `<th style="width: ${dynamicColWidth}; text-align: center;">${col.label}</th>`;
             });
             thirdTableHeader.innerHTML = headerHtml;
 
@@ -1099,8 +1105,8 @@
                 if (!hasValue) return;
 
                 let rowHtml = `
-                    <td style="text-align: left; font-weight: bold;">${item.account}</td>
-                    <td style="text-align: left;">${item.desc || '-'}</td>
+                    <td style="text-align: left; font-weight: bold; word-break: break-word;">${item.account}</td>
+                    <td style="text-align: left; word-break: break-word;">${item.desc || '-'}</td>
                 `;
 
                 activeCols.forEach(col => {
