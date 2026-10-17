@@ -192,21 +192,28 @@
         .selected-details-container th, 
         .selected-details-container td { font-size: clamp(9px, 0.6vw + 5px, 11.5px); }
 
+        /* Teesre box ke table ke liye wrapper */
+        .third-details-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
         #ceo-third-details table {
-            width: 100% !important;
-            table-layout: fixed !important;
+            width: 100%;
+            table-layout: fixed;
         }
         #ceo-third-details th {
             font-size: clamp(8.5px, 0.5vw + 5px, 10.5px) !important;
-            padding: 4px 1px !important;
+            padding: 4px 2px !important;
             line-height: 1.1 !important;
+            text-align: center;
         }
         #ceo-third-details td {
             font-size: clamp(9px, 0.55vw + 5.5px, 11px) !important;
             padding: 4px 2px !important;
         }
         #ceo-third-details td.text-right {
-            padding-right: 3px !important;
+            padding-right: 4px !important;
             font-size: clamp(9px, 0.6vw + 5.5px, 11.5px) !important;
         }
 
@@ -300,7 +307,7 @@
             font-size: 11px !important;
         }
 
-        /* Monthly Summary Section Styling: Outer Red, White, Green, White, Inner Golden */
+        /* Monthly Summary Section Styling */
         #monthly-summary-section {
             display: flex;
             flex-direction: column;
@@ -892,20 +899,22 @@
                         <button type="button" id="ceo-third-jpg-btn" class="jpg-btn">JPG</button>
                     </div>
                 </div>
-                <table style="width: 100%; table-layout: fixed;">
-                    <thead>
-                        <tr id="third-table-header">
-                            <th style="width: 25%;">Account Name</th>
-                            <th style="width: 25%;">Description</th>
-                            <th style="width: 50%;">Amount Details</th>
-                        </tr>
-                    </thead>
-                    <tbody id="third-details-body">
-                        <tr>
-                            <td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div id="third-table-scroll-wrapper" class="third-details-wrapper">
+                    <table id="third-details-table" style="width: 100%; table-layout: fixed;">
+                        <thead>
+                            <tr id="third-table-header">
+                                <th style="width: 25%;">Account Name</th>
+                                <th style="width: 45%;">Description</th>
+                                <th style="width: 30%;">Amount Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="third-details-body">
+                            <tr>
+                                <td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div id="created-by-container" style="display: block; flex-shrink: 0;">
@@ -1012,6 +1021,8 @@
         const thirdDateDisplay = document.getElementById('third-date-display');
         const thirdTableHeader = document.getElementById('third-table-header');
         const thirdDetailsBody = document.getElementById('third-details-body');
+        const thirdTableScrollWrapper = document.getElementById('third-table-scroll-wrapper');
+        const thirdDetailsTable = document.getElementById('third-details-table');
 
         const createdByContainer = document.getElementById('created-by-container');
 
@@ -2332,10 +2343,13 @@
             thirdDateDisplay.innerText = `Date: None`;
             thirdTableHeader.innerHTML = `
                 <th style="width: 25%;">Account Name</th>
-                <th style="width: 25%;">Description</th>
-                <th style="width: 50%;">Amount Details</th>
+                <th style="width: 45%;">Description</th>
+                <th style="width: 30%;">Amount Details</th>
             `;
             thirdDetailsBody.innerHTML = `<tr><td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td></tr>`;
+            if (thirdDetailsTable) {
+                thirdDetailsTable.style.minWidth = '100%';
+            }
         }
 
         function updateDateBoxOnly(dateStr, items) {
@@ -2365,18 +2379,44 @@
             if (activeCols.length === 0) {
                 thirdTableHeader.innerHTML = `
                     <th style="width: 25%;">Account Name</th>
-                    <th style="width: 25%;">Description</th>
-                    <th style="width: 50%;">Amount Details</th>
+                    <th style="width: 45%;">Description</th>
+                    <th style="width: 30%;">Amount Details</th>
                 `;
                 thirdDetailsBody.innerHTML = `<tr><td colspan="3" style="color:#666; padding: 8px;">No non-zero records found</td></tr>`;
+                if (thirdDetailsTable) {
+                    thirdDetailsTable.style.minWidth = '100%';
+                }
                 return;
             }
 
             let numActive = activeCols.length;
             let accWidth = 24;
             let descWidth = 24;
-            let remainingWidth = 100 - accWidth - descWidth;
-            let dynamicColWidth = (remainingWidth / numActive).toFixed(2) + '%';
+            let dynamicColWidth = '18%';
+
+            // Columns ki tadad ke mutabiq dynamic settings
+            if (numActive === 1) {
+                accWidth = 24;
+                descWidth = 50;
+                dynamicColWidth = '26%';
+                if (thirdDetailsTable) thirdDetailsTable.style.minWidth = '100%';
+            } else if (numActive === 2) {
+                accWidth = 24;
+                descWidth = 38;
+                dynamicColWidth = '19%';
+                if (thirdDetailsTable) thirdDetailsTable.style.minWidth = '100%';
+            } else if (numActive === 3) {
+                accWidth = 24;
+                descWidth = 28;
+                dynamicColWidth = '16%';
+                if (thirdDetailsTable) thirdDetailsTable.style.minWidth = '100%';
+            } else if (numActive >= 4) {
+                // 4 columns par minimum width 390px aur smooth horizontal scroll
+                accWidth = 24;
+                descWidth = 28;
+                dynamicColWidth = '18%';
+                if (thirdDetailsTable) thirdDetailsTable.style.minWidth = '390px';
+            }
 
             let headerHtml = `<th style="width: ${accWidth}%;">Account Name</th><th style="width: ${descWidth}%;">Description</th>`;
             activeCols.forEach(col => {
