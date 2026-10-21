@@ -793,7 +793,6 @@
                 let totalSent = 0;
                 let runningSubTotal = 0;
                 const shouldFilterByMonth = !isExcludedFromMonthFilter(selectedAccount);
-                const isAmanatAcc = !isAcAccount(selectedAccount);
 
                 const isAmanatTarget = (selectedAccount === 'Farooq Shah Amanat' || selectedAccount === 'Musharaf Amanat');
                 let prevBalance = 0;
@@ -873,11 +872,8 @@
                     totalReceived += recVal;
                     totalSent += sentVal;
 
-                    if (isAmanatAcc) {
-                        runningSubTotal = runningSubTotal + recVal - sentVal;
-                    } else {
-                        runningSubTotal = runningSubTotal + sentVal - recVal;
-                    }
+                    // درست کیا گیا فارمولا: ہر اکاؤنٹ میں آنے والی رقم جمع اور جانے والی مائنس ہو گی
+                    runningSubTotal = runningSubTotal + recVal - sentVal;
 
                     const slipVal = expense.slip || expense.slipUrl || '';
                     const slipHtml = slipVal 
