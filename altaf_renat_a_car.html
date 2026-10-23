@@ -51,6 +51,10 @@
         tr:nth-child(even) { background-color: #f9f9f9; }
         tbody tr { height: clamp(28px, 1vw + 22px, 34px); }
         
+        .slip-link { color: #007bff; font-weight: bold; text-decoration: none !important; cursor: pointer; }
+        .slip-link:hover { color: #0056b3; text-decoration: none !important; }
+        a { text-decoration: none !important; }
+
         .text-right { text-align: right !important; padding-right: 6px !important; }
         th.text-right { text-align: right !important; padding-right: 6px !important; }
 
@@ -199,11 +203,17 @@
                     sumCharges += recVal;
                     sumPay += sentVal;
 
+                    const slipUrl = exp.slipUrl || exp.slip || '';
+                    const descText = exp.desc || '';
+                    const descHtml = slipUrl 
+                        ? `<a href="${slipUrl}" target="_blank" class="slip-link" title="View Slip">${descText || 'View Slip'}</a>` 
+                        : (descText || '');
+
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>${count++}</td>
                         <td>${formatDateToDMY(exp.date)}</td>
-                        <td style="text-align: left; word-break: break-word;">${exp.desc || ''}</td>
+                        <td style="text-align: left; word-break: break-word;">${descHtml}</td>
                         <td class="text-right" style="font-weight: bold; white-space: nowrap;">${formatPlainNum(recVal)}</td>
                         <td class="text-right" style="font-weight: bold; white-space: nowrap;">${formatPlainNum(sentVal)}</td>
                     `;
