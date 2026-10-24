@@ -18,7 +18,6 @@
         * { box-sizing: border-box; }
         html, body { height: 100%; margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f7f6; overflow: hidden; }
         
-        /* درستگی: overflow-y: auto کیا گیا ہے تاکہ موبائل پر پوری اسکرین آسانی سے اسکرول ہو سکے */
         .container { display: flex; flex-direction: column; height: 100vh; max-width: 1000px; margin: 0 auto; background: #ffffff; padding: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-y: auto; position: relative; }
         
         .fixed-header { flex-shrink: 0; background: #ffffff; padding-bottom: 6px; border-bottom: 2px solid #ddd; }
@@ -113,6 +112,22 @@
         td.clickable-val { cursor: pointer; font-weight: bold; color: #007bff; }
         td.clickable-val:hover { background-color: #e2f0ff; text-decoration: underline; }
         
+        td.editable-cell { cursor: pointer; position: relative; }
+        td.editable-cell:hover { background-color: #f0f7ff; }
+        .inline-edit-input {
+            width: 100% !important;
+            height: 100% !important;
+            padding: 3px 2px !important;
+            border: 2px solid #007bff !important;
+            border-radius: 2px !important;
+            font-size: inherit !important;
+            font-family: inherit !important;
+            background: #ffffff !important;
+            color: #000 !important;
+            outline: none !important;
+            box-sizing: border-box !important;
+        }
+
         .desc-cell {
             text-align: left !important;
             white-space: normal !important;
@@ -159,9 +174,16 @@
         }
         
         .add-btn { background-color: #28a745; color: white; border: none; padding: 4px 1px; border-radius: 3px; cursor: pointer; font-weight: bold; width: 100%; font-size: clamp(9px, 0.5vw + 5.5px, 11px); }
-        .action-btns { display: flex; gap: 2px; justify-content: center; }
-        .edit-btn { background-color: #ffc107; color: #000; border: none; padding: 3px 4px; border-radius: 3px; cursor: pointer; font-size: clamp(8.5px, 0.5vw + 5px, 11px); font-weight: bold; }
-        .delete-btn { background-color: #dc3545; color: white; border: none; padding: 3px 4px; border-radius: 3px; cursor: pointer; font-size: clamp(8.5px, 0.5vw + 5px, 11px); font-weight: bold; }
+        
+        .action-btns { display: flex; justify-content: space-between; align-items: center; padding: 0 4px; width: 100%; }
+        
+        .icon-btn { background: none; border: none; cursor: pointer; padding: 3px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; transition: background 0.2s; }
+        .edit-icon-btn { color: #6c757d; }
+        .edit-icon-btn:hover { background-color: #e2e6ea; color: #007bff; }
+        .delete-icon-btn { color: #6c757d; }
+        .delete-icon-btn:hover { background-color: #f8d7da; color: #dc3545; }
+        .icon-btn svg { width: 16px; height: 16px; }
+
         .up-btn { background-color: #17a2b8; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: clamp(8px, 0.4vw + 5px, 10.5px); font-weight: bold; line-height: 1.1; }
         .down-btn { background-color: #6f42c1; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: clamp(8px, 0.4vw + 5px, 10.5px); font-weight: bold; line-height: 1.1; }
         .status { margin-bottom: 5px; color: #666; font-size: clamp(10px, 0.6vw + 7px, 12px); }
@@ -177,6 +199,70 @@
         }
 
         .footer-text { text-align: center; font-size: clamp(11px, 0.6vw + 7px, 13px); font-weight: bold; color: #333; margin-top: 24px; margin-bottom: 8px; }
+
+        /* Custom Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+        .modal-box {
+            background: #ffffff;
+            width: 90%; max-width: 420px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            overflow: hidden;
+            display: flex; flex-direction: column;
+            animation: modalPop 0.25s ease-out;
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-header {
+            background: #007bff;
+            color: #ffffff;
+            padding: 12px 16px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 18px; font-weight: bold;
+        }
+        .modal-close-btn {
+            background: none; border: none; color: #ffffff;
+            font-size: 20px; cursor: pointer; font-weight: bold;
+        }
+        .modal-body {
+            padding: 16px;
+            display: flex; flex-direction: column; gap: 12px;
+            max-height: 70vh; overflow-y: auto;
+        }
+        .modal-group {
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .modal-group label {
+            font-size: 11px; font-weight: bold; color: #555; text-transform: uppercase;
+        }
+        .modal-input {
+            padding: 10px; border: 1px solid #ccc; border-radius: 6px;
+            font-size: 14px; outline: none; width: 100%;
+        }
+        .modal-input:focus { border-color: #007bff; }
+        .modal-footer {
+            padding: 12px 16px; background: #f8f9fa;
+            border-top: 1px solid #eee;
+            display: flex; justify-content: flex-end; gap: 10px;
+        }
+        .modal-btn-cancel {
+            background: #ffffff; border: 1px solid #ccc; color: #333;
+            padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer;
+        }
+        .modal-btn-save {
+            background: #28a745; border: none; color: #ffffff;
+            padding: 8px 20px; border-radius: 6px; font-weight: bold; cursor: pointer;
+        }
+        .modal-btn-save:hover { background: #218838; }
     </style>
 </head>
 <body>
@@ -325,6 +411,79 @@
         </div>
     </div>
 
+    <!-- Edit Entry Modal Popup -->
+    <div id="edit-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span>Edit Entry</span>
+                <button type="button" class="modal-close-btn" id="modal-close-x">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-doc-id">
+                <div class="modal-group">
+                    <label>Date</label>
+                    <input type="date" id="modal-date" class="modal-input">
+                </div>
+                <div class="modal-group">
+                    <label>Description</label>
+                    <input type="text" id="modal-desc" class="modal-input" placeholder="Description">
+                </div>
+                <div class="modal-group">
+                    <label>Slip URL</label>
+                    <input type="text" id="modal-slip" class="modal-input" placeholder="Slip URL / Link">
+                </div>
+                <div class="modal-group">
+                    <label id="modal-label-rec">Received</label>
+                    <input type="number" id="modal-received" class="modal-input" step="any">
+                </div>
+                <div class="modal-group">
+                    <label id="modal-label-sent">Sent</label>
+                    <input type="number" id="modal-sent" class="modal-input" step="any">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="modal-btn-cancel" id="modal-btn-cancel">Cancel</button>
+                <button type="button" class="modal-btn-save" id="modal-btn-save">Save Entry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add New Entry Modal Popup -->
+    <div id="add-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header" style="background: #28a745;">
+                <span>Add New Entry</span>
+                <button type="button" class="modal-close-btn" id="add-modal-close-x">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-group">
+                    <label>Date</label>
+                    <input type="date" id="add-modal-date" class="modal-input">
+                </div>
+                <div class="modal-group">
+                    <label>Description</label>
+                    <input type="text" id="add-modal-desc" class="modal-input" placeholder="Description">
+                </div>
+                <div class="modal-group">
+                    <label>Slip URL</label>
+                    <input type="text" id="add-modal-slip" class="modal-input" placeholder="Slip URL / Link">
+                </div>
+                <div class="modal-group">
+                    <label id="add-modal-label-rec">Received</label>
+                    <input type="number" id="add-modal-received" class="modal-input" step="any" placeholder="0">
+                </div>
+                <div class="modal-group">
+                    <label id="add-modal-label-sent">Sent</label>
+                    <input type="number" id="add-modal-sent" class="modal-input" step="any" placeholder="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="modal-btn-cancel" id="add-modal-btn-cancel">Cancel</button>
+                <button type="button" class="modal-btn-save" id="add-modal-btn-save">Add Entry</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, updateDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -388,6 +547,33 @@
 
         const createdByContainer = document.getElementById('created-by-container');
         const mainDataTable = document.getElementById('main-data-table');
+
+        // Edit Modal Elements
+        const editModal = document.getElementById('edit-modal');
+        const modalCloseX = document.getElementById('modal-close-x');
+        const modalBtnCancel = document.getElementById('modal-btn-cancel');
+        const modalBtnSave = document.getElementById('modal-btn-save');
+        const editDocId = document.getElementById('edit-doc-id');
+        const modalDate = document.getElementById('modal-date');
+        const modalDesc = document.getElementById('modal-desc');
+        const modalSlip = document.getElementById('modal-slip');
+        const modalReceived = document.getElementById('modal-received');
+        const modalSent = document.getElementById('modal-sent');
+        const modalLabelRec = document.getElementById('modal-label-rec');
+        const modalLabelSent = document.getElementById('modal-label-sent');
+
+        // Add Modal Elements
+        const addModal = document.getElementById('add-modal');
+        const addModalCloseX = document.getElementById('add-modal-close-x');
+        const addModalBtnCancel = document.getElementById('add-modal-btn-cancel');
+        const addModalBtnSave = document.getElementById('add-modal-btn-save');
+        const addModalDate = document.getElementById('add-modal-date');
+        const addModalDesc = document.getElementById('add-modal-desc');
+        const addModalSlip = document.getElementById('add-modal-slip');
+        const addModalReceived = document.getElementById('add-modal-received');
+        const addModalSent = document.getElementById('add-modal-sent');
+        const addModalLabelRec = document.getElementById('add-modal-label-rec');
+        const addModalLabelSent = document.getElementById('add-modal-label-sent');
 
         const monthNames = [
             "January", "February", "March", "April", "May", "June",
@@ -616,6 +802,76 @@
             };
         }
 
+        function makeCellEditable(td, docId, fieldName, currentVal, inputType = 'text') {
+            td.classList.add('editable-cell');
+            td.title = "Double click to edit";
+
+            td.addEventListener('dblclick', (e) => {
+                if (e.target.tagName === 'BUTTON') return;
+                if (td.querySelector('input')) return;
+
+                e.stopPropagation();
+
+                const input = document.createElement('input');
+                input.type = inputType;
+                input.className = 'inline-edit-input';
+                input.value = currentVal !== undefined && currentVal !== null ? currentVal : '';
+
+                if (inputType === 'number') {
+                    input.style.textAlign = 'right';
+                    input.step = 'any';
+                } else if (fieldName === 'desc') {
+                    input.style.textAlign = 'left';
+                } else {
+                    input.style.textAlign = 'center';
+                }
+
+                td.innerHTML = '';
+                td.appendChild(input);
+                input.focus();
+                if (inputType === 'text' || inputType === 'number') {
+                    input.select();
+                }
+
+                let isSaved = false;
+                const saveChanges = async () => {
+                    if (isSaved) return;
+                    isSaved = true;
+
+                    let newVal = input.value;
+                    if (inputType === 'number') {
+                        newVal = parseFloat(newVal) || 0;
+                    } else {
+                        newVal = newVal.trim();
+                    }
+
+                    if (newVal !== currentVal) {
+                        try {
+                            await updateDoc(doc(db, "ceo_expenses", docId), {
+                                [fieldName]: newVal
+                            });
+                        } catch (err) {
+                            console.error("Update error:", err);
+                            renderData();
+                        }
+                    } else {
+                        renderData();
+                    }
+                };
+
+                input.addEventListener('blur', saveChanges);
+
+                input.addEventListener('keydown', (ke) => {
+                    if (ke.key === 'Enter') {
+                        input.blur();
+                    } else if (ke.key === 'Escape') {
+                        isSaved = true;
+                        renderData();
+                    }
+                });
+            });
+        }
+
         function renderData() {
             const selectedAccount = accountFilter.value;
             const currentSelectedMonth = monthFilter ? monthFilter.value : 'all';
@@ -629,6 +885,9 @@
             }
 
             pageTitle.innerText = `Detail. ${selectedAccount}`;
+
+            let firstColHeader = 'Received';
+            let secondColHeader = 'Sent';
 
             if (selectedAccount === 'CEO') {
                 secondSummary.style.display = 'flex';
@@ -657,8 +916,6 @@
                 let colOneLabel = 'Total Received';
                 let colTwoLabel = 'Total Sent';
                 let colThreeLabel = 'Total';
-                let firstColHeader = 'Received';
-                let secondColHeader = 'Sent';
 
                 if (selectedAccount === 'Altaf Rent A Car') {
                     colOneLabel = 'Total Charges';
@@ -701,8 +958,10 @@
                     <th style="width: 15%;" class="text-right">Sub Total</th>
                     <th style="width: 15%;" class="action-col">Action</th>
                 `;
+                
+                // پرانا ان پٹ فارم اپنی جگہ برقرار ہے
                 addRowFormTr.innerHTML = `
-                    <td id="next-sno" style="font-weight: bold;">1</td>
+                    <td id="next-sno" style="font-weight: bold; cursor: pointer; color: #007bff;" title="Click to Open Add Form">1</td>
                     <td><input type="date" id="date" required></td>
                     <td><input type="text" id="desc" placeholder="Desc" required></td>
                     <td><input type="text" id="slip" placeholder="URL"></td>
@@ -712,8 +971,28 @@
                     <td class="action-col"><button type="button" id="submit-btn" class="add-btn">Add</button></td>
                 `;
 
+                const nextSnoCell = document.getElementById('next-sno');
                 const dateInput = document.getElementById('date');
                 if (dateInput) dateInput.valueAsDate = new Date();
+
+                const openAddModal = () => {
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    addModalDate.value = todayStr;
+                    addModalDesc.value = '';
+                    addModalSlip.value = '';
+                    addModalReceived.value = '';
+                    addModalSent.value = '';
+
+                    addModalLabelRec.innerText = firstColHeader;
+                    addModalLabelSent.innerText = secondColHeader;
+
+                    addModal.style.display = 'flex';
+                };
+
+                if (nextSnoCell) {
+                    nextSnoCell.addEventListener('click', openAddModal);
+                }
+
                 const submitBtn = document.getElementById('submit-btn');
                 if (submitBtn) {
                     submitBtn.addEventListener('click', handleAddRecord);
@@ -872,7 +1151,6 @@
                     totalReceived += recVal;
                     totalSent += sentVal;
 
-                    // درست کیا گیا فارمولا: ہر اکاؤنٹ میں آنے والی رقم جمع اور جانے والی مائنس ہو گی
                     runningSubTotal = runningSubTotal + recVal - sentVal;
 
                     const slipVal = expense.slip || expense.slipUrl || '';
@@ -893,38 +1171,83 @@
                         : '';
 
                     const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${count++}</td>
-                        <td>${formatDateToDMY(expense.date)}</td>
-                        <td class="desc-cell">
-                            <div style="display: flex; flex-direction: column; gap: 2px;">
-                                <span style="word-break: break-word;">${expense.desc || ''}</span>
-                                ${(upBtnHtml || downBtnHtml) ? `
-                                <div style="display: flex; gap: 3px; align-items: center; margin-top: 2px;">
-                                    ${upBtnHtml}${downBtnHtml}
-                                </div>` : ''}
-                            </div>
-                        </td>
-                        <td>${slipHtml}</td>
-                        <td class="text-right">${formatPlainNum(recVal)}</td>
-                        <td class="text-right">${formatPlainNum(sentVal)}</td>
-                        <td class="text-right" style="font-weight: bold; color: #dc3545;">${formatPlainNum(runningSubTotal)}</td>
-                        <td class="action-col">
-                            <div class="action-btns">
-                                <button class="edit-btn" data-id="${id}" data-date="${expense.date || ''}" data-desc="${expense.desc || ''}" data-slip="${slipVal}" data-received="${recVal}" data-sent="${sentVal}">Edit</button>
-                                <button class="delete-btn" data-id="${id}">Del</button>
-                            </div>
-                        </td>
+
+                    const tdSno = document.createElement('td');
+                    tdSno.innerText = count++;
+
+                    const tdDate = document.createElement('td');
+                    tdDate.innerHTML = formatDateToDMY(expense.date);
+                    makeCellEditable(tdDate, id, 'date', expense.date || '', 'date');
+
+                    const tdDesc = document.createElement('td');
+                    tdDesc.className = 'desc-cell';
+                    tdDesc.innerHTML = `
+                        <div style="display: flex; flex-direction: column; gap: 2px;">
+                            <span style="word-break: break-word;">${expense.desc || ''}</span>
+                            ${(upBtnHtml || downBtnHtml) ? `
+                            <div style="display: flex; gap: 3px; align-items: center; margin-top: 2px;">
+                                ${upBtnHtml}${downBtnHtml}
+                            </div>` : ''}
+                        </div>
                     `;
+                    makeCellEditable(tdDesc, id, 'desc', expense.desc || '', 'text');
+
+                    const tdSlip = document.createElement('td');
+                    tdSlip.innerHTML = slipHtml;
+                    makeCellEditable(tdSlip, id, 'slip', slipVal, 'text');
+
+                    const tdRec = document.createElement('td');
+                    tdRec.className = 'text-right';
+                    tdRec.innerText = formatPlainNum(recVal);
+                    makeCellEditable(tdRec, id, 'received', recVal, 'number');
+
+                    const tdSent = document.createElement('td');
+                    tdSent.className = 'text-right';
+                    tdSent.innerText = formatPlainNum(sentVal);
+                    makeCellEditable(tdSent, id, 'sent', sentVal, 'number');
+
+                    const tdSub = document.createElement('td');
+                    tdSub.className = 'text-right';
+                    tdSub.style.fontWeight = 'bold';
+                    tdSub.style.color = '#dc3545';
+                    tdSub.innerText = formatPlainNum(runningSubTotal);
+
+                    const tdAction = document.createElement('td');
+                    tdAction.className = 'action-col';
+                    tdAction.innerHTML = `
+                        <div class="action-btns">
+                            <button class="icon-btn edit-icon-btn edit-btn" data-id="${id}" data-date="${expense.date || ''}" data-desc="${expense.desc || ''}" data-slip="${slipVal}" data-received="${recVal}" data-sent="${sentVal}" title="Edit">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                            <button class="icon-btn delete-icon-btn delete-btn" data-id="${id}" title="Delete">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+
+                    row.appendChild(tdSno);
+                    row.appendChild(tdDate);
+                    row.appendChild(tdDesc);
+                    row.appendChild(tdSlip);
+                    row.appendChild(tdRec);
+                    row.appendChild(tdSent);
+                    row.appendChild(tdSub);
+                    row.appendChild(tdAction);
+
                     expenseList.appendChild(row);
                 });
 
-                const nextSnoCell = document.getElementById('next-sno');
-                if (nextSnoCell) nextSnoCell.innerText = count;
+                const nextSnoCellSummary = document.getElementById('next-sno');
+                if (nextSnoCellSummary) nextSnoCellSummary.innerText = count;
 
                 document.querySelectorAll('.up-btn').forEach(btn => {
                     btn.addEventListener('click', async (e) => {
-                        const idx = parseInt(e.target.getAttribute('data-index'), 10);
+                        const idx = parseInt(e.currentTarget.getAttribute('data-index'), 10);
                         if (idx > 0) {
                             await swapExpensesData(filteredItems[idx], filteredItems[idx - 1]);
                         }
@@ -933,7 +1256,7 @@
 
                 document.querySelectorAll('.down-btn').forEach(btn => {
                     btn.addEventListener('click', async (e) => {
-                        const idx = parseInt(e.target.getAttribute('data-index'), 10);
+                        const idx = parseInt(e.currentTarget.getAttribute('data-index'), 10);
                         if (idx < filteredItems.length - 1) {
                             await swapExpensesData(filteredItems[idx], filteredItems[idx + 1]);
                         }
@@ -942,52 +1265,28 @@
 
                 document.querySelectorAll('.delete-btn').forEach(btn => {
                     btn.addEventListener('click', async (e) => {
-                        const docId = e.target.getAttribute('data-id');
+                        const docId = e.currentTarget.getAttribute('data-id');
                         if (confirm("Kiya aap is record ko delete karna chahte hain?")) {
                             await deleteDoc(doc(db, "ceo_expenses", docId));
                         }
                     });
                 });
 
+                // Edit Modal Popup Trigger
                 document.querySelectorAll('.edit-btn').forEach(btn => {
-                    btn.addEventListener('click', async (e) => {
-                        const docId = e.target.getAttribute('data-id');
-                        const oldDate = e.target.getAttribute('data-date');
-                        const oldDesc = e.target.getAttribute('data-desc');
-                        const oldSlip = e.target.getAttribute('data-slip') || '';
-                        const oldRec = e.target.getAttribute('data-received');
-                        const oldSent = e.target.getAttribute('data-sent');
+                    btn.addEventListener('click', (e) => {
+                        const b = e.currentTarget;
+                        editDocId.value = b.getAttribute('data-id');
+                        modalDate.value = b.getAttribute('data-date') || '';
+                        modalDesc.value = b.getAttribute('data-desc') || '';
+                        modalSlip.value = b.getAttribute('data-slip') || '';
+                        modalReceived.value = b.getAttribute('data-received') || 0;
+                        modalSent.value = b.getAttribute('data-sent') || 0;
 
-                        const newDate = prompt("Nayi Date likhein (YYYY-MM-DD):", oldDate);
-                        if (newDate === null) return;
-                        const newDesc = prompt("Nayi Description likhein:", oldDesc);
-                        if (newDesc === null) return;
-                        const newSlip = prompt("Slip URL / Link (khali chhor sakte hain):", oldSlip);
-                        if (newSlip === null) return;
-                        
-                        let promptRec = "Nayi Received Raqam:";
-                        let promptSent = isAcAccount(selectedAccount) ? "Nayi Sent Raqam:" : "Nayi Return Raqam:";
-                        if (selectedAccount === 'Altaf Rent A Car') {
-                            promptRec = "Nayi Charges Raqam:";
-                            promptSent = "Nayi Pay Raqam:";
-                        } else if (selectedAccount === 'Sharif A/C') {
-                            promptRec = "Nayi Received Raqam:";
-                            promptSent = "Nayi Sent Raqam:";
-                        }
+                        modalLabelRec.innerText = firstColHeader;
+                        modalLabelSent.innerText = secondColHeader;
 
-                        const newRec = prompt(promptRec, oldRec);
-                        if (newRec === null) return;
-                        
-                        const newSent = prompt(promptSent, oldSent);
-                        if (newSent === null) return;
-
-                        await updateDoc(doc(db, "ceo_expenses", docId), {
-                            date: newDate,
-                            desc: newDesc,
-                            slip: newSlip.trim(),
-                            received: parseFloat(newRec) || 0,
-                            sent: parseFloat(newSent) || 0
-                        });
+                        editModal.style.display = 'flex';
                     });
                 });
 
@@ -995,6 +1294,116 @@
                 totalSentDisplay.innerText = formatPlainNum(totalSent);
                 totalBalanceDisplay.innerText = formatPlainNum(totalReceived - totalSent);
             }
+        }
+
+        // Edit Modal Save & Close handlers
+        async function saveModalData() {
+            const docId = editDocId.value;
+            if (!docId) return;
+
+            const newDate = modalDate.value;
+            const newDesc = modalDesc.value.trim();
+            const newSlip = modalSlip.value.trim();
+            const newRec = parseFloat(modalReceived.value) || 0;
+            const newSent = parseFloat(modalSent.value) || 0;
+
+            if (!newDesc) {
+                alert("Please Description likhein!");
+                return;
+            }
+
+            try {
+                await updateDoc(doc(db, "ceo_expenses", docId), {
+                    date: newDate,
+                    desc: newDesc,
+                    slip: newSlip,
+                    received: newRec,
+                    sent: newSent
+                });
+                editModal.style.display = 'none';
+            } catch (err) {
+                console.error("Error updating document:", err);
+                alert("Error updating record!");
+            }
+        }
+
+        modalBtnSave.addEventListener('click', saveModalData);
+        modalCloseX.addEventListener('click', () => { editModal.style.display = 'none'; });
+        modalBtnCancel.addEventListener('click', () => { editModal.style.display = 'none'; });
+
+        // Add Modal Save & Close handlers
+        async function addNewEntryFromModal() {
+            const selectedAccount = accountFilter.value;
+            const newDate = addModalDate.value;
+            const newDesc = addModalDesc.value.trim();
+            const newSlip = addModalSlip.value.trim();
+            const newRec = parseFloat(addModalReceived.value) || 0;
+            const newSent = parseFloat(addModalSent.value) || 0;
+
+            if (!newDesc) {
+                alert("Please Description likhein!");
+                return;
+            }
+
+            try {
+                await addDoc(expensesRef, {
+                    account: selectedAccount,
+                    date: newDate,
+                    desc: newDesc,
+                    slip: newSlip,
+                    received: newRec,
+                    sent: newSent,
+                    createdAt: new Date()
+                });
+                addModal.style.display = 'none';
+            } catch (err) {
+                console.error("Error adding document:", err);
+                alert("Error adding record!");
+            }
+        }
+
+        addModalBtnSave.addEventListener('click', addNewEntryFromModal);
+        addModalCloseX.addEventListener('click', () => { addModal.style.display = 'none'; });
+        addModalBtnCancel.addEventListener('click', () => { addModal.style.display = 'none'; });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === editModal) {
+                editModal.style.display = 'none';
+            }
+            if (e.target === addModal) {
+                addModal.style.display = 'none';
+            }
+        });
+
+        // پرانا ایڈ کرنے کا طریقہ (Table footer button click)
+        async function handleAddRecord() {
+            const selectedAccount = accountFilter.value;
+            const dateInput = document.getElementById('date');
+            const descInput = document.getElementById('desc');
+            const slipInput = document.getElementById('slip');
+            const receivedInput = document.getElementById('received');
+            const sentInput = document.getElementById('sent');
+
+            if (!descInput || !descInput.value) {
+                alert("Please Description likhein!");
+                return;
+            }
+
+            await addDoc(expensesRef, {
+                account: selectedAccount,
+                date: dateInput ? dateInput.value : '',
+                desc: descInput ? descInput.value : '',
+                slip: slipInput ? slipInput.value.trim() : '',
+                received: receivedInput ? (parseFloat(receivedInput.value) || 0) : 0,
+                sent: sentInput ? (parseFloat(sentInput.value) || 0) : 0,
+                createdAt: new Date()
+            });
+
+            if (descInput) descInput.value = '';
+            if (slipInput) slipInput.value = '';
+            if (receivedInput) receivedInput.value = '';
+            if (sentInput) sentInput.value = '';
+            if (dateInput) dateInput.valueAsDate = new Date();
         }
 
         function updateAmountBoxOnly(items, type, columnHeaderLabel, clickedVal) {
@@ -1136,36 +1545,6 @@
             };
             await updateDoc(doc(db, "ceo_expenses", itemA.id), dataForA);
             await updateDoc(doc(db, "ceo_expenses", itemB.id), dataForB);
-        }
-
-        async function handleAddRecord() {
-            const selectedAccount = accountFilter.value;
-            const dateInput = document.getElementById('date');
-            const descInput = document.getElementById('desc');
-            const slipInput = document.getElementById('slip');
-            const receivedInput = document.getElementById('received');
-            const sentInput = document.getElementById('sent');
-
-            if (!descInput || !descInput.value) {
-                alert("Please Description likhein!");
-                return;
-            }
-
-            await addDoc(expensesRef, {
-                account: selectedAccount,
-                date: dateInput ? dateInput.value : '',
-                desc: descInput ? descInput.value : '',
-                slip: slipInput ? slipInput.value.trim() : '',
-                received: receivedInput ? (parseFloat(receivedInput.value) || 0) : 0,
-                sent: sentInput ? (parseFloat(sentInput.value) || 0) : 0,
-                createdAt: new Date()
-            });
-
-            if (descInput) descInput.value = '';
-            if (slipInput) slipInput.value = '';
-            if (receivedInput) receivedInput.value = '';
-            if (sentInput) sentInput.value = '';
-            if (dateInput) dateInput.valueAsDate = new Date();
         }
 
         onSnapshot(q, (snapshot) => {
