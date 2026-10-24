@@ -783,6 +783,8 @@
                         <option value="Office 02% Arif">Office 02% Arif</option>
                         <option value="Altaf Rent A Car">Altaf Rent A Car</option>
                         <option value="Sharif A/C">Sharif A/C</option>
+                        <option value="SAJID">SAJID</option>
+                        <option value="RASHID DRIVER">RASHID DRIVER</option>
                     </select>
                     <button type="button" id="row-pdf-btn" class="pdf-btn">PDF</button>
                     <button type="button" id="row-jpg-btn" class="jpg-btn">JPG</button>
@@ -1094,7 +1096,9 @@
                 (acc.includes('farooq shah') && !acc.includes('ac')) ||
                 (acc.includes('frooq shah') && !acc.includes('ac')) ||
                 acc.includes('altaf rent a car') || acc.includes('altaf rent') ||
-                acc.includes('sharif a/c') || acc === 'sharif a/c' || acc.includes('sharif')) {
+                acc.includes('sharif a/c') || acc === 'sharif a/c' || acc.includes('sharif') ||
+                acc.includes('sajid') || acc === 'sajid' ||
+                acc.includes('rashid driver') || acc === 'rashid driver') {
                 return false;
             }
 
@@ -1129,13 +1133,17 @@
                 return acc.includes('altaf rent a car') || acc.includes('altaf rent');
             } else if (selectedAccount === 'Sharif A/C') {
                 return acc === 'sharif a/c' || acc.includes('sharif a/c') || acc === 'sharif';
+            } else if (selectedAccount === 'SAJID') {
+                return acc === 'sajid' || acc.includes('sajid');
+            } else if (selectedAccount === 'RASHID DRIVER') {
+                return acc === 'rashid driver' || acc.includes('rashid driver');
             }
             return false;
         }
 
         function isExcludedFromMonthFilter(accName) {
             const acc = accName.toLowerCase().trim();
-            return acc.includes('altaf rent a car') || acc.includes('altaf rent') || acc.includes('sharif a/c') || acc.includes('sharif');
+            return acc.includes('altaf rent a car') || acc.includes('altaf rent') || acc.includes('sharif a/c') || acc.includes('sharif') || acc.includes('sajid') || acc.includes('rashid driver');
         }
 
         function populateMonthFilterForAccount(selectedAccount, resetToDefault = false) {
@@ -1154,7 +1162,7 @@
 
                 let match = false;
                 if (selectedAccount === 'CEO') {
-                    if (itemAccount.includes('sharif')) return;
+                    if (itemAccount.includes('sharif') || itemAccount.includes('sajid') || itemAccount.includes('rashid driver')) return;
                     match = true;
                 } else {
                     match = isAccountMatch(itemAccount, selectedAccount);
@@ -1343,7 +1351,7 @@
             allExpensesData.forEach(item => {
                 const d = item.expense.date;
                 const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
-                if (itemAccount.includes('sharif')) return;
+                if (itemAccount.includes('sharif') || itemAccount.includes('sajid') || itemAccount.includes('rashid driver')) return;
 
                 if (d && d !== 'no-date') {
                     const parts = d.split('-');
@@ -1394,7 +1402,8 @@
                 if (!d || d === 'no-date') return;
 
                 const rawAccount = (item.expense.account ? item.expense.account.trim() : '');
-                if (rawAccount.toLowerCase().includes('sharif')) return;
+                const accLower = rawAccount.toLowerCase();
+                if (accLower.includes('sharif') || accLower.includes('sajid') || accLower.includes('rashid driver')) return;
 
                 const parts = d.split('-');
                 if (parts.length >= 2) {
@@ -1472,7 +1481,8 @@
 
                 allExpensesData.forEach(item => {
                     const rawAcc = item.expense.account ? item.expense.account.trim() : '';
-                    if (rawAcc.toLowerCase().includes('sharif')) return;
+                    const accLower = rawAcc.toLowerCase();
+                    if (accLower.includes('sharif') || accLower.includes('sajid') || accLower.includes('rashid driver')) return;
                     const d = item.expense.date || '';
 
                     if (isAccountMatch(rawAcc, accName)) {
@@ -1846,7 +1856,8 @@
 
             allExpensesData.forEach(item => {
                 const rawAccount = item.expense.account ? item.expense.account.trim() : '';
-                if (rawAccount.toLowerCase().includes('sharif')) return;
+                const accLower = rawAccount.toLowerCase();
+                if (accLower.includes('sharif') || accLower.includes('sajid') || accLower.includes('rashid driver')) return;
 
                 const desc = item.expense.desc ? item.expense.desc.trim() : '';
                 const date = item.expense.date || 'no-date';
@@ -1909,7 +1920,8 @@
 
             allExpensesData.forEach(item => {
                 const rawAccount = item.expense.account ? item.expense.account.trim() : '';
-                if (rawAccount.toLowerCase().includes('sharif')) return;
+                const accLower = rawAccount.toLowerCase();
+                if (accLower.includes('sharif') || accLower.includes('sajid') || accLower.includes('rashid driver')) return;
 
                 const isAc = isAcAccount(rawAccount);
                 if (!isAc) {
@@ -1961,8 +1973,12 @@
 
                 allExpensesData.forEach((item) => {
                     const rawAccount = item.expense.account ? item.expense.account.trim() : 'Musharaf Amanat';
-                    if (!isCeo && rawAccount.toLowerCase().includes('sharif') && selectedAccount !== 'Sharif A/C') return;
-                    if (isCeo && rawAccount.toLowerCase().includes('sharif')) return;
+                    const accLower = rawAccount.toLowerCase();
+                    const isExcludedAccount = accLower.includes('sharif') || accLower.includes('sajid') || accLower.includes('rashid driver');
+                    const isCurrentlySelected = selectedAccount === 'Sharif A/C' || selectedAccount === 'SAJID' || selectedAccount === 'RASHID DRIVER';
+
+                    if (!isCeo && isExcludedAccount && !isCurrentlySelected) return;
+                    if (isCeo && isExcludedAccount) return;
 
                     const desc = item.expense.desc ? item.expense.desc.trim() : '';
                     const itemDate = item.expense.date || '';
@@ -2111,7 +2127,7 @@
                     colThreeLabel = 'Remaining Charges';
                     firstColHeader = 'Charges';
                     secondColHeader = 'Pay';
-                } else if (selectedAccount === 'Sharif A/C') {
+                } else if (selectedAccount === 'Sharif A/C' || selectedAccount === 'SAJID' || selectedAccount === 'RASHID DRIVER') {
                     colOneLabel = 'Total Received';
                     colTwoLabel = 'Total Sent';
                     colThreeLabel = 'Total Balance';
@@ -2494,9 +2510,16 @@
 
         if (monthFilter) {
             monthFilter.addEventListener('change', () => {
+                const selectedVal = monthFilter.value;
+                if (msMonthSelect && msMonthSelect.value !== selectedVal) {
+                    msMonthSelect.value = selectedVal;
+                    renderMonthlySummaryTable();
+                }
                 if (fromDateFilter) fromDateFilter.value = '';
                 if (toDateFilter) toDateFilter.value = '';
-                renderData();
+                if (!isDrillDownMode) {
+                    renderData();
+                }
             });
         }
 

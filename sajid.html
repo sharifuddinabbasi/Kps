@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAJID - Khan Petroleum Service</title>
+
+    <!-- PWA Code -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007bff">
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+      }
+    </script>
+
+    <!-- HTML2PDF & HTML2CANVAS Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f4f7f6; overflow: hidden; }
+        .container { display: flex; flex-direction: column; height: 100vh; max-width: 900px; margin: 0 auto; background: #ffffff; padding: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-y: auto; position: relative; }
+        .fixed-header { flex-shrink: 0; background: #ffffff; padding-bottom: 8px; border-bottom: 2px solid #eee; position: relative; }
+        
+        /* 3D Diesel Color Brand Title */
+        .brand-title-main {
+            text-align: center;
+            font-size: clamp(24px, 6vw, 34px);
+            font-weight: 900;
+            color: #e5a108;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 6px 0;
+            white-space: nowrap;
+            text-shadow: 
+                0 1px 0 #b37402,
+                0 2px 0 #8c5700,
+                0 3px 0 #663d00,
+                0 4px 5px rgba(0, 0, 0, 0.45);
+        }
+
+        .header-top { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 8px; 
+            flex-wrap: nowrap; 
+            gap: 8px; 
+            width: 100%;
+        }
+        h1 { color: #333; font-size: clamp(17px, 1.2vw + 10px, 22px); margin: 0; }
+
+        .search-toggle-btn { 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 5px 14px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: clamp(12px, 0.7vw + 8px, 14.5px); 
+            font-weight: bold; 
+            white-space: nowrap;
+        }
+        .search-toggle-btn:hover { background-color: #0056b3; }
+        .search-toggle-btn.active { background-color: #dc3545; }
+
+        .search-container { display: none; margin-bottom: 10px; background: #eef6ff; padding: 8px; border-radius: 6px; border: 1px solid #007bff; }
+        .search-container.show { display: flex; gap: 8px; align-items: center; }
+        .search-box { padding: 6px 10px; font-size: clamp(12px, 0.8vw + 8px, 15px); border-radius: 4px; border: 1px solid #ccc; flex: 1; outline: none; }
+        .search-box:focus { border-color: #007bff; }
+        .search-cancel-btn { background-color: #dc3545; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-size: clamp(12px, 0.7vw + 8px, 14px); font-weight: bold; cursor: pointer; white-space: nowrap; }
+        .search-cancel-btn:hover { background-color: #bd2130; }
+
+        .summary { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 5px; }
+        .card { flex: 1 1 calc(33.333% - 8px); min-width: 80px; padding: 6px 4px; border-radius: 6px; text-align: center; color: white; }
+        .card.received-card { background-color: #28a745; }
+        .card.sent-card { background-color: #007bff; }
+        .card.balance-card { background-color: #dc3545; }
+        .card h3 { margin: 0; font-size: clamp(9.5px, 0.6vw + 6px, 12px); text-transform: uppercase; }
+        .card p { font-size: clamp(12.5px, 0.9vw + 7px, 16px); font-weight: bold; margin: 2px 0 0 0; word-break: break-word; }
+        
+        .controls-filter-row { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 6px; 
+            margin: 6px 0 4px 0; 
+            background: #f8faff; 
+            padding: 6px 8px; 
+            border-radius: 4px; 
+            border: 1px dashed #007bff; 
+        }
+        .filter-line { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            width: 100%;
+        }
+        .controls-filter-row label { font-size: clamp(10.5px, 0.6vw + 7px, 13px); font-weight: bold; color: #333; flex-shrink: 0; }
+        .control-input { padding: 3px 6px; font-size: clamp(10.5px, 0.6vw + 7px, 13px); border-radius: 4px; border: 1px solid #007bff; background: #fff; color: #333; outline: none; }
+        .reset-filter-btn { background: #6c757d; color: #fff; border: none; padding: 4px 8px; border-radius: 3px; font-size: clamp(10.5px, 0.6vw + 7px, 13px); cursor: pointer; font-weight: bold; flex-shrink: 0; line-height: 1; }
+
+        .table-portion { 
+            flex: 1 1 auto; 
+            height: 250px; 
+            overflow-y: auto; 
+            overflow-x: auto; 
+            margin-top: 5px; 
+            border-bottom: 1px solid #ddd; 
+            width: 100%; 
+            position: relative; 
+            -webkit-overflow-scrolling: touch; 
+        }
+        
+        .table-portion.large-scroll { 
+            height: calc(100vh - 220px) !important; 
+            max-height: calc(100vh - 220px) !important; 
+            flex: 1 1 auto; 
+            margin-bottom: 10px;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+        }
+
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th, td { border: 1px solid #ddd; padding: clamp(4px, 0.4vw + 2px, 6px) clamp(1px, 0.3vw + 1px, 4px); text-align: center; font-size: clamp(10px, 0.7vw + 6px, 12.5px); white-space: normal; overflow: hidden; word-wrap: break-word; vertical-align: middle; }
+        th { background-color: #f2f2f2; font-weight: bold; position: sticky; top: 0; z-index: 10; line-height: 1.1; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tbody tr { height: clamp(26px, 1vw + 20px, 32px); }
+        
+        .slip-link { color: #007bff; font-weight: bold; text-decoration: none !important; cursor: pointer; }
+        .slip-link:hover { color: #0056b3; text-decoration: none !important; }
+        a { text-decoration: none !important; }
+
+        .text-right { text-align: right !important; padding-right: 4px !important; white-space: nowrap !important; }
+        th.text-right { text-align: right !important; padding-right: 4px !important; white-space: nowrap !important; }
+
+        .status { margin-bottom: 5px; color: #666; font-size: clamp(10px, 0.6vw + 7px, 12px); }
+        .pdf-btn { background-color: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: clamp(10px, 0.6vw + 6.5px, 12.5px); font-weight: bold; }
+        .jpg-btn { background-color: #28a745; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: clamp(10px, 0.6vw + 6.5px, 12.5px); font-weight: bold; }
+
+        .footer-text { text-align: center; font-size: clamp(11px, 0.6vw + 7px, 13px); font-weight: bold; color: #333; margin-top: 15px; margin-bottom: 10px; padding-bottom: 10px; }
+        .export-meta-footer { display: none; margin-top: 10px; font-size: 9px; color: #666; text-align: right; border-top: 1px dashed #ccc; padding-top: 4px; }
+        .export-mode-active .export-meta-footer { display: block !important; }
+
+        .export-header-title {
+            display: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 6px;
+        }
+        .export-mode-active .export-header-title { display: block !important; }
+
+        /* Modal Overlay */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-box { background: #fff; padding: 18px; border-radius: 8px; width: 90%; max-width: 380px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-align: center; font-family: Arial, sans-serif; }
+        .modal-box h3 { margin-top: 0; font-size: 16px; color: #007bff; }
+        .modal-box p { font-size: 13px; color: #444; margin-bottom: 12px; }
+        .modal-inputs { display: flex; justify-content: space-around; gap: 8px; margin: 12px 0; align-items: center; }
+        .modal-inputs div { display: flex; flex-direction: column; align-items: flex-start; }
+        .modal-inputs label { font-size: 11px; font-weight: bold; color: #555; margin-bottom: 3px; }
+        .modal-inputs input { width: 80px; padding: 5px; font-size: 12px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
+        .modal-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
+        .modal-btn { padding: 8px 12px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-all { background: #28a745; color: white; }
+        .btn-range { background: #007bff; color: white; }
+        .btn-cancel { background: #6c757d; color: white; margin-top: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="main-view-wrapper">
+            <div class="brand-title-main">Khan Petroleum Service</div>
+
+            <div class="fixed-header">
+                <div class="header-top">
+                    <h1 id="page-title">SAJID Detail</h1>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <button type="button" id="row-pdf-btn" class="pdf-btn">PDF</button>
+                        <button type="button" id="row-jpg-btn" class="jpg-btn">JPG</button>
+                        <button type="button" id="search-toggle-btn-top" class="search-toggle-btn">Search</button>
+                    </div>
+                </div>
+
+                <div id="search-container" class="search-container">
+                    <input type="text" id="search-input" class="search-box" placeholder="Lafz, detail ya amount likhein...">
+                    <button type="button" id="search-inline-cancel-btn" class="search-cancel-btn">Cancel</button>
+                </div>
+                
+                <div class="summary" id="first-summary-cards">
+                    <div class="card received-card">
+                        <h3>Total Received</h3>
+                        <p id="total-received">0</p>
+                    </div>
+                    <div class="card sent-card">
+                        <h3>Total Sent</h3>
+                        <p id="total-sent">0</p>
+                    </div>
+                    <div class="card balance-card">
+                        <h3>Total</h3>
+                        <p id="total-balance">0</p>
+                    </div>
+                </div>
+
+                <div id="month-filter-container" class="controls-filter-row">
+                    <div class="filter-line">
+                        <label for="month-filter">Select Month:</label>
+                        <select id="month-filter" class="control-input" style="flex: 1;">
+                            <option value="all">All Months</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-line" style="flex-wrap: nowrap;">
+                        <label for="from-date-filter">From:</label>
+                        <input type="date" id="from-date-filter" class="control-input" style="flex: 1; min-width: 0;">
+
+                        <label for="to-date-filter">To:</label>
+                        <input type="date" id="to-date-filter" class="control-input" style="flex: 1; min-width: 0;">
+
+                        <button type="button" id="clear-dates-btn" class="reset-filter-btn" title="Reset Dates">✕</button>
+                    </div>
+                </div>
+
+                <div id="loading" class="status">Loading data...</div>
+            </div>
+
+            <div id="table-container" class="table-portion large-scroll">
+                <div id="main-export-title" class="export-header-title">SAJID Detail</div>
+                
+                <div id="export-summary-holder" class="export-summary-container"></div>
+
+                <table id="main-view-table">
+                    <thead>
+                        <tr id="table-header-row">
+                            <th style="width: 7%;">S.No</th>
+                            <th style="width: 16%;">Date</th>
+                            <th style="width: 44%;">Description</th>
+                            <th style="width: 16.5%;" class="text-right">Received</th>
+                            <th style="width: 16.5%;" class="text-right">Sent</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expense-list"></tbody>
+                </table>
+
+                <div id="export-meta-footer" class="export-meta-footer">
+                    Report Generated on: <span id="export-timestamp-span">-</span>
+                </div>
+            </div>
+
+            <div id="created-by-container" style="display: block; flex-shrink: 0;">
+                <div class="footer-text">Created by Sharifuddin</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal-overlay">
+        <div class="modal-box">
+            <h3>Export Options</h3>
+            <p>تمام ڈیٹا ایکسپورٹ کریں یا رو کا رینج منتخب کریں:</p>
+            
+            <div class="modal-inputs">
+                <div>
+                    <label for="fromSno">From S.No:</label>
+                    <input type="number" id="fromSno" min="1" placeholder="1">
+                </div>
+                <div>
+                    <label for="toSno">To S.No:</label>
+                    <input type="number" id="toSno" min="1" placeholder="10">
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" id="modal-btn-range" class="modal-btn btn-range">ایکپورٹ منتخب روز (Selected Range)</button>
+                <button type="button" id="modal-btn-all" class="modal-btn btn-all">ایکپورٹ تمام ڈیٹا (All Data)</button>
+                <button type="button" id="modal-btn-cancel" class="modal-btn btn-cancel">منسوخ کریں (Cancel)</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSPb0bIHj9edsuZi0RO1VNhTovDZYOrP8",
+            authDomain: "khanpetolum.firebaseapp.com",
+            projectId: "khanpetolum",
+            storageBucket: "khanpetolum.firebasestorage.app",
+            messagingSenderId: "667827334582",
+            appId: "1:667827334582:web:dc1edc4522f027689ca517",
+            measurementId: "G-HHLCHWEE06"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const expensesRef = collection(db, "ceo_expenses");
+        const q = query(expensesRef, orderBy("date", "asc"));
+
+        const monthFilter = document.getElementById('month-filter');
+        const fromDateFilter = document.getElementById('from-date-filter');
+        const toDateFilter = document.getElementById('to-date-filter');
+        const clearDatesBtn = document.getElementById('clear-dates-btn');
+
+        const searchInput = document.getElementById('search-input');
+        const searchContainer = document.getElementById('search-container');
+        const searchToggleBtnTop = document.getElementById('search-toggle-btn-top');
+        const searchInlineCancelBtn = document.getElementById('search-inline-cancel-btn');
+
+        const rowPdfBtn = document.getElementById('row-pdf-btn');
+        const rowJpgBtn = document.getElementById('row-jpg-btn');
+        
+        const expenseList = document.getElementById('expense-list');
+        const totalReceivedDisplay = document.getElementById('total-received');
+        const totalSentDisplay = document.getElementById('total-sent');
+        const totalBalanceDisplay = document.getElementById('total-balance');
+        const loadingDiv = document.getElementById('loading');
+
+        const tableContainer = document.getElementById('table-container');
+        const mainExportTitle = document.getElementById('main-export-title');
+        const exportSummaryHolder = document.getElementById('export-summary-holder');
+        const exportTimestampSpan = document.getElementById('export-timestamp-span');
+        const firstSummaryCards = document.getElementById('first-summary-cards');
+
+        const exportModal = document.getElementById('exportModal');
+        const fromSnoInput = document.getElementById('fromSno');
+        const toSnoInput = document.getElementById('toSno');
+
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        let allExpensesData = [];
+        let currentExportTarget = { elementId: '', fileName: '', format: '' };
+        let isSearchActive = false;
+        let isInitialLoad = true;
+
+        function getSystemCurrentYearMonth() {
+            const d = new Date();
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            return `${yyyy}-${mm}`;
+        }
+
+        function isAccountMatch(itemAccount) {
+            const acc = itemAccount.toLowerCase().trim();
+            return acc === 'sajid' || acc.includes('sajid');
+        }
+
+        function populateMonthFilter() {
+            if (!monthFilter) return;
+            const currentSelectedVal = monthFilter.value;
+            const uniqueYearMonths = new Set();
+
+            allExpensesData.forEach(item => {
+                const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
+                const d = item.expense.date;
+
+                if (isAccountMatch(itemAccount) && d && d !== 'no-date') {
+                    const parts = d.split('-');
+                    if (parts.length >= 2) {
+                        uniqueYearMonths.add(`${parts[0]}-${parts[1]}`);
+                    }
+                }
+            });
+
+            const sorted = Array.from(uniqueYearMonths).sort();
+            monthFilter.innerHTML = '<option value="all">All Months</option>';
+
+            sorted.forEach(ym => {
+                const parts = ym.split('-');
+                const year = parts[0];
+                const month = parts[1];
+                const mIndex = parseInt(month, 10) - 1;
+                const label = `${monthNames[mIndex]}${year}`;
+
+                const opt = document.createElement('option');
+                opt.value = ym;
+                opt.textContent = label;
+                monthFilter.appendChild(opt);
+            });
+
+            const sysYM = getSystemCurrentYearMonth();
+
+            if (isInitialLoad) {
+                if (sorted.includes(sysYM)) {
+                    monthFilter.value = sysYM;
+                } else if (sorted.length > 0) {
+                    monthFilter.value = sorted[sorted.length - 1];
+                } else {
+                    monthFilter.value = 'all';
+                }
+                isInitialLoad = false;
+            } else if (currentSelectedVal && (currentSelectedVal === 'all' || sorted.includes(currentSelectedVal))) {
+                monthFilter.value = currentSelectedVal;
+            } else if (sorted.includes(sysYM)) {
+                monthFilter.value = sysYM;
+            } else {
+                monthFilter.value = 'all';
+            }
+        }
+
+        function formatPlainNum(num) {
+            if (num === undefined || num === null || isNaN(num)) return '0';
+            return Number(num).toLocaleString('en-IN');
+        }
+
+        function checkDateInRange(dateStr, selectedYearMonth, fromDate, toDate) {
+            if (!dateStr || dateStr === 'no-date') return true;
+            if (fromDate && dateStr < fromDate) return false;
+            if (toDate && dateStr > toDate) return false;
+
+            if (!fromDate && !toDate && selectedYearMonth !== 'all') {
+                const parts = dateStr.split('-');
+                if (parts.length >= 2) {
+                    if (`${parts[0]}-${parts[1]}` !== selectedYearMonth) return false;
+                }
+            }
+            return true;
+        }
+
+        window.toggleSearchMode = function() {
+            isSearchActive = !isSearchActive;
+            if (isSearchActive) {
+                searchContainer.style.display = 'flex';
+                searchContainer.classList.add('show');
+                searchToggleBtnTop.innerText = 'Cancel';
+                searchToggleBtnTop.classList.add('active');
+                searchInput.focus();
+            } else {
+                searchContainer.style.display = 'none';
+                searchContainer.classList.remove('show');
+                searchToggleBtnTop.innerText = 'Search';
+                searchToggleBtnTop.classList.remove('active');
+                searchInput.value = '';
+            }
+            renderData();
+        };
+
+        if (searchToggleBtnTop) searchToggleBtnTop.onclick = window.toggleSearchMode;
+        if (searchInlineCancelBtn) searchInlineCancelBtn.onclick = window.toggleSearchMode;
+
+        function stampExportTime() {
+            const now = new Date();
+            const d = String(now.getDate()).padStart(2, '0');
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const y = now.getFullYear();
+            const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            if (exportTimestampSpan) {
+                exportTimestampSpan.innerText = `${d}-${m}-${y},${time}`;
+            }
+        }
+
+        window.triggerDownload = function(elementId, fileName, format) {
+            currentExportTarget = { elementId, fileName, format };
+            const totalRows = expenseList.querySelectorAll('tr').length;
+            fromSnoInput.value = 1;
+            toSnoInput.value = totalRows > 0 ? totalRows : 1;
+            exportModal.style.display = 'flex';
+        };
+
+        window.closeExportModal = function() { exportModal.style.display = 'none'; };
+        window.processExportAll = function() { window.closeExportModal(); executeExport(null, null); };
+
+        window.processExportRange = function() {
+            const fromVal = parseInt(fromSnoInput.value);
+            const toVal = parseInt(toSnoInput.value);
+            const totalRows = expenseList.querySelectorAll('tr').length;
+
+            if (isNaN(fromVal) || isNaN(toVal) || fromVal < 1 || toVal < fromVal || fromVal > totalRows) {
+                alert('برائے مہربانی درست سیریل نمبر کا انتخاب کریں۔');
+                return;
+            }
+            window.closeExportModal();
+            executeExport(fromVal, toVal);
+        };
+
+        const modalBtnRange = document.getElementById('modal-btn-range');
+        const modalBtnAll = document.getElementById('modal-btn-all');
+        const modalBtnCancel = document.getElementById('modal-btn-cancel');
+
+        if (modalBtnRange) modalBtnRange.onclick = window.processExportRange;
+        if (modalBtnAll) modalBtnAll.onclick = window.processExportAll;
+        if (modalBtnCancel) modalBtnCancel.onclick = window.closeExportModal;
+
+        if (rowPdfBtn) rowPdfBtn.onclick = () => window.triggerDownload('table-container', 'SAJID', 'pdf');
+        if (rowJpgBtn) rowJpgBtn.onclick = () => window.triggerDownload('table-container', 'SAJID', 'jpg');
+
+        function executeExport(fromSno, toSno) {
+            const { elementId, fileName, format } = currentExportTarget;
+            stampExportTime();
+            if (format === 'pdf') downloadPDF(elementId, fileName, fromSno, toSno);
+            else if (format === 'jpg') downloadJPG(elementId, fileName, fromSno, toSno);
+        }
+
+        function downloadPDF(elementId, fileName, fromSno = null, toSno = null) {
+            const element = document.getElementById(elementId);
+            mainExportTitle.innerText = `SAJID Detail`;
+            
+            const card1 = firstSummaryCards.cloneNode(true);
+            card1.style.display = 'flex';
+            exportSummaryHolder.appendChild(card1);
+
+            const rows = expenseList.querySelectorAll('tr');
+            const hiddenRows = [];
+            if (fromSno !== null && toSno !== null) {
+                rows.forEach((row, idx) => {
+                    if ((idx + 1) < fromSno || (idx + 1) > toSno) {
+                        row.style.display = 'none';
+                        hiddenRows.push(row);
+                    }
+                });
+            }
+
+            rowPdfBtn.style.display = 'none';
+            rowJpgBtn.style.display = 'none';
+            element.classList.add('export-mode-active');
+
+            const opt = {
+                margin:       [8, 8, 8, 8],
+                filename:     `${fileName}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                rowPdfBtn.style.display = 'inline-block';
+                rowJpgBtn.style.display = 'inline-block';
+                element.classList.remove('export-mode-active');
+                hiddenRows.forEach(row => row.style.display = '');
+                exportSummaryHolder.innerHTML = '';
+            });
+        }
+
+        function downloadJPG(elementId, fileName, fromSno = null, toSno = null) {
+            const element = document.getElementById(elementId);
+            mainExportTitle.innerText = `SAJID Detail`;
+
+            const card1 = firstSummaryCards.cloneNode(true);
+            card1.style.display = 'flex';
+            exportSummaryHolder.appendChild(card1);
+
+            const rows = expenseList.querySelectorAll('tr');
+            const hiddenRows = [];
+            if (fromSno !== null && toSno !== null) {
+                rows.forEach((row, idx) => {
+                    if ((idx + 1) < fromSno || (idx + 1) > toSno) {
+                        row.style.display = 'none';
+                        hiddenRows.push(row);
+                    }
+                });
+            }
+
+            rowPdfBtn.style.display = 'none';
+            rowJpgBtn.style.display = 'none';
+            element.classList.add('export-mode-active');
+
+            html2canvas(element, { scale: 2, useCORS: true, letterRendering: true }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `${fileName}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 0.98);
+                link.click();
+
+                rowPdfBtn.style.display = 'inline-block';
+                rowJpgBtn.style.display = 'inline-block';
+                element.classList.remove('export-mode-active');
+                hiddenRows.forEach(row => row.style.display = '');
+                exportSummaryHolder.innerHTML = '';
+            });
+        }
+
+        function formatDateToDMY(dateStr) {
+            if (!dateStr) return '-';
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}-${parts[1]}-${parts[0].slice(-2)}`;
+            }
+            return dateStr;
+        }
+
+        function renderData() {
+            if (exportSummaryHolder) exportSummaryHolder.innerHTML = '';
+
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            const currentSelectedMonth = monthFilter ? monthFilter.value : 'all';
+            const fromDateVal = fromDateFilter ? fromDateFilter.value : '';
+            const toDateVal = toDateFilter ? toDateFilter.value : '';
+
+            expenseList.innerHTML = '';
+            let count = 1;
+            let totalReceived = 0;
+            let totalSent = 0;
+
+            allExpensesData.forEach((item) => {
+                const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
+                const itemDate = item.expense.date || '';
+
+                if (!isAccountMatch(itemAccount)) return;
+
+                if (!checkDateInRange(itemDate, currentSelectedMonth, fromDateVal, toDateVal)) {
+                    return;
+                }
+
+                const expense = item.expense;
+                const recVal = expense.received || 0;
+                const sentVal = expense.sent || 0;
+                const descText = expense.desc || '';
+
+                if (isSearchActive && searchTerm) {
+                    const matchSearch = itemAccount.toLowerCase().includes(searchTerm) || 
+                                        descText.toLowerCase().includes(searchTerm) ||
+                                        String(recVal).includes(searchTerm) ||
+                                        String(sentVal).includes(searchTerm);
+                    if (!matchSearch) return;
+                }
+
+                totalReceived += recVal;
+                totalSent += sentVal;
+
+                const slipUrl = expense.slipUrl || expense.slip || '';
+                const descHtml = slipUrl 
+                    ? `<a href="${slipUrl}" target="_blank" class="slip-link" title="View Slip">${descText || 'View Slip'}</a>` 
+                    : (descText || '-');
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${count++}</td>
+                    <td>${formatDateToDMY(expense.date)}</td>
+                    <td style="text-align: left;">${descHtml}</td>
+                    <td class="text-right">${formatPlainNum(recVal)}</td>
+                    <td class="text-right">${formatPlainNum(sentVal)}</td>
+                `;
+                expenseList.appendChild(row);
+            });
+
+            totalReceivedDisplay.innerText = formatPlainNum(totalReceived);
+            totalSentDisplay.innerText = formatPlainNum(totalSent);
+            totalBalanceDisplay.innerText = formatPlainNum(totalReceived - totalSent);
+        }
+
+        onSnapshot(q, (snapshot) => {
+            allExpensesData = [];
+            loadingDiv.style.display = 'none';
+            snapshot.forEach((docSnap) => {
+                allExpensesData.push({ id: docSnap.id, expense: docSnap.data() });
+            });
+
+            allExpensesData.sort((a, b) => (a.expense.date || '').localeCompare(b.expense.date || ''));
+
+            populateMonthFilter();
+            renderData();
+        });
+
+        if (monthFilter) monthFilter.addEventListener('change', renderData);
+        if (fromDateFilter) fromDateFilter.addEventListener('change', renderData);
+        if (toDateFilter) toDateFilter.addEventListener('change', renderData);
+
+        if (clearDatesBtn) {
+            clearDatesBtn.addEventListener('click', () => {
+                if (fromDateFilter) fromDateFilter.value = '';
+                if (toDateFilter) toDateFilter.value = '';
+                populateMonthFilter();
+                renderData();
+            });
+        }
+
+        searchInput.addEventListener('input', renderData);
+    </script>
+</body>
+</html>

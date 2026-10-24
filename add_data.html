@@ -292,6 +292,8 @@
                         <option value="Office 02% Arif">Office 02% Arif</option>
                         <option value="Altaf Rent A Car">Altaf Rent A Car</option>
                         <option value="Sharif A/C">Sharif A/C</option>
+                        <option value="SAJID">SAJID</option>
+                        <option value="RASHID DRIVER">RASHID DRIVER</option>
                     </select>
                 </div>
             </div>
@@ -598,7 +600,9 @@
                 (acc.includes('farooq shah') && !acc.includes('ac')) ||
                 (acc.includes('frooq shah') && !acc.includes('ac')) ||
                 acc.includes('altaf rent a car') || acc.includes('altaf rent') ||
-                acc.includes('sharif a/c') || acc === 'sharif a/c' || acc.includes('sharif')) {
+                acc.includes('sharif a/c') || acc === 'sharif a/c' || acc.includes('sharif') ||
+                acc.includes('sajid') || acc === 'sajid' ||
+                acc.includes('rashid driver') || acc === 'rashid driver') {
                 return false;
             }
 
@@ -633,13 +637,17 @@
                 return acc.includes('altaf rent a car') || acc.includes('altaf rent');
             } else if (selectedAccount === 'Sharif A/C') {
                 return acc === 'sharif a/c' || acc.includes('sharif a/c') || acc === 'sharif';
+            } else if (selectedAccount === 'SAJID') {
+                return acc === 'sajid' || acc.includes('sajid');
+            } else if (selectedAccount === 'RASHID DRIVER') {
+                return acc === 'rashid driver' || acc.includes('rashid driver');
             }
             return false;
         }
 
         function isExcludedFromMonthFilter(accName) {
             const acc = accName.toLowerCase().trim();
-            return acc.includes('altaf rent a car') || acc.includes('altaf rent') || acc.includes('sharif a/c') || acc.includes('sharif');
+            return acc.includes('altaf rent a car') || acc.includes('altaf rent') || acc.includes('sharif a/c') || acc.includes('sharif') || acc.includes('sajid') || acc.includes('rashid driver');
         }
 
         function populateMonthFilterForAccount(selectedAccount) {
@@ -652,7 +660,7 @@
 
                 let match = false;
                 if (selectedAccount === 'CEO') {
-                    if (itemAccount.includes('sharif')) return;
+                    if (itemAccount.includes('sharif') || itemAccount.includes('sajid') || itemAccount.includes('rashid driver')) return;
                     match = true;
                 } else {
                     match = isAccountMatch(itemAccount, selectedAccount);
@@ -730,7 +738,8 @@
 
             allExpensesData.forEach(item => {
                 const rawAccount = item.expense.account ? item.expense.account.trim() : '';
-                if (rawAccount.toLowerCase().includes('sharif')) return;
+                const accLower = rawAccount.toLowerCase();
+                if (accLower.includes('sharif') || accLower.includes('sajid') || accLower.includes('rashid driver')) return;
 
                 const date = item.expense.date || 'no-date';
 
@@ -786,7 +795,8 @@
 
             allExpensesData.forEach(item => {
                 const rawAccount = item.expense.account ? item.expense.account.trim() : '';
-                if (rawAccount.toLowerCase().includes('sharif')) return;
+                const accLower = rawAccount.toLowerCase();
+                if (accLower.includes('sharif') || accLower.includes('sajid') || accLower.includes('rashid driver')) return;
 
                 const isAc = isAcAccount(rawAccount);
                 if (!isAc) {
@@ -923,7 +933,7 @@
                     colThreeLabel = 'Remaining Charges';
                     firstColHeader = 'Charges';
                     secondColHeader = 'Pay';
-                } else if (selectedAccount === 'Sharif A/C') {
+                } else if (selectedAccount === 'Sharif A/C' || selectedAccount === 'SAJID' || selectedAccount === 'RASHID DRIVER') {
                     colOneLabel = 'Total Received';
                     colTwoLabel = 'Total Sent';
                     colThreeLabel = 'Total Balance';
@@ -959,7 +969,6 @@
                     <th style="width: 15%;" class="action-col">Action</th>
                 `;
                 
-                // پرانا ان پٹ فارم اپنی جگہ برقرار ہے
                 addRowFormTr.innerHTML = `
                     <td id="next-sno" style="font-weight: bold; cursor: pointer; color: #007bff;" title="Click to Open Add Form">1</td>
                     <td><input type="date" id="date" required></td>
@@ -1272,7 +1281,6 @@
                     });
                 });
 
-                // Edit Modal Popup Trigger
                 document.querySelectorAll('.edit-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const b = e.currentTarget;
@@ -1296,7 +1304,6 @@
             }
         }
 
-        // Edit Modal Save & Close handlers
         async function saveModalData() {
             const docId = editDocId.value;
             if (!docId) return;
@@ -1331,7 +1338,6 @@
         modalCloseX.addEventListener('click', () => { editModal.style.display = 'none'; });
         modalBtnCancel.addEventListener('click', () => { editModal.style.display = 'none'; });
 
-        // Add Modal Save & Close handlers
         async function addNewEntryFromModal() {
             const selectedAccount = accountFilter.value;
             const newDate = addModalDate.value;
@@ -1375,7 +1381,6 @@
             }
         });
 
-        // پرانا ایڈ کرنے کا طریقہ (Table footer button click)
         async function handleAddRecord() {
             const selectedAccount = accountFilter.value;
             const dateInput = document.getElementById('date');
