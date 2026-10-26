@@ -1,0 +1,23 @@
+{
+  "id": "/altaf-rent-app",
+  "short_name": "Altaf Rent",
+  "name": "Altaf Rent A Car",
+  "icons": [
+    {
+      "src": "icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./altaf_renat_a_car.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#007bff"
+}
