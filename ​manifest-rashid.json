@@ -16,6 +16,7 @@
   "start_url": "./rashid_driver.html",
   "scope": "./",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#007bff"
 }
