@@ -13,10 +13,9 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": "./rashid_driver.html",
+  "start_url": "rashid_driver.html",
   "scope": "./",
-  "background_color": "#ffffff",
-  "theme_color": "#007bff",
   "display": "standalone",
-  "orientation": "portrait"
+  "background_color": "#ffffff",
+  "theme_color": "#007bff"
 }
