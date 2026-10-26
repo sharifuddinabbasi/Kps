@@ -1,0 +1,22 @@
+{
+  "short_name": "Rashid Driver",
+  "name": "RASHID DRIVER - Khan Petroleum Service",
+  "icons": [
+    {
+      "src": "icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./rashid_driver.html",
+  "scope": "./",
+  "background_color": "#ffffff",
+  "theme_color": "#007bff",
+  "display": "standalone",
+  "orientation": "portrait"
+}

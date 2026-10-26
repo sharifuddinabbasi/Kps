@@ -1,0 +1,22 @@
+{
+  "short_name": "AC Abbott",
+  "name": "AC Abbott - Khan Petroleum Service",
+  "icons": [
+    {
+      "src": "icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./Abbott.html",
+  "scope": "./",
+  "background_color": "#ffffff",
+  "theme_color": "#007bff",
+  "display": "standalone",
+  "orientation": "portrait"
+}

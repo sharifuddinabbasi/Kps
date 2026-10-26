@@ -1,0 +1,22 @@
+{
+  "short_name": "AC-53 Farooq",
+  "name": "AC-53 Farooq Shah - Khan Petroleum Service",
+  "icons": [
+    {
+      "src": "icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./AC53_Farooq_Shah.html",
+  "scope": "./",
+  "background_color": "#ffffff",
+  "theme_color": "#007bff",
+  "display": "standalone",
+  "orientation": "portrait"
+}

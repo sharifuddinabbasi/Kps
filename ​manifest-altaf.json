@@ -1,0 +1,22 @@
+{
+  "short_name": "Altaf Rent",
+  "name": "Altaf Rent A Car - Khan Petroleum Service",
+  "icons": [
+    {
+      "src": "icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./altaf_renat_a_car.html",
+  "scope": "./",
+  "background_color": "#ffffff",
+  "theme_color": "#007bff",
+  "display": "standalone",
+  "orientation": "portrait"
+}

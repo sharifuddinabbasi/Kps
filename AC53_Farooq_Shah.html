@@ -6,7 +6,7 @@
     <title>AC-53 Farooq Shah - Khan Petroleum Service</title>
 
     <!-- PWA Code -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest-ac53.json">
     <meta name="theme-color" content="#007bff">
     <script>
       if ('serviceWorker' in navigator) {
@@ -24,7 +24,6 @@
         .container { display: flex; flex-direction: column; height: 100vh; max-width: 900px; margin: 0 auto; background: #ffffff; padding: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-y: auto; position: relative; }
         .fixed-header { flex-shrink: 0; background: #ffffff; padding-bottom: 8px; border-bottom: 2px solid #eee; position: relative; }
         
-        /* 3D Diesel Color Brand Title */
         .brand-title-main {
             text-align: center;
             font-size: clamp(24px, 6vw, 34px);
@@ -39,16 +38,6 @@
                 0 2px 0 #8c5700,
                 0 3px 0 #663d00,
                 0 4px 5px rgba(0, 0, 0, 0.45);
-        }
-
-        /* Top Action Buttons (Search) */
-        .top-action-bar {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-bottom: 8px;
-            gap: 8px;
-            width: 100%;
         }
 
         .header-top { 
@@ -165,7 +154,6 @@
         }
         .export-mode-active .export-header-title { display: block !important; }
 
-        /* Modal Overlay */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal-box { background: #fff; padding: 18px; border-radius: 8px; width: 90%; max-width: 380px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-align: center; font-family: Arial, sans-serif; }
         .modal-box h3 { margin-top: 0; font-size: 16px; color: #007bff; }
@@ -267,12 +255,10 @@
         </div>
     </div>
 
-    <!-- Export Modal -->
     <div id="exportModal" class="modal-overlay">
         <div class="modal-box">
             <h3>Export Options</h3>
             <p>تمام ڈیٹا ایکسپورٹ کریں یا رو کا رینج منتخب کریں:</p>
-            
             <div class="modal-inputs">
                 <div>
                     <label for="fromSno">From S.No:</label>
@@ -283,7 +269,6 @@
                     <input type="number" id="toSno" min="1" placeholder="10">
                 </div>
             </div>
-
             <div class="modal-actions">
                 <button type="button" id="modal-btn-range" class="modal-btn btn-range">ایکپورٹ منتخب روز (Selected Range)</button>
                 <button type="button" id="modal-btn-all" class="modal-btn btn-all">ایکپورٹ تمام ڈیٹا (All Data)</button>
@@ -613,7 +598,6 @@
 
                 if (!isAccountMatch(itemAccount)) return;
 
-                // Yahan !isSearchActive ko hata diya gaya hai taake search ke waqt bhi month filter kaam kare[span_1](start_span)[span_1](end_span)
                 if (!checkDateInRange(itemDate, currentSelectedMonth, fromDateVal, toDateVal)) {
                     return;
                 }
