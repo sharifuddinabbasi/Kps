@@ -1,6 +1,7 @@
 {
+  "id": "/altaf-rent-app",
   "short_name": "Altaf Rent",
-  "name": "Altaf Rent A Car - Khan Petroleum Service",
+  "name": "Altaf Rent A Car",
   "icons": [
     {
       "src": "icon.png",
