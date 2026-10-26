@@ -15,8 +15,7 @@
   ],
   "start_url": "./altaf_renat_a_car.html",
   "scope": "./",
-  "background_color": "#ffffff",
-  "theme_color": "#007bff",
   "display": "standalone",
-  "orientation": "portrait"
+  "background_color": "#ffffff",
+  "theme_color": "#007bff"
 }
