@@ -174,6 +174,17 @@
 
         let allExpensesData = [];
 
+        function getCreatedAtTime(expense) {
+            const c = expense.createdAt;
+            if (!c) return 0;
+            if (typeof c.toMillis === 'function') return c.toMillis();
+            if (c.seconds !== undefined) return c.seconds * 1000 + Math.floor((c.nanoseconds || 0) / 1000000);
+            if (c instanceof Date) return c.getTime();
+            if (typeof c === 'number') return c;
+            const parsed = Date.parse(c);
+            return isNaN(parsed) ? 0 : parsed;
+        }
+
         function formatPlainNum(num) {
             return num !== undefined && num !== null ? num.toString() : '0';
         }
@@ -269,7 +280,9 @@
             allExpensesData.sort((a, b) => {
                 const dateA = a.expense.date || '';
                 const dateB = b.expense.date || '';
-                return dateA.localeCompare(dateB);
+                const dateCompare = dateA.localeCompare(dateB);
+                if (dateCompare !== 0) return dateCompare;
+                return getCreatedAtTime(a.expense) - getCreatedAtTime(b.expense);
             });
 
             renderData();

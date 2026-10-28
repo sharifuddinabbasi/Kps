@@ -24,7 +24,6 @@
         .container { display: flex; flex-direction: column; height: 100vh; max-width: 900px; margin: 0 auto; background: #ffffff; padding: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-y: auto; position: relative; }
         .fixed-header { flex-shrink: 0; background: #ffffff; padding-bottom: 8px; border-bottom: 2px solid #eee; position: relative; }
         
-        /* 3D Diesel Color Brand Title (Option B) */
         .brand-title-main {
             text-align: center;
             font-size: clamp(24px, 6vw, 34px);
@@ -41,7 +40,6 @@
                 0 4px 5px rgba(0, 0, 0, 0.45);
         }
 
-        /* Top Action Buttons (Search) for CEO */
         .top-action-bar {
             display: flex;
             justify-content: flex-end;
@@ -51,7 +49,6 @@
             width: 100%;
         }
 
-        /* Account Title line under Service */
         .header-top { 
             display: flex; 
             justify-content: space-between; 
@@ -192,7 +189,6 @@
         .selected-details-container th, 
         .selected-details-container td { font-size: clamp(9px, 0.6vw + 5px, 11.5px); }
 
-        /* Teesre box ke table ke liye wrapper */
         .third-details-wrapper {
             width: 100%;
             overflow-x: auto;
@@ -307,7 +303,6 @@
             font-size: 11px !important;
         }
 
-        /* Monthly Summary Section Styling */
         #monthly-summary-section {
             display: flex;
             flex-direction: column;
@@ -461,7 +456,6 @@
             text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 1px 2px rgba(220, 53, 69, 0.25);
         }
 
-        /* Dues Summary Table Styling */
         .ms-dues-table-container {
             border: 1px solid #007bff;
             border-radius: 4px;
@@ -583,7 +577,6 @@
             justify-content: flex-end;
         }
 
-        /* Clean Export Mode */
         .ms-clean-export-active {
             width: 720px !important;
             max-width: 720px !important;
@@ -671,11 +664,9 @@
 </head>
 <body>
     <div class="container">
-        <!-- Main Regular View Container -->
         <div id="main-view-wrapper">
             <div class="brand-title-main">Khan Petroleum Service</div>
 
-            <!-- INTEGRATED MONTHLY SUMMARY SECTION WITH CORRECTED BORDER LAYERS -->
             <div id="monthly-summary-section">
                 <div class="ms-border-layer-1">
                     <div class="ms-border-layer-2">
@@ -741,31 +732,25 @@
                 </div>
             </div>
 
-            <!-- Blue dividing line below Monthly Summary section -->
             <div class="monthly-summary-divider"></div>
 
-            <!-- CEO ACCOUNT VIEW SECTION -->
             <div class="fixed-header">
-                <!-- Drilldown Clean Header -->
                 <div id="drilldown-header" class="drilldown-top-bar" style="display: none;">
                     <h1 id="drilldown-title">Detail.</h1>
                     <button type="button" id="drilldown-back-btn" class="ms-back-btn" style="background-color: #6c757d; color: #fff; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">Back</button>
                 </div>
 
-                <!-- Drilldown Top Badge -->
                 <div id="drilldown-badge" class="drilldown-badge-row" style="display: none;">
                     <div id="drilldown-badge-label" class="drilldown-badge-label">Total Expenses Month of</div>
                     <div id="drilldown-badge-amount" class="drilldown-badge-amount">0</div>
                 </div>
 
-                <!-- Account Name Row -->
                 <div id="default-header-top" class="header-top">
                     <h1 id="page-title">Account's Detail</h1>
                     <button type="button" id="search-toggle-btn-top" class="search-toggle-btn">Search</button>
                 </div>
                 <div id="top-action-bar" style="display: none;"></div>
 
-                <!-- Select Account Dropdown with PDF & JPG -->
                 <div id="account-select-row" class="account-select-group">
                     <label for="account-filter">Select Account: </label>
                     <select id="account-filter" class="account-select">
@@ -790,7 +775,6 @@
                     <button type="button" id="row-jpg-btn" class="jpg-btn">JPG</button>
                 </div>
 
-                <!-- Search Input with dedicated Cancel Button -->
                 <div id="search-container" class="search-container">
                     <input type="text" id="search-input" class="search-box" placeholder="Lafz, detail ya amount likhein...">
                     <button type="button" id="search-inline-cancel-btn" class="search-cancel-btn">Cancel</button>
@@ -925,7 +909,6 @@
         </div>
     </div>
 
-    <!-- Export Modal -->
     <div id="exportModal" class="modal-overlay">
         <div class="modal-box">
             <h3>Export Options</h3>
@@ -1037,7 +1020,6 @@
         const fromSnoInput = document.getElementById('fromSno');
         const toSnoInput = document.getElementById('toSno');
 
-        // Monthly Summary Elements
         const msTitle = document.getElementById('ms-title');
         const msMonthSelect = document.getElementById('ms-month-select');
         const msTableBody = document.getElementById('ms-table-body');
@@ -1086,6 +1068,17 @@
         let isSearchActive = false;
         let isDrillDownMode = false;
         let drillDownSelectedYM = '';
+
+        function getCreatedAtTime(expense) {
+            const c = expense.createdAt;
+            if (!c) return 0;
+            if (typeof c.toMillis === 'function') return c.toMillis();
+            if (c.seconds !== undefined) return c.seconds * 1000 + Math.floor((c.nanoseconds || 0) / 1000000);
+            if (c instanceof Date) return c.getTime();
+            if (typeof c === 'number') return c;
+            const parsed = Date.parse(c);
+            return isNaN(parsed) ? 0 : parsed;
+        }
 
         function isAcAccount(accStr) {
             if (!accStr) return false;
@@ -1949,7 +1942,6 @@
 
             createdByContainer.style.display = 'block';
 
-            // SEARCH MODE
             if (isSearchActive) {
                 pageTitle.innerText = isCeo ? "Search Details" : `Search: ${selectedAccount}`;
 
@@ -2035,7 +2027,6 @@
                 return;
             }
 
-            // DRILLDOWN / REGULAR VIEW
             if (isDrillDownMode) {
                 drilldownHeader.style.display = 'flex';
                 
@@ -2085,7 +2076,6 @@
             }
 
             if (selectedAccount === 'CEO' && !isDrillDownMode) {
-                // CEO VIEW
                 pageTitle.innerText = "Account's Detail";
 
                 secondSummary.style.display = 'flex';
@@ -2107,7 +2097,6 @@
                     <th style="width: 19.5%;" class="text-right">Amanat<br>Return</th>
                 `;
             } else {
-                // OTHER ACCOUNTS VIEW
                 if (!isDrillDownMode) {
                     pageTitle.innerText = `Detail. ${selectedAccount}`;
                     secondSummary.style.display = 'none';
@@ -2410,7 +2399,6 @@
             let descWidth = 24;
             let dynamicColWidth = '18%';
 
-            // Columns ki tadad ke mutabiq dynamic settings
             if (numActive === 1) {
                 accWidth = 24;
                 descWidth = 50;
@@ -2427,7 +2415,6 @@
                 dynamicColWidth = '16%';
                 if (thirdDetailsTable) thirdDetailsTable.style.minWidth = '100%';
             } else if (numActive >= 4) {
-                // 4 columns par minimum width 390px aur smooth horizontal scroll
                 accWidth = 24;
                 descWidth = 28;
                 dynamicColWidth = '18%';
@@ -2488,7 +2475,9 @@
             allExpensesData.sort((a, b) => {
                 const dateA = a.expense.date || '';
                 const dateB = b.expense.date || '';
-                return dateA.localeCompare(dateB);
+                const dateCompare = dateA.localeCompare(dateB);
+                if (dateCompare !== 0) return dateCompare;
+                return getCreatedAtTime(a.expense) - getCreatedAtTime(b.expense);
             });
 
             populateMsMonths();
