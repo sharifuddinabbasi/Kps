@@ -149,7 +149,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBSPb0bIHj9edsuZi0RO1VNhTovDZYOrP8",
@@ -173,6 +173,14 @@
         const loadingDiv = document.getElementById('loading');
 
         let allExpensesData = [];
+
+        function getSystemTodayDate() {
+            const d = new Date();
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
 
         function getCreatedAtTime(expense) {
             const c = expense.createdAt;
@@ -273,8 +281,26 @@
         onSnapshot(q, (snapshot) => {
             allExpensesData = [];
             loadingDiv.style.display = 'none';
+            const todayStr = getSystemTodayDate();
+
             snapshot.forEach((docSnap) => {
-                allExpensesData.push({ id: docSnap.id, expense: docSnap.data() });
+                const itemData = docSnap.data();
+                const acc = itemData.account ? itemData.account.toLowerCase().trim() : '';
+                const isMatch = acc.includes('altaf rent a car') || acc.includes('altaf rent');
+
+                if (isMatch) {
+                    const recVal = Number(itemData.received) || 0;
+                    const sentVal = Number(itemData.sent) || 0;
+
+                    if (recVal === 0 && sentVal === 0 && itemData.date !== todayStr) {
+                        itemData.date = todayStr;
+                        updateDoc(doc(db, "ceo_expenses", docSnap.id), {
+                            date: todayStr
+                        }).catch((err) => console.error("Auto date update error:", err));
+                    }
+                }
+
+                allExpensesData.push({ id: docSnap.id, expense: itemData });
             });
 
             allExpensesData.sort((a, b) => {
