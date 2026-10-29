@@ -1143,8 +1143,8 @@
         }
 
         function isExcludedFromMonthFilter(accName) {
-            const acc = accName.toLowerCase().trim();
-            return acc.includes('altaf rent a car') || acc.includes('altaf rent') || acc.includes('sharif a/c') || acc.includes('sharif') || acc.includes('sajid') || acc.includes('rashid driver');
+            // Ab سب اکاؤنٹس منتھ فلٹر استعمال کر سکتے ہیں اور ان پر مہینے کے آغاز میں اولڈ ڈیوز کا لاجک چلے گا
+            return false;
         }
 
         function populateMonthFilterForAccount(selectedAccount, resetToDefault = false) {
@@ -2223,7 +2223,14 @@
                 const shouldFilterByMonth = !isExcludedFromMonthFilter(selectedAccount);
                 const activeMonth = isDrillDownMode ? (drillDownSelectedYM || currentSelectedMonth) : currentSelectedMonth;
 
-                const isAmanatTarget = (selectedAccount === 'Farooq Shah Amanat' || selectedAccount === 'Musharaf Amanat');
+                const isAmanatTarget = (
+                    selectedAccount === 'Farooq Shah Amanat' || 
+                    selectedAccount === 'Musharaf Amanat' || 
+                    selectedAccount === 'Altaf Rent A Car' || 
+                    selectedAccount === 'Sharif A/C' || 
+                    selectedAccount === 'SAJID' || 
+                    selectedAccount === 'RASHID DRIVER'
+                );
                 let prevBalance = 0;
                 let prevMonthName = '';
                 let vDateFormatted = '';

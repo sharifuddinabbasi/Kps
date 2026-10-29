@@ -43,6 +43,26 @@
         .card h3 { margin: 0; font-size: clamp(9.5px, 0.6vw + 6px, 12px); text-transform: uppercase; }
         .card p { font-size: clamp(12.5px, 0.9vw + 7px, 16px); font-weight: bold; margin: 2px 0 0 0; word-break: break-word; }
         
+        .controls-filter-row { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 6px; 
+            margin: 6px 0 4px 0; 
+            background: #f8faff; 
+            padding: 6px 8px; 
+            border-radius: 4px; 
+            border: 1px dashed #007bff; 
+        }
+        .filter-line { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            width: 100%;
+        }
+        .controls-filter-row label { font-size: clamp(10.5px, 0.6vw + 7px, 13px); font-weight: bold; color: #333; flex-shrink: 0; }
+        .control-input { padding: 3px 6px; font-size: clamp(10.5px, 0.6vw + 7px, 13px); border-radius: 4px; border: 1px solid #007bff; background: #fff; color: #333; outline: none; }
+        .reset-filter-btn { background: #6c757d; color: #fff; border: none; padding: 4px 8px; border-radius: 3px; font-size: clamp(10.5px, 0.6vw + 7px, 13px); cursor: pointer; font-weight: bold; flex-shrink: 0; line-height: 1; }
+
         .table-portion { flex: 1 1 auto; overflow-y: auto; overflow-x: auto; margin-top: 5px; border: 1px solid #007bff; border-radius: 4px; width: 100%; margin-bottom: 10px; }
 
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
@@ -123,6 +143,23 @@
                 </div>
             </div>
 
+            <!-- Month Filter شامل کیا گیا ہے -->
+            <div id="month-filter-container" class="controls-filter-row">
+                <div class="filter-line">
+                    <label for="month-filter">Select Month:</label>
+                    <select id="month-filter" class="control-input" style="flex: 1;">
+                        <option value="all">All Months</option>
+                    </select>
+                </div>
+                <div class="filter-line" style="flex-wrap: nowrap;">
+                    <label for="from-date-filter">From:</label>
+                    <input type="date" id="from-date-filter" class="control-input" style="flex: 1; min-width: 0;">
+                    <label for="to-date-filter">To:</label>
+                    <input type="date" id="to-date-filter" class="control-input" style="flex: 1; min-width: 0;">
+                    <button type="button" id="clear-dates-btn" class="reset-filter-btn" title="Reset Dates">✕</button>
+                </div>
+            </div>
+
             <div id="loading" class="status">Loading data...</div>
         </div>
 
@@ -172,7 +209,25 @@
         const totalBalanceDisplay = document.getElementById('total-balance');
         const loadingDiv = document.getElementById('loading');
 
+        const monthFilter = document.getElementById('month-filter');
+        const fromDateFilter = document.getElementById('from-date-filter');
+        const toDateFilter = document.getElementById('to-date-filter');
+        const clearDatesBtn = document.getElementById('clear-dates-btn');
+
         let allExpensesData = [];
+        let isInitialLoad = true;
+
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        function getSystemCurrentYearMonth() {
+            const d = new Date();
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            return `${yyyy}-${mm}`;
+        }
 
         function getSystemTodayDate() {
             const d = new Date();
@@ -204,11 +259,132 @@
             return dateStr;
         }
 
+        function checkDateInRange(dateStr, selectedYearMonth, fromDate, toDate) {
+            if (!dateStr || dateStr === 'no-date') return true;
+            if (fromDate && dateStr < fromDate) return false;
+            if (toDate && dateStr > toDate) return false;
+            if (!fromDate && !toDate && selectedYearMonth !== 'all') {
+                const parts = dateStr.split('-');
+                if (parts.length >= 2) {
+                    if (`${parts[0]}-${parts[1]}` !== selectedYearMonth) return false;
+                }
+            }
+            return true;
+        }
+
+        function populateMonthFilter() {
+            if (!monthFilter) return;
+            const currentSelectedVal = monthFilter.value;
+            const uniqueYearMonths = new Set();
+
+            allExpensesData.forEach(item => {
+                const acc = item.expense.account ? item.expense.account.toLowerCase().trim() : '';
+                const isMatch = acc.includes('altaf rent a car') || acc.includes('altaf rent');
+                const d = item.expense.date;
+
+                if (isMatch && d && d !== 'no-date') {
+                    const parts = d.split('-');
+                    if (parts.length >= 2) {
+                        uniqueYearMonths.add(`${parts[0]}-${parts[1]}`);
+                    }
+                }
+            });
+
+            const sorted = Array.from(uniqueYearMonths).sort();
+            monthFilter.innerHTML = '<option value="all">All Months</option>';
+
+            sorted.forEach(ym => {
+                const parts = ym.split('-');
+                const year = parts[0];
+                const month = parts[1];
+                const mIndex = parseInt(month, 10) - 1;
+                const label = `${monthNames[mIndex]} ${year}`;
+
+                const opt = document.createElement('option');
+                opt.value = ym;
+                opt.textContent = label;
+                monthFilter.appendChild(opt);
+            });
+
+            const sysYM = getSystemCurrentYearMonth();
+
+            if (isInitialLoad) {
+                if (sorted.includes(sysYM)) {
+                    monthFilter.value = sysYM;
+                } else if (sorted.length > 0) {
+                    monthFilter.value = sorted[sorted.length - 1];
+                } else {
+                    monthFilter.value = 'all';
+                }
+                isInitialLoad = false;
+            } else if (currentSelectedVal && (currentSelectedVal === 'all' || sorted.includes(currentSelectedVal))) {
+                monthFilter.value = currentSelectedVal;
+            } else if (sorted.includes(sysYM)) {
+                monthFilter.value = sysYM;
+            } else {
+                monthFilter.value = 'all';
+            }
+        }
+
         function renderData() {
+            const currentSelectedMonth = monthFilter ? monthFilter.value : 'all';
+            const fromDateVal = fromDateFilter ? fromDateFilter.value : '';
+            const toDateVal = toDateFilter ? toDateFilter.value : '';
+
             expenseList.innerHTML = '';
             let count = 1;
             let sumCharges = 0;
             let sumPay = 0;
+
+            let prevBalance = 0;
+            let prevMonthName = '';
+            let vDateFormatted = '';
+            let showVirtualRow = false;
+
+            if (currentSelectedMonth && currentSelectedMonth !== 'all' && !fromDateVal && !toDateVal) {
+                const parts = currentSelectedMonth.split('-');
+                if (parts.length >= 2) {
+                    const y = parseInt(parts[0], 10);
+                    const m = parseInt(parts[1], 10);
+                    let prevM = m - 1;
+                    let prevY = y;
+                    if (prevM === 0) {
+                        prevM = 12;
+                        prevY = y - 1;
+                    }
+                    prevMonthName = monthNames[prevM - 1];
+                    const startOfCurrentMonth = `${y}-${String(m).padStart(2, '0')}-01`;
+
+                    allExpensesData.forEach(item => {
+                        const acc = item.expense.account ? item.expense.account.toLowerCase().trim() : '';
+                        const isMatch = acc.includes('altaf rent a car') || acc.includes('altaf rent');
+                        const itemDate = item.expense.date || '';
+
+                        if (isMatch && itemDate && itemDate < startOfCurrentMonth) {
+                            prevBalance += (Number(item.expense.received) || 0) - (Number(item.expense.sent) || 0);
+                        }
+                    });
+
+                    if (prevBalance !== 0) {
+                        showVirtualRow = true;
+                        vDateFormatted = `01-${String(m).padStart(2, '0')}<br>${y}`;
+                    }
+                }
+            }
+
+            if (showVirtualRow) {
+                sumCharges += prevBalance;
+                const vRow = document.createElement('tr');
+                vRow.style.backgroundColor = '#fdfbf7';
+                vRow.innerHTML = `
+                    <td>${count++}</td>
+                    <td>${vDateFormatted}</td>
+                    <td style="text-align: left; font-weight: bold; color: #555;">Old dues Month of ${prevMonthName}</td>
+                    <td class="text-right" style="font-weight: bold; white-space: nowrap;">${formatPlainNum(prevBalance)}</td>
+                    <td class="text-right" style="font-weight: bold; white-space: nowrap;">0</td>
+                `;
+                expenseList.appendChild(vRow);
+            }
 
             allExpensesData.forEach(item => {
                 const acc = item.expense.account ? item.expense.account.toLowerCase().trim() : '';
@@ -216,6 +392,12 @@
 
                 if (isMatch) {
                     const exp = item.expense;
+                    const itemDate = exp.date || '';
+
+                    if (!checkDateInRange(itemDate, currentSelectedMonth, fromDateVal, toDateVal)) {
+                        return;
+                    }
+
                     const recVal = exp.received || 0;
                     const sentVal = exp.sent || 0;
 
@@ -311,8 +493,22 @@
                 return getCreatedAtTime(a.expense) - getCreatedAtTime(b.expense);
             });
 
+            populateMonthFilter();
             renderData();
         });
+
+        if (monthFilter) monthFilter.addEventListener('change', renderData);
+        if (fromDateFilter) fromDateFilter.addEventListener('change', renderData);
+        if (toDateFilter) toDateFilter.addEventListener('change', renderData);
+
+        if (clearDatesBtn) {
+            clearDatesBtn.addEventListener('click', () => {
+                if (fromDateFilter) fromDateFilter.value = '';
+                if (toDateFilter) toDateFilter.value = '';
+                populateMonthFilter();
+                renderData();
+            });
+        }
     </script>
 </body>
 </html>
