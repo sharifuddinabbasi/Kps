@@ -669,8 +669,10 @@
             return false;
         }
 
-        function populateMonthFilterForAccount(selectedAccount) {
+        function populateMonthFilterForAccount(selectedAccount, resetToDefault = false) {
             if (!monthFilter) return;
+            const currentSelectedVal = monthFilter.value;
+
             const uniqueYearMonths = new Set();
 
             allExpensesData.forEach(item => {
@@ -711,7 +713,9 @@
 
             const sysYM = getSystemCurrentYearMonth();
 
-            if (sorted.includes(sysYM)) {
+            if (!resetToDefault && currentSelectedVal && (currentSelectedVal === 'all' || sorted.includes(currentSelectedVal))) {
+                monthFilter.value = currentSelectedVal;
+            } else if (sorted.includes(sysYM)) {
                 monthFilter.value = sysYM;
             } else if (sorted.length > 0) {
                 monthFilter.value = sorted[sorted.length - 1];
@@ -1618,7 +1622,7 @@
         });
 
         accountFilter.addEventListener('change', () => {
-            populateMonthFilterForAccount(accountFilter.value);
+            populateMonthFilterForAccount(accountFilter.value, true);
             if (fromDateFilter) fromDateFilter.value = '';
             if (toDateFilter) toDateFilter.value = '';
             renderData();
@@ -1639,7 +1643,7 @@
             clearDatesBtn.addEventListener('click', () => {
                 if (fromDateFilter) fromDateFilter.value = '';
                 if (toDateFilter) toDateFilter.value = '';
-                populateMonthFilterForAccount(accountFilter.value);
+                populateMonthFilterForAccount(accountFilter.value, true);
                 renderData();
             });
         }
