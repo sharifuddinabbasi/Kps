@@ -1970,6 +1970,8 @@
                 `;
 
                 expenseList.innerHTML = '';
+                let searchTotalAmount = 0;
+                let matchCount = 0;
 
                 allExpensesData.forEach((item) => {
                     const rawAccount = item.expense.account ? item.expense.account.trim() : 'Musharaf Amanat';
@@ -2007,6 +2009,8 @@
                     if (recVal === 0 && sentVal === 0) return;
 
                     let displayAmount = recVal > 0 ? recVal : sentVal;
+                    searchTotalAmount += displayAmount;
+                    matchCount++;
 
                     const isAc = isAcAccount(rawAccount);
                     let remarkText = '';
@@ -2031,6 +2035,18 @@
                     `;
                     expenseList.appendChild(row);
                 });
+
+                if (matchCount > 0) {
+                    const totalRow = document.createElement('tr');
+                    totalRow.style.backgroundColor = '#e8f5e9';
+                    totalRow.style.borderTop = '2px solid #28a745';
+                    totalRow.innerHTML = `
+                        <td colspan="3" style="text-align: right; font-weight: bold; color: #2e7d32; padding-right: 10px; font-size: 13px;">Total</td>
+                        <td class="text-right" style="font-weight: bold; color: #dc3545; white-space: nowrap; font-size: 13.5px;">${formatPlainNum(searchTotalAmount)}</td>
+                        <td></td>
+                    `;
+                    expenseList.appendChild(totalRow);
+                }
 
                 return;
             }
