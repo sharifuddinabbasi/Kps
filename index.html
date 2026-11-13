@@ -1143,7 +1143,6 @@
         }
 
         function isExcludedFromMonthFilter(accName) {
-            // Ab سب اکاؤنٹس منتھ فلٹر استعمال کر سکتے ہیں اور ان پر مہینے کے آغاز میں اولڈ ڈیوز کا لاجک چلے گا
             return false;
         }
 
@@ -1239,7 +1238,7 @@
             accountFilter.value = accName;
             populateMonthFilterForAccount(accName);
             if (monthFilter) {
-                monthFilter.value = ym;
+                monthFilter.value = (ym === 'all' ? 'all' : ym);
             }
             if (fromDateFilter) fromDateFilter.value = '';
             if (toDateFilter) toDateFilter.value = '';
@@ -1443,7 +1442,7 @@
                         <td class="clickable-val">${formatPlainNum(expenseVal)}</td>
                     `;
                     tr.addEventListener('click', () => {
-                        window.openAccountDetailsFromSummary(acc, selectedYM === 'all' ? getSystemCurrentYearMonth() : selectedYM, false);
+                        window.openAccountDetailsFromSummary(acc, selectedYM, false);
                     });
                     msTableBody.appendChild(tr);
                 }
@@ -1518,7 +1517,7 @@
                         <td class="dues-val clickable-val">${formatPlainNum(balance)}</td>
                     `;
                     tr.addEventListener('click', () => {
-                        window.openAccountDetailsFromSummary(accName, selectedYM === 'all' ? getSystemCurrentYearMonth() : selectedYM, true);
+                        window.openAccountDetailsFromSummary(accName, selectedYM, true);
                     });
                     msDuesBody.appendChild(tr);
                 }
@@ -1708,11 +1707,14 @@
             
             if (elementId === 'table-container') {
                 if (isDrillDownMode) {
-                    const parts = (drillDownSelectedYM || (monthFilter ? monthFilter.value : '')).split('-');
-                    let monthLabel = '';
-                    if (parts.length >= 2) {
-                        const mIndex = parseInt(parts[1], 10) - 1;
-                        monthLabel = `${monthNames[mIndex]}${parts[0]}`;
+                    const ymVal = (drillDownSelectedYM || (monthFilter ? monthFilter.value : ''));
+                    let monthLabel = 'All Months';
+                    if (ymVal !== 'all') {
+                        const parts = ymVal.split('-');
+                        if (parts.length >= 2) {
+                            const mIndex = parseInt(parts[1], 10) - 1;
+                            monthLabel = `${monthNames[mIndex]}${parts[0]}`;
+                        }
                     }
                     mainExportTitle.innerText = `Account Detail ${selectedAccount} (${monthLabel})`;
                 } else if (isSearchActive) {
@@ -1780,11 +1782,14 @@
 
             if (elementId === 'table-container') {
                 if (isDrillDownMode) {
-                    const parts = (drillDownSelectedYM || (monthFilter ? monthFilter.value : '')).split('-');
-                    let monthLabel = '';
-                    if (parts.length >= 2) {
-                        const mIndex = parseInt(parts[1], 10) - 1;
-                        monthLabel = `${monthNames[mIndex]}${parts[0]}`;
+                    const ymVal = (drillDownSelectedYM || (monthFilter ? monthFilter.value : ''));
+                    let monthLabel = 'All Months';
+                    if (ymVal !== 'all') {
+                        const parts = ymVal.split('-');
+                        if (parts.length >= 2) {
+                            const mIndex = parseInt(parts[1], 10) - 1;
+                            monthLabel = `${monthNames[mIndex]}${parts[0]}`;
+                        }
                     }
                     mainExportTitle.innerText = `Account Detail ${selectedAccount} (${monthLabel})`;
                 } else if (isSearchActive) {
@@ -2058,19 +2063,22 @@
                 const badgeLabel = drilldownBadge.querySelector('.drilldown-badge-label');
                 const badgeAmount = drilldownBadge.querySelector('.drilldown-badge-amount');
 
-                const parts = (drillDownSelectedYM || currentSelectedMonth).split('-');
-                let monthLabel = '';
-                if (parts.length >= 2) {
-                    const mIndex = parseInt(parts[1], 10) - 1;
-                    monthLabel = `${monthNames[mIndex]}${parts[0]}`;
+                const ymVal = (drillDownSelectedYM || currentSelectedMonth);
+                let monthLabel = 'All Months';
+                if (ymVal !== 'all') {
+                    const parts = ymVal.split('-');
+                    if (parts.length >= 2) {
+                        const mIndex = parseInt(parts[1], 10) - 1;
+                        monthLabel = `${monthNames[mIndex]}${parts[0]}`;
+                    }
                 }
 
                 if (window._isDuesDrillDown) {
                     badgeLabel.style.backgroundColor = '#007bff';
-                    badgeLabel.innerText = `Total Dues Month of ${monthLabel}`;
+                    badgeLabel.innerText = `Total Dues (${monthLabel})`;
                 } else {
                     badgeLabel.style.backgroundColor = '#28a745';
-                    badgeLabel.innerText = `Total Expenses Month of ${monthLabel}`;
+                    badgeLabel.innerText = `Total Expenses (${monthLabel})`;
                 }
 
                 defaultHeaderTop.style.display = 'none';
