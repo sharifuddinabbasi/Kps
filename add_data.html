@@ -9,7 +9,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#007bff">
     <script>
-      if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')) {
         navigator.serviceWorker.register('sw.js');
       }
     </script>
@@ -202,7 +202,7 @@
 
         .up-btn { background-color: #17a2b8; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: clamp(8px, 0.4vw + 5px, 10.5px); font-weight: bold; line-height: 1.1; }
         .down-btn { background-color: #6f42c1; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: clamp(8px, 0.4vw + 5px, 10.5px); font-weight: bold; line-height: 1.1; }
-        .status { margin-bottom: 5px; color: #666; font-size: clamp(10px, 0.6vw + 7px, 12px); }
+        .status { margin: 8px 4px; color: #666; font-size: clamp(11px, 0.6vw + 7px, 13px); font-weight: bold; }
         
         .selected-details-container { flex: 0 0 auto; margin-top: 8px; padding: 0 6px 6px 6px; background: #eef6ff; border: 1px solid #007bff; border-radius: 4px; width: 100%; max-height: 600px; overflow-y: auto; position: relative; }
         .selected-details-header { display: flex; align-items: center; justify-content: space-between; font-size: clamp(11px, 0.7vw + 7px, 13.5px); font-weight: bold; color: #007bff; padding: 6px 0 4px 0; background: #eef6ff; position: sticky; top: 0; z-index: 20; border-bottom: 1px solid #cce4ff; }
@@ -559,6 +559,66 @@
         let authSignIn = null;
         let authSignOut = null;
 
+        const isWebProtocol = window.location.protocol === 'http:' || window.location.protocol === 'https:';
+
+        // 30 Seconds Auto-Logout on Inactivity
+        let inactivityTimer = null;
+        let lastActivityReset = 0;
+        const INACTIVITY_LIMIT_MS = 30000;
+
+        function showAutoLogoutToast(msg) {
+            let toast = document.getElementById('auto-logout-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'auto-logout-toast';
+                toast.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#dc3545;color:#fff;padding:10px 18px;border-radius:6px;font-size:13px;font-weight:bold;z-index:2000;box-shadow:0 4px 10px rgba(0,0,0,0.3);text-align:center;max-width:90%;';
+                document.body.appendChild(toast);
+            }
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 4000);
+        }
+
+        function clearInactivityTimer() {
+            if (inactivityTimer) {
+                clearTimeout(inactivityTimer);
+                inactivityTimer = null;
+            }
+        }
+
+        function resetInactivityTimer() {
+            clearInactivityTimer();
+            if (!isAdminLoggedIn || !auth || !authSignOut) return;
+            lastActivityReset = Date.now();
+
+            inactivityTimer = setTimeout(async () => {
+                if (isAdminLoggedIn && auth && authSignOut) {
+                    try {
+                        editModal.style.display = 'none';
+                        addModal.style.display = 'none';
+                        await authSignOut(auth);
+                        showAutoLogoutToast("30 سیکنڈ تک کوئی سرگرمی نہ ہونے کی وجہ سے خودکار لاگ آؤٹ کر دیا گیا ہے۔");
+                    } catch (err) {
+                        console.error("Auto logout error:", err);
+                    }
+                }
+            }, INACTIVITY_LIMIT_MS);
+        }
+
+        function handleUserActivity() {
+            if (!isAdminLoggedIn) return;
+            const now = Date.now();
+            if (now - lastActivityReset > 500) {
+                resetInactivityTimer();
+            }
+        }
+
+        ['mousemove', 'mousedown', 'keydown', 'touchstart', 'touchmove', 'click', 'input', 'scroll'].forEach(evtName => {
+            window.addEventListener(evtName, handleUserActivity, true);
+        });
+
         // Auth UI Elements
         const authToggleBtn = document.getElementById('auth-toggle-btn');
         const loginModal = document.getElementById('login-modal');
@@ -570,6 +630,9 @@
         const loginErrorMsg = document.getElementById('login-error-msg');
 
         async function initFirebaseAuth() {
+            if (!isWebProtocol) {
+                return;
+            }
             try {
                 const authModule = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
                 auth = authModule.getAuth(app);
@@ -582,26 +645,29 @@
                         authToggleBtn.innerText = 'Logout';
                         authToggleBtn.classList.add('logged-in');
                         authToggleBtn.title = `Logged in as ${user.email}`;
+                        resetInactivityTimer();
                     } else {
                         authToggleBtn.innerText = 'Login';
                         authToggleBtn.classList.remove('logged-in');
                         authToggleBtn.title = 'Admin Login';
+                        clearInactivityTimer();
                     }
                     renderData();
                 });
             } catch (err) {
-                console.warn("Auth unavailable in local content:// viewer:", err);
+                console.warn("Auth init skipped:", err);
             }
         }
         initFirebaseAuth();
 
         authToggleBtn.addEventListener('click', async () => {
-            if (!auth) {
-                alert("لاگ ان کرنے کے لیے اس فائل کو اپنی ویب سائٹ لنک (https://...) کے ذریعے کھولیں، براہِ راست فائل مینیجر سے نہیں۔");
+            if (!isWebProtocol || !auth) {
+                alert("لاگ ان کرنے کے لیے اس فائل کو اپنی ویب سائٹ لنک (https://...) کے ذریعے کھولیں۔ فون کی میموری (content://) سے صرف حساب دیکھا جا سکتا ہے۔");
                 return;
             }
             if (isAdminLoggedIn) {
                 if (confirm("کیا آپ لاگ آؤٹ (Logout) کرنا چاہتے ہیں؟")) {
+                    clearInactivityTimer();
                     await authSignOut(auth);
                 }
             } else {
