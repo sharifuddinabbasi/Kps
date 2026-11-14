@@ -9,7 +9,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#007bff">
     <script>
-      if ('serviceWorker' in navigator) {
+      if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
         navigator.serviceWorker.register('sw.js');
       }
     </script>
@@ -24,6 +24,22 @@
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
         h1 { color: #333; font-size: clamp(16px, 1vw + 10px, 21px); margin: 0; }
         .account-select { padding: 4px 8px; font-size: clamp(12px, 0.8vw + 8px, 15px); border-radius: 4px; border: 1px solid #007bff; background-color: #e9f5ff; font-weight: bold; color: #007bff; cursor: pointer; }
+        
+        .auth-btn {
+            padding: 4px 9px;
+            font-size: clamp(11px, 0.7vw + 7px, 13px);
+            border-radius: 4px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            color: #fff;
+            background-color: #007bff;
+            transition: background 0.2s;
+        }
+        .auth-btn:hover { background-color: #0056b3; }
+        .auth-btn.logged-in { background-color: #dc3545; }
+        .auth-btn.logged-in:hover { background-color: #b02a37; }
+
         .summary { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 5px; }
         .card { flex: 1 1 calc(33.333% - 6px); min-width: 75px; padding: 5px 3px; border-radius: 6px; text-align: center; color: white; }
         .card.received-card { background-color: #28a745; }
@@ -263,20 +279,27 @@
             padding: 8px 20px; border-radius: 6px; font-weight: bold; cursor: pointer;
         }
         .modal-btn-save:hover { background: #218838; }
+        .login-error {
+            color: #dc3545;
+            font-size: 12px;
+            font-weight: bold;
+            display: none;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="fixed-header">
             <div class="header-top">
-                <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
                     <h1 id="page-title">Detail. CEO</h1>
                     <div id="ceo-net-summary-header" style="font-size: 13px; font-weight: bold; background: #dc3545; color: #ffffff; padding: 4px 8px; border-radius: 4px; display: none;">
                         Total: <span id="ceo-net-value">0</span>
                     </div>
                 </div>
-                <div>
-                    <label for="account-filter" style="font-size: 12px; font-weight: bold; color: #333;">Select Account: </label>
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <label for="account-filter" style="font-size: 12px; font-weight: bold; color: #333;">Account:</label>
                     <select id="account-filter" class="account-select">
                         <option value="CEO">CEO</option>
                         <option value="Musharaf Amanat">Musharaf Amanat</option>
@@ -295,6 +318,7 @@
                         <option value="SAJID">SAJID</option>
                         <option value="RASHID DRIVER">RASHID DRIVER</option>
                     </select>
+                    <button type="button" id="auth-toggle-btn" class="auth-btn" title="Admin Login">Login</button>
                 </div>
             </div>
             
@@ -413,6 +437,31 @@
         </div>
     </div>
 
+    <!-- Admin Login Modal Popup -->
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span>Admin Login</span>
+                <button type="button" class="modal-close-btn" id="login-modal-close-x">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-group">
+                    <label>Email</label>
+                    <input type="email" id="login-email" class="modal-input" placeholder="Admin Email">
+                </div>
+                <div class="modal-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" class="modal-input" placeholder="Password">
+                </div>
+                <div id="login-error-msg" class="login-error">غلط ای میل یا پاس ورڈ! دوبارہ کوشش کریں۔</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="modal-btn-cancel" id="login-btn-cancel">Cancel</button>
+                <button type="button" class="modal-btn-save" id="login-btn-submit" style="background: #007bff;">Login</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Edit Entry Modal Popup -->
     <div id="edit-modal" class="modal-overlay">
         <div class="modal-box">
@@ -504,6 +553,96 @@
         const db = getFirestore(app);
         const expensesRef = collection(db, "ceo_expenses");
         const q = query(expensesRef, orderBy("date", "asc"));
+
+        let isAdminLoggedIn = false;
+        let auth = null;
+        let authSignIn = null;
+        let authSignOut = null;
+
+        // Auth UI Elements
+        const authToggleBtn = document.getElementById('auth-toggle-btn');
+        const loginModal = document.getElementById('login-modal');
+        const loginModalCloseX = document.getElementById('login-modal-close-x');
+        const loginBtnCancel = document.getElementById('login-btn-cancel');
+        const loginBtnSubmit = document.getElementById('login-btn-submit');
+        const loginEmailInput = document.getElementById('login-email');
+        const loginPasswordInput = document.getElementById('login-password');
+        const loginErrorMsg = document.getElementById('login-error-msg');
+
+        async function initFirebaseAuth() {
+            try {
+                const authModule = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
+                auth = authModule.getAuth(app);
+                authSignIn = authModule.signInWithEmailAndPassword;
+                authSignOut = authModule.signOut;
+
+                authModule.onAuthStateChanged(auth, (user) => {
+                    isAdminLoggedIn = !!user;
+                    if (isAdminLoggedIn) {
+                        authToggleBtn.innerText = 'Logout';
+                        authToggleBtn.classList.add('logged-in');
+                        authToggleBtn.title = `Logged in as ${user.email}`;
+                    } else {
+                        authToggleBtn.innerText = 'Login';
+                        authToggleBtn.classList.remove('logged-in');
+                        authToggleBtn.title = 'Admin Login';
+                    }
+                    renderData();
+                });
+            } catch (err) {
+                console.warn("Auth unavailable in local content:// viewer:", err);
+            }
+        }
+        initFirebaseAuth();
+
+        authToggleBtn.addEventListener('click', async () => {
+            if (!auth) {
+                alert("لاگ ان کرنے کے لیے اس فائل کو اپنی ویب سائٹ لنک (https://...) کے ذریعے کھولیں، براہِ راست فائل مینیجر سے نہیں۔");
+                return;
+            }
+            if (isAdminLoggedIn) {
+                if (confirm("کیا آپ لاگ آؤٹ (Logout) کرنا چاہتے ہیں؟")) {
+                    await authSignOut(auth);
+                }
+            } else {
+                loginErrorMsg.style.display = 'none';
+                loginPasswordInput.value = '';
+                loginModal.style.display = 'flex';
+                loginEmailInput.focus();
+            }
+        });
+
+        async function handleAdminLogin() {
+            if (!auth || !authSignIn) return;
+            const email = loginEmailInput.value.trim();
+            const password = loginPasswordInput.value;
+            if (!email || !password) {
+                loginErrorMsg.innerText = "براہ کرم ای میل اور پاس ورڈ دونوں درج کریں۔";
+                loginErrorMsg.style.display = 'block';
+                return;
+            }
+            loginBtnSubmit.disabled = true;
+            loginBtnSubmit.innerText = "Checking...";
+            loginErrorMsg.style.display = 'none';
+            try {
+                await authSignIn(auth, email, password);
+                loginModal.style.display = 'none';
+            } catch (err) {
+                console.error("Login error:", err);
+                loginErrorMsg.innerText = "غلط ای میل یا پاس ورڈ! دوبارہ کوشش کریں۔";
+                loginErrorMsg.style.display = 'block';
+            } finally {
+                loginBtnSubmit.disabled = false;
+                loginBtnSubmit.innerText = "Login";
+            }
+        }
+
+        loginBtnSubmit.addEventListener('click', handleAdminLogin);
+        loginPasswordInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleAdminLogin();
+        });
+        loginModalCloseX.addEventListener('click', () => { loginModal.style.display = 'none'; });
+        loginBtnCancel.addEventListener('click', () => { loginModal.style.display = 'none'; });
 
         const accountFilter = document.getElementById('account-filter');
         const monthFilter = document.getElementById('month-filter');
@@ -665,7 +804,6 @@
         }
 
         function isExcludedFromMonthFilter(accName) {
-            // Ab سب اکاؤنٹس منتھ فلٹر استعمال کر سکتے ہیں اور ان پر مہینے کے آغاز میں اولڈ ڈیوز کا لاجک چلے گا
             return false;
         }
 
@@ -836,10 +974,13 @@
         }
 
         function makeCellEditable(td, docId, fieldName, currentVal, inputType = 'text') {
+            if (!isAdminLoggedIn) return;
+
             td.classList.add('editable-cell');
             td.title = "Double click to edit";
 
             td.addEventListener('dblclick', (e) => {
+                if (!isAdminLoggedIn) return;
                 if (e.target.tagName === 'BUTTON') return;
                 if (td.querySelector('input')) return;
 
@@ -974,60 +1115,75 @@
                 cardTwoLabel.innerText = colTwoLabel;
                 cardThreeLabel.innerText = colThreeLabel;
 
-                tableFooter.style.display = 'table-footer-group';
                 ceoSelectedDetails.style.display = 'none';
                 ceoThirdDetails.style.display = 'none';
                 createdByContainer.style.display = 'none';
                 scrollableBody.classList.add('large-scroll');
                 mainDataTable.classList.add('scrollable-table');
 
-                tableHeaderRow.innerHTML = `
-                    <th style="width: 6%;">S.No</th>
-                    <th style="width: 8%;">Date</th>
-                    <th style="width: 24%;">Description</th>
-                    <th style="width: 6%;">Slip</th>
-                    <th style="width: 13%;" class="text-right">${firstColHeader}</th>
-                    <th style="width: 13%;" class="text-right">${secondColHeader}</th>
-                    <th style="width: 15%;" class="text-right">Sub Total</th>
-                    <th style="width: 15%;" class="action-col">Action</th>
-                `;
-                
-                addRowFormTr.innerHTML = `
-                    <td id="next-sno" style="font-weight: bold; cursor: pointer; color: #007bff;" title="Click to Open Add Form">1</td>
-                    <td><input type="date" id="date" required></td>
-                    <td><input type="text" id="desc" placeholder="Desc" required></td>
-                    <td><input type="text" id="slip" placeholder="URL"></td>
-                    <td><input type="number" id="received" placeholder="${firstColHeader}" step="1"></td>
-                    <td><input type="number" id="sent" placeholder="${secondColHeader}" step="1"></td>
-                    <td>-</td>
-                    <td class="action-col"><button type="button" id="submit-btn" class="add-btn">Add</button></td>
-                `;
+                if (isAdminLoggedIn) {
+                    tableFooter.style.display = 'table-footer-group';
+                    tableHeaderRow.innerHTML = `
+                        <th style="width: 6%;">S.No</th>
+                        <th style="width: 8%;">Date</th>
+                        <th style="width: 24%;">Description</th>
+                        <th style="width: 6%;">Slip</th>
+                        <th style="width: 13%;" class="text-right">${firstColHeader}</th>
+                        <th style="width: 13%;" class="text-right">${secondColHeader}</th>
+                        <th style="width: 15%;" class="text-right">Sub Total</th>
+                        <th style="width: 15%;" class="action-col">Action</th>
+                    `;
+                    
+                    addRowFormTr.innerHTML = `
+                        <td id="next-sno" style="font-weight: bold; cursor: pointer; color: #007bff;" title="Click to Open Add Form">1</td>
+                        <td><input type="date" id="date" required></td>
+                        <td><input type="text" id="desc" placeholder="Desc" required></td>
+                        <td><input type="text" id="slip" placeholder="URL"></td>
+                        <td><input type="number" id="received" placeholder="${firstColHeader}" step="1"></td>
+                        <td><input type="number" id="sent" placeholder="${secondColHeader}" step="1"></td>
+                        <td>-</td>
+                        <td class="action-col"><button type="button" id="submit-btn" class="add-btn">Add</button></td>
+                    `;
 
-                const nextSnoCell = document.getElementById('next-sno');
-                const dateInput = document.getElementById('date');
-                if (dateInput) dateInput.valueAsDate = new Date();
+                    const nextSnoCell = document.getElementById('next-sno');
+                    const dateInput = document.getElementById('date');
+                    if (dateInput) dateInput.valueAsDate = new Date();
 
-                const openAddModal = () => {
-                    const todayStr = new Date().toISOString().split('T')[0];
-                    addModalDate.value = todayStr;
-                    addModalDesc.value = '';
-                    addModalSlip.value = '';
-                    addModalReceived.value = '';
-                    addModalSent.value = '';
+                    const openAddModal = () => {
+                        if (!isAdminLoggedIn) return;
+                        const todayStr = new Date().toISOString().split('T')[0];
+                        addModalDate.value = todayStr;
+                        addModalDesc.value = '';
+                        addModalSlip.value = '';
+                        addModalReceived.value = '';
+                        addModalSent.value = '';
 
-                    addModalLabelRec.innerText = firstColHeader;
-                    addModalLabelSent.innerText = secondColHeader;
+                        addModalLabelRec.innerText = firstColHeader;
+                        addModalLabelSent.innerText = secondColHeader;
 
-                    addModal.style.display = 'flex';
-                };
+                        addModal.style.display = 'flex';
+                    };
 
-                if (nextSnoCell) {
-                    nextSnoCell.addEventListener('click', openAddModal);
-                }
+                    if (nextSnoCell) {
+                        nextSnoCell.addEventListener('click', openAddModal);
+                    }
 
-                const submitBtn = document.getElementById('submit-btn');
-                if (submitBtn) {
-                    submitBtn.addEventListener('click', handleAddRecord);
+                    const submitBtn = document.getElementById('submit-btn');
+                    if (submitBtn) {
+                        submitBtn.addEventListener('click', handleAddRecord);
+                    }
+                } else {
+                    tableFooter.style.display = 'none';
+                    addRowFormTr.innerHTML = '';
+                    tableHeaderRow.innerHTML = `
+                        <th style="width: 7%;">S.No</th>
+                        <th style="width: 10%;">Date</th>
+                        <th style="width: 34%;">Description</th>
+                        <th style="width: 7%;">Slip</th>
+                        <th style="width: 14%;" class="text-right">${firstColHeader}</th>
+                        <th style="width: 14%;" class="text-right">${secondColHeader}</th>
+                        <th style="width: 14%;" class="text-right">Sub Total</th>
+                    `;
                 }
             }
 
@@ -1163,7 +1319,7 @@
                         <td class="text-right" style="font-weight: bold;">${formatPlainNum(prevBalance)}</td>
                         <td class="text-right">0</td>
                         <td class="text-right" style="font-weight: bold; color: #dc3545;">${formatPlainNum(runningSubTotal)}</td>
-                        <td class="action-col">-</td>
+                        ${isAdminLoggedIn ? '<td class="action-col">-</td>' : ''}
                     `;
                     expenseList.appendChild(vRow);
                 }
@@ -1202,11 +1358,11 @@
                     const prevDate = index > 0 ? (filteredItems[index - 1].expense.date || '') : null;
                     const nextDate = index < filteredItems.length - 1 ? (filteredItems[index + 1].expense.date || '') : null;
 
-                    const upBtnHtml = (prevDate !== null && prevDate === currentDate)
+                    const upBtnHtml = (isAdminLoggedIn && prevDate !== null && prevDate === currentDate)
                         ? `<button class="up-btn" data-index="${index}" title="Move Up">U</button>`
                         : '';
 
-                    const downBtnHtml = (nextDate !== null && nextDate === currentDate)
+                    const downBtnHtml = (isAdminLoggedIn && nextDate !== null && nextDate === currentDate)
                         ? `<button class="down-btn" data-index="${index}" title="Move Down">D</button>`
                         : '';
 
@@ -1252,24 +1408,6 @@
                     tdSub.style.color = '#dc3545';
                     tdSub.innerText = formatPlainNum(runningSubTotal);
 
-                    const tdAction = document.createElement('td');
-                    tdAction.className = 'action-col';
-                    tdAction.innerHTML = `
-                        <div class="action-btns">
-                            <button class="icon-btn edit-icon-btn edit-btn" data-id="${id}" data-date="${expense.date || ''}" data-desc="${expense.desc || ''}" data-slip="${slipVal}" data-received="${recVal}" data-sent="${sentVal}" title="Edit">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                </svg>
-                            </button>
-                            <button class="icon-btn delete-icon-btn delete-btn" data-id="${id}" title="Delete">
-                                <svg viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                                </svg>
-                            </button>
-                        </div>
-                    `;
-
                     row.appendChild(tdSno);
                     row.appendChild(tdDate);
                     row.appendChild(tdDesc);
@@ -1277,57 +1415,83 @@
                     row.appendChild(tdRec);
                     row.appendChild(tdSent);
                     row.appendChild(tdSub);
-                    row.appendChild(tdAction);
+
+                    if (isAdminLoggedIn) {
+                        const tdAction = document.createElement('td');
+                        tdAction.className = 'action-col';
+                        tdAction.innerHTML = `
+                            <div class="action-btns">
+                                <button class="icon-btn edit-icon-btn edit-btn" data-id="${id}" data-date="${expense.date || ''}" data-desc="${expense.desc || ''}" data-slip="${slipVal}" data-received="${recVal}" data-sent="${sentVal}" title="Edit">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                </button>
+                                <button class="icon-btn delete-icon-btn delete-btn" data-id="${id}" title="Delete">
+                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        `;
+                        row.appendChild(tdAction);
+                    }
 
                     expenseList.appendChild(row);
                 });
 
-                const nextSnoCellSummary = document.getElementById('next-sno');
-                if (nextSnoCellSummary) nextSnoCellSummary.innerText = count;
+                if (isAdminLoggedIn) {
+                    const nextSnoCellSummary = document.getElementById('next-sno');
+                    if (nextSnoCellSummary) nextSnoCellSummary.innerText = count;
 
-                document.querySelectorAll('.up-btn').forEach(btn => {
-                    btn.addEventListener('click', async (e) => {
-                        const idx = parseInt(e.currentTarget.getAttribute('data-index'), 10);
-                        if (idx > 0) {
-                            await swapExpensesData(filteredItems[idx], filteredItems[idx - 1]);
-                        }
+                    document.querySelectorAll('.up-btn').forEach(btn => {
+                        btn.addEventListener('click', async (e) => {
+                            if (!isAdminLoggedIn) return;
+                            const idx = parseInt(e.currentTarget.getAttribute('data-index'), 10);
+                            if (idx > 0) {
+                                await swapExpensesData(filteredItems[idx], filteredItems[idx - 1]);
+                            }
+                        });
                     });
-                });
 
-                document.querySelectorAll('.down-btn').forEach(btn => {
-                    btn.addEventListener('click', async (e) => {
-                        const idx = parseInt(e.currentTarget.getAttribute('data-index'), 10);
-                        if (idx < filteredItems.length - 1) {
-                            await swapExpensesData(filteredItems[idx], filteredItems[idx + 1]);
-                        }
+                    document.querySelectorAll('.down-btn').forEach(btn => {
+                        btn.addEventListener('click', async (e) => {
+                            if (!isAdminLoggedIn) return;
+                            const idx = parseInt(e.currentTarget.getAttribute('data-index'), 10);
+                            if (idx < filteredItems.length - 1) {
+                                await swapExpensesData(filteredItems[idx], filteredItems[idx + 1]);
+                            }
+                        });
                     });
-                });
 
-                document.querySelectorAll('.delete-btn').forEach(btn => {
-                    btn.addEventListener('click', async (e) => {
-                        const docId = e.currentTarget.getAttribute('data-id');
-                        if (confirm("Kiya aap is record ko delete karna chahte hain?")) {
-                            await deleteDoc(doc(db, "ceo_expenses", docId));
-                        }
+                    document.querySelectorAll('.delete-btn').forEach(btn => {
+                        btn.addEventListener('click', async (e) => {
+                            if (!isAdminLoggedIn) return;
+                            const docId = e.currentTarget.getAttribute('data-id');
+                            if (confirm("Kiya aap is record ko delete karna chahte hain?")) {
+                                await deleteDoc(doc(db, "ceo_expenses", docId));
+                            }
+                        });
                     });
-                });
 
-                document.querySelectorAll('.edit-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const b = e.currentTarget;
-                        editDocId.value = b.getAttribute('data-id');
-                        modalDate.value = b.getAttribute('data-date') || '';
-                        modalDesc.value = b.getAttribute('data-desc') || '';
-                        modalSlip.value = b.getAttribute('data-slip') || '';
-                        modalReceived.value = b.getAttribute('data-received') || 0;
-                        modalSent.value = b.getAttribute('data-sent') || 0;
+                    document.querySelectorAll('.edit-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            if (!isAdminLoggedIn) return;
+                            const b = e.currentTarget;
+                            editDocId.value = b.getAttribute('data-id');
+                            modalDate.value = b.getAttribute('data-date') || '';
+                            modalDesc.value = b.getAttribute('data-desc') || '';
+                            modalSlip.value = b.getAttribute('data-slip') || '';
+                            modalReceived.value = b.getAttribute('data-received') || 0;
+                            modalSent.value = b.getAttribute('data-sent') || 0;
 
-                        modalLabelRec.innerText = firstColHeader;
-                        modalLabelSent.innerText = secondColHeader;
+                            modalLabelRec.innerText = firstColHeader;
+                            modalLabelSent.innerText = secondColHeader;
 
-                        editModal.style.display = 'flex';
+                            editModal.style.display = 'flex';
+                        });
                     });
-                });
+                }
 
                 totalReceivedDisplay.innerText = formatPlainNum(totalReceived);
                 totalSentDisplay.innerText = formatPlainNum(totalSent);
@@ -1336,6 +1500,10 @@
         }
 
         async function saveModalData() {
+            if (!isAdminLoggedIn) {
+                alert("براہ کرم پہلے لاگ ان کریں!");
+                return;
+            }
             const docId = editDocId.value;
             if (!docId) return;
 
@@ -1370,6 +1538,10 @@
         modalBtnCancel.addEventListener('click', () => { editModal.style.display = 'none'; });
 
         async function addNewEntryFromModal() {
+            if (!isAdminLoggedIn) {
+                alert("براہ کرم پہلے لاگ ان کریں!");
+                return;
+            }
             const selectedAccount = accountFilter.value;
             const newDate = addModalDate.value;
             const newDesc = addModalDesc.value.trim();
@@ -1410,9 +1582,16 @@
             if (e.target === addModal) {
                 addModal.style.display = 'none';
             }
+            if (e.target === loginModal) {
+                loginModal.style.display = 'none';
+            }
         });
 
         async function handleAddRecord() {
+            if (!isAdminLoggedIn) {
+                alert("براہ کرم پہلے لاگ ان کریں!");
+                return;
+            }
             const selectedAccount = accountFilter.value;
             const dateInput = document.getElementById('date');
             const descInput = document.getElementById('desc');
@@ -1567,6 +1746,7 @@
         }
 
         async function swapExpensesData(itemA, itemB) {
+            if (!isAdminLoggedIn) return;
             const dataForA = {
                 desc: itemB.expense.desc || '',
                 slip: (itemB.expense.slip || itemB.expense.slipUrl || '').trim(),
@@ -1598,9 +1778,11 @@
 
                     if (recVal === 0 && sentVal === 0 && itemData.date !== todayStr) {
                         itemData.date = todayStr;
-                        updateDoc(doc(db, "ceo_expenses", docSnap.id), {
-                            date: todayStr
-                        }).catch((err) => console.error("Auto date update error:", err));
+                        if (isAdminLoggedIn) {
+                            updateDoc(doc(db, "ceo_expenses", docSnap.id), {
+                                date: todayStr
+                            }).catch((err) => console.error("Auto date update error:", err));
+                        }
                     }
                 }
 
@@ -1619,6 +1801,11 @@
 
             populateMonthFilterForAccount(accountFilter.value);
             renderData();
+        }, (error) => {
+            console.error("Firestore read error:", error);
+            loadingDiv.style.display = 'block';
+            loadingDiv.style.color = '#dc3545';
+            loadingDiv.innerText = "ڈیٹا لوڈ نہیں ہو سکا: " + error.message;
         });
 
         accountFilter.addEventListener('change', () => {
