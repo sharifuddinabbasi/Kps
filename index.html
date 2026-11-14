@@ -266,6 +266,18 @@
         .export-mode-active tbody tr {
             height: auto !important;
         }
+        .export-mode-active th {
+            position: static !important;
+        }
+        .export-mode-active table,
+        .export-mode-active tbody {
+            page-break-inside: auto !important;
+            break-inside: auto !important;
+        }
+        .export-mode-active tr {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
 
         .export-header-title {
             display: none;
@@ -1932,9 +1944,9 @@
                 margin:       [8, 8, 8, 8],
                 filename:     `${fileName}_${isSearchActive ? 'Search' : selectedAccount}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+                html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: 0 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+                pagebreak:    { mode: ['css', 'legacy'], avoid: ['tr', '.summary', '.export-meta-footer'] }
             };
 
             html2pdf().set(opt).from(element).save().then(() => {
