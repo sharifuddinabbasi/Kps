@@ -277,12 +277,31 @@
             border-bottom: 2px solid #007bff;
             padding-bottom: 6px;
         }
-        .export-mode-active .export-header-title {
+        #main-export-title {
+            margin-bottom: 2px !important;
+            border-bottom: none !important;
+            padding-bottom: 0 !important;
+        }
+        .export-header-subtitle {
+            display: none;
+            text-align: center;
+            font-size: 13.5px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 6px;
+        }
+        .export-mode-active .export-header-title,
+        .export-mode-active .export-header-subtitle {
             display: block !important;
         }
 
         #table-container.pdf-export-mode .export-header-title {
             font-size: 26px !important;
+        }
+        #table-container.pdf-export-mode .export-header-subtitle {
+            font-size: 16.5px !important;
         }
         #table-container.pdf-export-mode th, 
         #table-container.pdf-export-mode td {
@@ -362,6 +381,16 @@
             color: #333;
             margin: 0;
             letter-spacing: 0.2px;
+        }
+        .ms-export-subtitle {
+            display: none;
+            font-size: 14px;
+            font-weight: bold;
+            color: #007bff;
+            margin-top: 4px;
+        }
+        .ms-clean-export-active .ms-export-subtitle {
+            display: block !important;
         }
         .ms-header-right-btns {
             display: flex;
@@ -577,6 +606,50 @@
             justify-content: flex-end;
         }
 
+        /* ڈیسک ٹاپ ویو کے لیے تجویز کردہ فونٹ سائز (موبائل ویو میں کوئی تبدیلی نہیں) */
+        @media (min-width: 768px) {
+            .ms-table th, .ms-table td {
+                font-size: 15.5px;
+            }
+            .ms-table td.clickable-val {
+                font-size: 18px;
+            }
+            .ms-dues-table th, .ms-dues-table td {
+                font-size: 15px;
+            }
+            .ms-dues-table td.dues-val {
+                font-size: 17.5px;
+            }
+            .ms-footer-label-box {
+                font-size: 15.5px;
+            }
+            .ms-footer-amount-box {
+                font-size: 18px;
+            }
+            .card h3 {
+                font-size: 13.5px;
+            }
+            .card p {
+                font-size: 19px;
+            }
+            th, td {
+                font-size: 14.5px;
+            }
+            .selected-details-container th, 
+            .selected-details-container td {
+                font-size: 13.5px;
+            }
+            #ceo-third-details th {
+                font-size: 13px !important;
+            }
+            #ceo-third-details td {
+                font-size: 13.5px !important;
+            }
+            #ceo-third-details td.text-right {
+                font-size: 14px !important;
+            }
+        }
+
         .ms-clean-export-active {
             width: 720px !important;
             max-width: 720px !important;
@@ -607,9 +680,15 @@
         .ms-pdf-boost-mode .ms-title {
             font-size: 24px !important;
         }
+        .ms-pdf-boost-mode .ms-export-subtitle {
+            font-size: 16px !important;
+        }
 
         .ms-jpg-boost-mode .ms-title {
             font-size: 34px !important;
+        }
+        .ms-jpg-boost-mode .ms-export-subtitle {
+            font-size: 22px !important;
         }
         .ms-jpg-boost-mode .ms-table th,
         .ms-jpg-boost-mode .ms-table td {
@@ -673,7 +752,10 @@
                         <div class="ms-border-layer-3">
                             <div class="ms-border-layer-4">
                                 <div class="ms-header-row">
-                                    <div id="ms-title" class="ms-title">CEO's Expenses Detail</div>
+                                    <div>
+                                        <div id="ms-title" class="ms-title">CEO's Expenses Detail</div>
+                                        <div id="ms-export-subtitle" class="ms-export-subtitle"></div>
+                                    </div>
                                     <div class="ms-header-right-btns">
                                         <button type="button" id="ms-pdf-btn" class="pdf-btn">PDF</button>
                                         <button type="button" id="ms-jpg-btn" class="jpg-btn">JPG</button>
@@ -834,6 +916,7 @@
 
             <div id="table-container" class="table-portion">
                 <div id="main-export-title" class="export-header-title">All Accounts detail for CEO</div>
+                <div id="main-export-subtitle" class="export-header-subtitle"></div>
                 
                 <div id="export-summary-holder" class="export-summary-container"></div>
 
@@ -1013,6 +1096,7 @@
 
         const tableContainer = document.getElementById('table-container');
         const mainExportTitle = document.getElementById('main-export-title');
+        const mainExportSubtitle = document.getElementById('main-export-subtitle');
         const exportSummaryHolder = document.getElementById('export-summary-holder');
         const exportTimestampSpan = document.getElementById('export-timestamp-span');
 
@@ -1021,6 +1105,7 @@
         const toSnoInput = document.getElementById('toSno');
 
         const msTitle = document.getElementById('ms-title');
+        const msExportSubtitle = document.getElementById('ms-export-subtitle');
         const msMonthSelect = document.getElementById('ms-month-select');
         const msTableBody = document.getElementById('ms-table-body');
         const msDuesContainer = document.getElementById('ms-dues-container');
@@ -1069,6 +1154,105 @@
             const mm = String(d.getMonth() + 1).padStart(2, '0');
             const dd = String(d.getDate()).padStart(2, '0');
             return `${yyyy}-${mm}-${dd}`;
+        }
+
+        function formatYMToMonthYear(ym) {
+            if (!ym || ym === 'all') return '';
+            const parts = ym.split('-');
+            if (parts.length >= 2) {
+                const year = parts[0];
+                const mIndex = parseInt(parts[1], 10) - 1;
+                if (mIndex >= 0 && mIndex < 12) {
+                    return `${monthNames[mIndex]} ${year}`;
+                }
+            }
+            return ym;
+        }
+
+        function formatYMDToFullDate(ymdStr) {
+            if (!ymdStr || ymdStr === 'no-date') return null;
+            const parts = ymdStr.trim().split('-');
+            if (parts.length !== 3) return null;
+            const year = parts[0];
+            const mIndex = parseInt(parts[1], 10) - 1;
+            const day = parts[2].padStart(2, '0');
+            if (isNaN(mIndex) || mIndex < 0 || mIndex >= 12) return null;
+            return `${day} ${monthNames[mIndex]} ${year}`;
+        }
+
+        function parseDMYToFullDate(dmyStr) {
+            if (!dmyStr) return null;
+            const parts = dmyStr.trim().split('-');
+            if (parts.length !== 3) return null;
+            const dd = parts[0].padStart(2, '0');
+            const mIndex = parseInt(parts[1], 10) - 1;
+            let yyyy = parts[2];
+            if (yyyy.length === 2) yyyy = '20' + yyyy;
+            if (isNaN(mIndex) || mIndex < 0 || mIndex >= 12) return null;
+            return `${dd} ${monthNames[mIndex]} ${yyyy}`;
+        }
+
+        function getMsExportSubtitleText() {
+            const ym = msMonthSelect ? msMonthSelect.value : 'all';
+            if (ym && ym !== 'all') {
+                return `Month of : ${formatYMToMonthYear(ym)}`;
+            }
+            const validYMD = [];
+            allExpensesData.forEach(item => {
+                const rawAcc = item.expense.account ? item.expense.account.toLowerCase() : '';
+                if (rawAcc.includes('sharif') || rawAcc.includes('sajid') || rawAcc.includes('rashid driver')) return;
+                const d = item.expense.date;
+                if (d && d !== 'no-date' && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
+                    validYMD.push(d);
+                }
+            });
+            validYMD.sort();
+            if (validYMD.length > 0) {
+                const startFull = formatYMDToFullDate(validYMD[0]);
+                const endFull = formatYMDToFullDate(validYMD[validYMD.length - 1]);
+                if (startFull && endFull) {
+                    return `Month of: ${startFull} to ${endFull}`;
+                }
+            }
+            return 'Month of: All Months';
+        }
+
+        function getTableExportSubtitleText() {
+            const activeYM = isDrillDownMode ? (drillDownSelectedYM || (monthFilter ? monthFilter.value : 'all')) : (monthFilter ? monthFilter.value : 'all');
+            const fromDateVal = (!isDrillDownMode && !isSearchActive && fromDateFilter) ? fromDateFilter.value : '';
+            const toDateVal = (!isDrillDownMode && !isSearchActive && toDateFilter) ? toDateFilter.value : '';
+
+            if (activeYM && activeYM !== 'all' && !fromDateVal && !toDateVal) {
+                return `Month of : ${formatYMToMonthYear(activeYM)}`;
+            }
+
+            const rows = expenseList.querySelectorAll('tr');
+            const validDates = [];
+            const dmyRegex = /^\d{2}-\d{2}-\d{2,4}$/;
+
+            rows.forEach(row => {
+                if (row.style.display === 'none') return;
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 2) {
+                    const c0 = cells[0].innerText.trim();
+                    const c1 = cells[1].innerText.trim();
+                    if (dmyRegex.test(c0)) {
+                        validDates.push(c0);
+                    } else if (dmyRegex.test(c1)) {
+                        validDates.push(c1);
+                    }
+                }
+            });
+
+            if (validDates.length > 0) {
+                const startFull = parseDMYToFullDate(validDates[0]);
+                const endFull = parseDMYToFullDate(validDates[validDates.length - 1]);
+                if (startFull && endFull) {
+                    return `Month of: ${startFull} to ${endFull}`;
+                }
+            }
+
+            return 'Month of: All Months';
         }
 
         let allExpensesData = [];
@@ -1270,20 +1454,17 @@
             }
         }
 
-        function getMonthLabelText() {
-            return msMonthSelect.options[msMonthSelect.selectedIndex] ? msMonthSelect.options[msMonthSelect.selectedIndex].text : msMonthSelect.value;
-        }
-
         if (msPdfBtn) {
             msPdfBtn.onclick = function() {
                 const el = document.getElementById('monthly-summary-section');
-                const monthText = getMonthLabelText();
                 
                 stampMsExportTime();
                 msPdfBtn.style.display = 'none';
                 msJpgBtn.style.display = 'none';
                 
-                if (msTitle) msTitle.innerText = `CEO's Expenses Detail of ${monthText}`;
+                if (msTitle) msTitle.innerText = "CEO's Expenses Detail";
+                if (msExportSubtitle) msExportSubtitle.innerText = getMsExportSubtitleText();
+
                 el.classList.add('ms-clean-export-active');
                 el.classList.add('ms-pdf-boost-mode');
 
@@ -1313,13 +1494,13 @@
         if (msJpgBtn) {
             msJpgBtn.onclick = function() {
                 const el = document.getElementById('monthly-summary-section');
-                const monthText = getMonthLabelText();
 
                 stampMsExportTime();
                 msPdfBtn.style.display = 'none';
                 msJpgBtn.style.display = 'none';
                 
-                if (msTitle) msTitle.innerText = `CEO's Expenses Detail of ${monthText}`;
+                if (msTitle) msTitle.innerText = "CEO's Expenses Detail";
+                if (msExportSubtitle) msExportSubtitle.innerText = getMsExportSubtitleText();
                 
                 el.classList.add('ms-clean-export-active');
                 el.classList.add('ms-jpg-boost-mode');
@@ -1705,34 +1886,6 @@
             const element = document.getElementById(elementId);
             const selectedAccount = accountFilter.value;
             
-            if (elementId === 'table-container') {
-                if (isDrillDownMode) {
-                    const ymVal = (drillDownSelectedYM || (monthFilter ? monthFilter.value : ''));
-                    let monthLabel = 'All Months';
-                    if (ymVal !== 'all') {
-                        const parts = ymVal.split('-');
-                        if (parts.length >= 2) {
-                            const mIndex = parseInt(parts[1], 10) - 1;
-                            monthLabel = `${monthNames[mIndex]}${parts[0]}`;
-                        }
-                    }
-                    mainExportTitle.innerText = `Account Detail ${selectedAccount} (${monthLabel})`;
-                } else if (isSearchActive) {
-                    const searchVal = searchInput.value.trim();
-                    mainExportTitle.innerText = `Detail for ${searchVal || 'Search'}`;
-                } else if (selectedAccount === 'CEO') {
-                    mainExportTitle.innerText = `All Accounts detail for CEO`;
-                } else {
-                    mainExportTitle.innerText = `Account Detail ${selectedAccount}`;
-                }
-                
-                prepareExportSummaries();
-                
-                if (selectedAccount !== 'CEO' && !isSearchActive) {
-                    element.classList.add('other-accounts-export');
-                }
-            }
-
             const rows = expenseList.querySelectorAll('tr');
             const hiddenRows = [];
 
@@ -1744,6 +1897,27 @@
                         hiddenRows.push(row);
                     }
                 });
+            }
+
+            if (elementId === 'table-container') {
+                if (isSearchActive) {
+                    const searchVal = searchInput.value.trim();
+                    mainExportTitle.innerText = `Detail for ${searchVal || 'Search'}`;
+                } else if (selectedAccount === 'CEO' && !isDrillDownMode) {
+                    mainExportTitle.innerText = `All Accounts detail for CEO`;
+                } else {
+                    mainExportTitle.innerText = `Account Detail ${selectedAccount}`;
+                }
+
+                if (mainExportSubtitle) {
+                    mainExportSubtitle.innerText = getTableExportSubtitleText();
+                }
+                
+                prepareExportSummaries();
+                
+                if (selectedAccount !== 'CEO' && !isSearchActive) {
+                    element.classList.add('other-accounts-export');
+                }
             }
 
             const pdfBtn = element.querySelector('.pdf-btn');
@@ -1780,34 +1954,6 @@
             const element = document.getElementById(elementId);
             const selectedAccount = accountFilter.value;
 
-            if (elementId === 'table-container') {
-                if (isDrillDownMode) {
-                    const ymVal = (drillDownSelectedYM || (monthFilter ? monthFilter.value : ''));
-                    let monthLabel = 'All Months';
-                    if (ymVal !== 'all') {
-                        const parts = ymVal.split('-');
-                        if (parts.length >= 2) {
-                            const mIndex = parseInt(parts[1], 10) - 1;
-                            monthLabel = `${monthNames[mIndex]}${parts[0]}`;
-                        }
-                    }
-                    mainExportTitle.innerText = `Account Detail ${selectedAccount} (${monthLabel})`;
-                } else if (isSearchActive) {
-                    const searchVal = searchInput.value.trim();
-                    mainExportTitle.innerText = `Detail for ${searchVal || 'Search'}`;
-                } else if (selectedAccount === 'CEO') {
-                    mainExportTitle.innerText = `All Accounts detail for CEO`;
-                } else {
-                    mainExportTitle.innerText = `Account Detail ${selectedAccount}`;
-                }
-                
-                prepareExportSummaries();
-                
-                if (selectedAccount !== 'CEO' && !isSearchActive) {
-                    element.classList.add('other-accounts-export');
-                }
-            }
-
             const rows = expenseList.querySelectorAll('tr');
             const hiddenRows = [];
 
@@ -1819,6 +1965,27 @@
                         hiddenRows.push(row);
                     }
                 });
+            }
+
+            if (elementId === 'table-container') {
+                if (isSearchActive) {
+                    const searchVal = searchInput.value.trim();
+                    mainExportTitle.innerText = `Detail for ${searchVal || 'Search'}`;
+                } else if (selectedAccount === 'CEO' && !isDrillDownMode) {
+                    mainExportTitle.innerText = `All Accounts detail for CEO`;
+                } else {
+                    mainExportTitle.innerText = `Account Detail ${selectedAccount}`;
+                }
+
+                if (mainExportSubtitle) {
+                    mainExportSubtitle.innerText = getTableExportSubtitleText();
+                }
+                
+                prepareExportSummaries();
+                
+                if (selectedAccount !== 'CEO' && !isSearchActive) {
+                    element.classList.add('other-accounts-export');
+                }
             }
 
             const pdfBtn = element.querySelector('.pdf-btn');
