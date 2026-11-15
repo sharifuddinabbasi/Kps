@@ -1804,15 +1804,11 @@
             if (isSearchActive) return;
 
             const selectedAccount = accountFilter.value;
+            if (selectedAccount === 'CEO') return;
+
             const card1 = firstSummaryCards.cloneNode(true);
             card1.style.display = 'flex';
             exportSummaryHolder.appendChild(card1);
-
-            if (selectedAccount === 'CEO') {
-                const card2 = secondSummary.cloneNode(true);
-                card2.style.display = 'flex';
-                exportSummaryHolder.appendChild(card2);
-            }
         }
 
         function stampExportTime() {
@@ -2142,6 +2138,7 @@
                 ceoSelectedDetails.style.display = 'none';
                 ceoThirdDetails.style.display = 'none';
 
+                tableContainer.style.display = 'block';
                 tableContainer.classList.add('large-scroll');
                 tableContainer.classList.remove('drilldown-scroll');
 
@@ -2175,7 +2172,11 @@
                         return;
                     }
 
-                    if (currentSelectedMonth !== 'all' && itemDate && itemDate !== 'no-date') {
+                    const formattedDateDmy = formatDateToDMY(itemDate).toLowerCase();
+                    const rawDate = itemDate.toLowerCase();
+                    const isDateMatch = searchTerm && (formattedDateDmy.includes(searchTerm) || rawDate.includes(searchTerm));
+
+                    if (!isDateMatch && currentSelectedMonth !== 'all' && itemDate && itemDate !== 'no-date') {
                         const itemYM = itemDate.substring(0, 7);
                         if (itemYM !== currentSelectedMonth) return;
                     }
@@ -2184,6 +2185,8 @@
                         const displayAmount = recVal > 0 ? recVal : sentVal;
                         const matchSearch = rawAccount.toLowerCase().includes(searchTerm) || 
                                             desc.toLowerCase().includes(searchTerm) ||
+                                            formattedDateDmy.includes(searchTerm) ||
+                                            rawDate.includes(searchTerm) ||
                                             String(displayAmount).includes(searchTerm) ||
                                             String(recVal).includes(searchTerm) ||
                                             String(sentVal).includes(searchTerm);
@@ -2268,6 +2271,7 @@
                 ceoSelectedDetails.style.display = 'none';
                 ceoThirdDetails.style.display = 'none';
 
+                tableContainer.style.display = 'block';
                 tableContainer.classList.add('drilldown-scroll');
                 tableContainer.classList.remove('large-scroll');
             } else {
@@ -2275,7 +2279,6 @@
                 drilldownBadge.style.display = 'none';
                 defaultHeaderTop.style.display = 'flex';
                 accountSelectRow.style.display = 'flex';
-                firstSummaryCards.style.display = 'flex';
                 tableContainer.classList.remove('drilldown-scroll');
 
                 if (isExcludedFromMonthFilter(selectedAccount)) {
@@ -2288,28 +2291,21 @@
             if (selectedAccount === 'CEO' && !isDrillDownMode) {
                 pageTitle.innerText = "Account's Detail";
 
-                secondSummary.style.display = 'flex';
-                ceoSelectedDetails.style.display = 'block';
-                ceoThirdDetails.style.display = 'block';
+                firstSummaryCards.style.display = 'none';
+                secondSummary.style.display = 'none';
+                tableContainer.style.display = 'none';
+                ceoSelectedDetails.style.display = 'none';
+                ceoThirdDetails.style.display = 'none';
 
-                cardOneLabel.innerText = 'Amount Received';
-                cardTwoLabel.innerText = 'Amount Sent';
-                cardThreeLabel.innerText = 'Total';
-
-                tableContainer.classList.remove('large-scroll');
-                
-                tableHeaderRow.innerHTML = `
-                    <th style="width: 7%;">S.No</th>
-                    <th style="width: 15%;">Date</th>
-                    <th style="width: 19.5%;" class="text-right">Amount<br>Rec.</th>
-                    <th style="width: 19.5%;" class="text-right">Amount<br>Sent</th>
-                    <th style="width: 19.5%;" class="text-right">Amanat<br>Rec.</th>
-                    <th style="width: 19.5%;" class="text-right">Amanat<br>Return</th>
-                `;
+                tableHeaderRow.innerHTML = '';
+                expenseList.innerHTML = '';
+                return;
             } else {
                 if (!isDrillDownMode) {
                     pageTitle.innerText = `Detail. ${selectedAccount}`;
+                    firstSummaryCards.style.display = 'flex';
                     secondSummary.style.display = 'none';
+                    tableContainer.style.display = 'block';
                     ceoSelectedDetails.style.display = 'none';
                     ceoThirdDetails.style.display = 'none';
                 }
@@ -2360,173 +2356,112 @@
             expenseList.innerHTML = '';
             let count = 1;
 
-            if (selectedAccount === 'CEO' && !isDrillDownMode) {
-                const autoCeoData = getAutoCeoDataByDate('', currentSelectedMonth, fromDateVal, toDateVal);
-                const sortedDates = Object.keys(autoCeoData).sort();
+            let totalReceived = 0;
+            let totalSent = 0;
+            const shouldFilterByMonth = !isExcludedFromMonthFilter(selectedAccount);
+            const activeMonth = isDrillDownMode ? (drillDownSelectedYM || currentSelectedMonth) : currentSelectedMonth;
 
-                let sumAmountReceived = 0;
-                let sumAmountSent = 0;
+            const isAmanatTarget = (
+                selectedAccount === 'Farooq Shah Amanat' || 
+                selectedAccount === 'Musharaf Amanat' || 
+                selectedAccount === 'Altaf Rent A Car' || 
+                selectedAccount === 'Sharif A/C' || 
+                selectedAccount === 'SAJID' || 
+                selectedAccount === 'RASHID DRIVER'
+            );
+            let prevBalance = 0;
+            let prevMonthName = '';
+            let vDateFormatted = '';
+            let showVirtualRow = false;
 
-                sortedDates.forEach(dateStr => {
-                    const data = autoCeoData[dateStr];
-                    sumAmountReceived += data.amountReceived;
-                    sumAmountSent += data.amountSent;
+            if (isAmanatTarget && activeMonth && activeMonth !== 'all' && !fromDateVal && !toDateVal) {
+                const parts = activeMonth.split('-');
+                if (parts.length >= 2) {
+                    const y = parseInt(parts[0], 10);
+                    const m = parseInt(parts[1], 10);
+                    let prevM = m - 1;
+                    let prevY = y;
+                    if (prevM === 0) {
+                        prevM = 12;
+                        prevY = y - 1;
+                    }
+                    prevMonthName = monthNames[prevM - 1];
+                    const startOfCurrentMonth = `${y}-${String(m).padStart(2, '0')}-01`;
 
-                    const formattedDate = formatDateToDMY(dateStr);
-                    const row = document.createElement('tr');
-
-                    const createTd = (val, type, label) => {
-                        const td = document.createElement('td');
-                        td.innerText = formatPlainNum(val);
-                        td.classList.add('text-right');
-                        if (val > 0) {
-                            td.className += ' clickable-val';
-                            td.addEventListener('click', () => {
-                                updateAmountBoxOnly(data.items, type, label, val);
-                            });
+                    allExpensesData.forEach(item => {
+                        const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
+                        const itemDate = item.expense.date || '';
+                        if (isAccountMatch(itemAccount, selectedAccount)) {
+                            if (itemDate && itemDate < startOfCurrentMonth) {
+                                prevBalance += (item.expense.received || 0) - (item.expense.sent || 0);
+                            }
                         }
-                        return td;
-                    };
-
-                    const snoTd = document.createElement('td');
-                    snoTd.innerText = count++;
-
-                    const dateTd = document.createElement('td');
-                    dateTd.innerText = formattedDate;
-                    dateTd.className = 'clickable-val';
-                    dateTd.addEventListener('click', () => {
-                        updateDateBoxOnly(formattedDate, data.items);
                     });
 
-                    row.appendChild(snoTd);
-                    row.appendChild(dateTd);
-                    row.appendChild(createTd(data.amountReceived, 'amountReceived', 'Amount Rec.'));
-                    row.appendChild(createTd(data.amountSent, 'amountSent', 'Amount Sent'));
-                    row.appendChild(createTd(data.amanatReceived, 'amanatReceived', 'Amanat Rec.'));
-                    row.appendChild(createTd(data.amanatReturn, 'amanatReturn', 'Amanat Return'));
-
-                    expenseList.appendChild(row);
-                });
-
-                const overallAmanat = getOverallAmanatSummary();
-                const totalBalance = sumAmountReceived - sumAmountSent;
-
-                totalReceivedDisplay.innerText = formatPlainNum(sumAmountReceived);
-                totalSentDisplay.innerText = formatPlainNum(sumAmountSent);
-                totalBalanceDisplay.innerText = formatPlainNum(totalBalance);
-
-                totalReceivedDisplay2.innerText = formatPlainNum(overallAmanat.amanatReceived);
-                totalSentDisplay2.innerText = formatPlainNum(overallAmanat.amanatReturn);
-                totalBalanceDisplay2.innerText = formatPlainNum(overallAmanat.remainingPayable);
-
-            } else {
-                let totalReceived = 0;
-                let totalSent = 0;
-                const shouldFilterByMonth = !isExcludedFromMonthFilter(selectedAccount);
-                const activeMonth = isDrillDownMode ? (drillDownSelectedYM || currentSelectedMonth) : currentSelectedMonth;
-
-                const isAmanatTarget = (
-                    selectedAccount === 'Farooq Shah Amanat' || 
-                    selectedAccount === 'Musharaf Amanat' || 
-                    selectedAccount === 'Altaf Rent A Car' || 
-                    selectedAccount === 'Sharif A/C' || 
-                    selectedAccount === 'SAJID' || 
-                    selectedAccount === 'RASHID DRIVER'
-                );
-                let prevBalance = 0;
-                let prevMonthName = '';
-                let vDateFormatted = '';
-                let showVirtualRow = false;
-
-                if (isAmanatTarget && activeMonth && activeMonth !== 'all' && !fromDateVal && !toDateVal) {
-                    const parts = activeMonth.split('-');
-                    if (parts.length >= 2) {
-                        const y = parseInt(parts[0], 10);
-                        const m = parseInt(parts[1], 10);
-                        let prevM = m - 1;
-                        let prevY = y;
-                        if (prevM === 0) {
-                            prevM = 12;
-                            prevY = y - 1;
-                        }
-                        prevMonthName = monthNames[prevM - 1];
-                        const startOfCurrentMonth = `${y}-${String(m).padStart(2, '0')}-01`;
-
-                        allExpensesData.forEach(item => {
-                            const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
-                            const itemDate = item.expense.date || '';
-                            if (isAccountMatch(itemAccount, selectedAccount)) {
-                                if (itemDate && itemDate < startOfCurrentMonth) {
-                                    prevBalance += (item.expense.received || 0) - (item.expense.sent || 0);
-                                }
-                            }
-                        });
-
-                        if (prevBalance !== 0) {
-                            showVirtualRow = true;
-                            vDateFormatted = `01-${String(m).padStart(2, '0')}-${String(y).slice(-2)}`;
-                        }
+                    if (prevBalance !== 0) {
+                        showVirtualRow = true;
+                        vDateFormatted = `01-${String(m).padStart(2, '0')}-${String(y).slice(-2)}`;
                     }
                 }
+            }
 
-                if (showVirtualRow) {
-                    totalReceived += prevBalance;
-                    const vRow = document.createElement('tr');
-                    vRow.style.backgroundColor = '#fdfbf7';
-                    vRow.innerHTML = `
-                        <td>${count++}</td>
-                        <td>${vDateFormatted}</td>
-                        <td style="text-align: left; font-weight: bold; color: #555;">Old dues Month of ${prevMonthName}</td>
-                        <td class="text-right" style="font-weight: bold; white-space: nowrap;">${formatPlainNum(prevBalance)}</td>
-                        <td class="text-right" style="white-space: nowrap;">0</td>
-                    `;
-                    expenseList.appendChild(vRow);
+            if (showVirtualRow) {
+                totalReceived += prevBalance;
+                const vRow = document.createElement('tr');
+                vRow.style.backgroundColor = '#fdfbf7';
+                vRow.innerHTML = `
+                    <td>${count++}</td>
+                    <td>${vDateFormatted}</td>
+                    <td style="text-align: left; font-weight: bold; color: #555;">Old dues Month of ${prevMonthName}</td>
+                    <td class="text-right" style="font-weight: bold; white-space: nowrap;">${formatPlainNum(prevBalance)}</td>
+                    <td class="text-right" style="white-space: nowrap;">0</td>
+                `;
+                expenseList.appendChild(vRow);
+            }
+
+            allExpensesData.forEach((item) => {
+                const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
+                const itemDate = item.expense.date || '';
+
+                if (!isAccountMatch(itemAccount, selectedAccount)) return;
+
+                if (shouldFilterByMonth && !checkDateInRange(itemDate, activeMonth, fromDateVal, toDateVal)) {
+                    return;
                 }
 
-                allExpensesData.forEach((item) => {
-                    const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
-                    const itemDate = item.expense.date || '';
+                const expense = item.expense;
+                const recVal = expense.received || 0;
+                const sentVal = expense.sent || 0;
+                
+                totalReceived += recVal;
+                totalSent += sentVal;
 
-                    if (!isAccountMatch(itemAccount, selectedAccount)) return;
+                const slipUrl = expense.slipUrl || expense.slip || '';
+                const descText = expense.desc || '';
+                const descHtml = slipUrl 
+                    ? `<a href="${slipUrl}" target="_blank" class="slip-link" title="View Slip">${descText || 'View Slip'}</a>` 
+                    : (descText || '-');
 
-                    if (shouldFilterByMonth && !checkDateInRange(itemDate, activeMonth, fromDateVal, toDateVal)) {
-                        return;
-                    }
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${count++}</td>
+                    <td>${formatDateToDMY(expense.date)}</td>
+                    <td style="text-align: left;">${descHtml}</td>
+                    <td class="text-right">${formatPlainNum(recVal)}</td>
+                    <td class="text-right">${formatPlainNum(sentVal)}</td>
+                `;
+                expenseList.appendChild(row);
+            });
 
-                    const expense = item.expense;
-                    const recVal = expense.received || 0;
-                    const sentVal = expense.sent || 0;
-                    
-                    totalReceived += recVal;
-                    totalSent += sentVal;
+            totalReceivedDisplay.innerText = formatPlainNum(totalReceived);
+            totalSentDisplay.innerText = formatPlainNum(totalSent);
+            totalBalanceDisplay.innerText = formatPlainNum(totalReceived - totalSent);
 
-                    const slipUrl = expense.slipUrl || expense.slip || '';
-                    const descText = expense.desc || '';
-                    const descHtml = slipUrl 
-                        ? `<a href="${slipUrl}" target="_blank" class="slip-link" title="View Slip">${descText || 'View Slip'}</a>` 
-                        : (descText || '-');
-
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${count++}</td>
-                        <td>${formatDateToDMY(expense.date)}</td>
-                        <td style="text-align: left;">${descHtml}</td>
-                        <td class="text-right">${formatPlainNum(recVal)}</td>
-                        <td class="text-right">${formatPlainNum(sentVal)}</td>
-                    `;
-                    expenseList.appendChild(row);
-                });
-
-                totalReceivedDisplay.innerText = formatPlainNum(totalReceived);
-                totalSentDisplay.innerText = formatPlainNum(totalSent);
-                totalBalanceDisplay.innerText = formatPlainNum(totalReceived - totalSent);
-
-                if (isDrillDownMode) {
-                    if (window._isDuesDrillDown) {
-                        drilldownBadgeAmount.innerText = formatPlainNum(totalReceived - totalSent);
-                    } else {
-                        drilldownBadgeAmount.innerText = formatPlainNum(totalSent);
-                    }
+            if (isDrillDownMode) {
+                if (window._isDuesDrillDown) {
+                    drilldownBadgeAmount.innerText = formatPlainNum(totalReceived - totalSent);
+                } else {
+                    drilldownBadgeAmount.innerText = formatPlainNum(totalSent);
                 }
             }
         }
