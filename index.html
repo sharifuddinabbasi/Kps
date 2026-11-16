@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Khan Petroleum Service</title>
-
-    <!-- PWA Code -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#007bff">
     <script>
@@ -13,99 +11,29 @@
         navigator.serviceWorker.register('sw.js');
       }
     </script>
-
-    <!-- HTML2PDF & HTML2CANVAS Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
     <style>
         * { box-sizing: border-box; }
         html, body { height: 100%; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f4f7f6; overflow: hidden; }
         .container { display: flex; flex-direction: column; height: 100vh; max-width: 900px; margin: 0 auto; background: #ffffff; padding: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-y: auto; position: relative; }
         .fixed-header { flex-shrink: 0; background: #ffffff; padding-bottom: 8px; border-bottom: 2px solid #eee; position: relative; }
-        
-        .brand-title-main {
-            text-align: center;
-            font-size: clamp(24px, 6vw, 34px);
-            font-weight: 900;
-            color: #e5a108;
-            text-transform: uppercase;
-            letter-spacing:  0.5px;
-            margin: 0 0 6px 0;
-            white-space: nowrap;
-            text-shadow: 
-                0 1px 0 #b37402,
-                0 2px 0 #8c5700,
-                0 3px 0 #663d00,
-                0 4px 5px rgba(0, 0, 0, 0.45);
-        }
-
-        .top-action-bar {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-bottom: 8px;
-            gap: 8px;
-            width: 100%;
-        }
-
-        .header-top { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 8px; 
-            flex-wrap: nowrap; 
-            gap: 8px; 
-            width: 100%;
-        }
+        .brand-title-main { text-align: center; font-size: clamp(24px, 6vw, 34px); font-weight: 900; color: #e5a108; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 6px 0; white-space: nowrap; text-shadow: 0 1px 0 #b37402, 0 2px 0 #8c5700, 0 3px 0 #663d00, 0 4px 5px rgba(0, 0, 0, 0.45); }
+        .top-action-bar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 8px; gap: 8px; width: 100%; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: nowrap; gap: 8px; width: 100%; }
         h1 { color: #333; font-size: clamp(17px, 1.2vw + 10px, 22px); margin: 0; }
-
-        .account-select-group { 
-            display: flex; 
-            align-items: center; 
-            gap: 6px; 
-            width: 100%;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-        }
-        .account-select-group label {
-            font-size: 12px; 
-            font-weight: bold; 
-            color: #333;
-            white-space: nowrap;
-        }
-        .account-select { 
-            padding: 4px 8px; 
-            font-size: clamp(12px, 0.8vw + 8px, 15px); 
-            border-radius: 4px; 
-            border: 1px solid #007bff; 
-            background-color: #e9f5ff; 
-            font-weight: bold; 
-            color: #007bff; 
-            cursor: pointer; 
-        }
-
-        .search-toggle-btn { 
-            background-color: #007bff; 
-            color: white; 
-            border: none; 
-            padding: 5px 14px; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-size: clamp(12px, 0.7vw + 8px, 14.5px); 
-            font-weight: bold; 
-            white-space: nowrap;
-        }
+        .account-select-group { display: flex; align-items: center; gap: 6px; width: 100%; margin-bottom: 8px; flex-wrap: wrap; }
+        .account-select-group label { font-size: 12px; font-weight: bold; color: #333; white-space: nowrap; }
+        .account-select { padding: 4px 8px; font-size: clamp(12px, 0.8vw + 8px, 15px); border-radius: 4px; border: 1px solid #007bff; background-color: #e9f5ff; font-weight: bold; color: #007bff; cursor: pointer; }
+        .search-toggle-btn { background-color: #007bff; color: white; border: none; padding: 5px 14px; border-radius: 4px; cursor: pointer; font-size: clamp(12px, 0.7vw + 8px, 14.5px); font-weight: bold; white-space: nowrap; }
         .search-toggle-btn:hover { background-color: #0056b3; }
         .search-toggle-btn.active { background-color: #dc3545; }
-
         .search-container { display: none; margin-bottom: 10px; background: #eef6ff; padding: 8px; border-radius: 6px; border: 1px solid #007bff; }
         .search-container.show { display: flex; gap: 8px; align-items: center; }
         .search-box { padding: 6px 10px; font-size: clamp(12px, 0.8vw + 8px, 15px); border-radius: 4px; border: 1px solid #ccc; flex: 1; outline: none; }
         .search-box:focus { border-color: #007bff; }
         .search-cancel-btn { background-color: #dc3545; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-size: clamp(12px, 0.7vw + 8px, 14px); font-weight: bold; cursor: pointer; white-space: nowrap; }
         .search-cancel-btn:hover { background-color: #bd2130; }
-
         .summary { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 5px; }
         .card { flex: 1 1 calc(33.333% - 8px); min-width: 80px; padding: 6px 4px; border-radius: 6px; text-align: center; color: white; }
         .card.received-card { background-color: #28a745; }
@@ -113,47 +41,12 @@
         .card.balance-card { background-color: #dc3545; }
         .card h3 { margin: 0; font-size: clamp(9.5px, 0.6vw + 6px, 12px); text-transform: uppercase; }
         .card p { font-size: clamp(12.5px, 0.9vw + 7px, 16px); font-weight: bold; margin: 2px 0 0 0; word-break: break-word; }
-        
-        .filter-line { 
-            display: flex; 
-            align-items: center; 
-            gap: 6px; 
-            width: 100%;
-        }
+        .filter-line { display: flex; align-items: center; gap: 6px; width: 100%; }
         .control-input { padding: 3px 6px; font-size: clamp(10.5px, 0.6vw + 7px, 13px); border-radius: 4px; border: 1px solid #007bff; background: #fff; color: #333; outline: none; }
         .reset-filter-btn { background: #6c757d; color: #fff; border: none; padding: 4px 8px; border-radius: 3px; font-size: clamp(10.5px, 0.6vw + 7px, 13px); cursor: pointer; font-weight: bold; flex-shrink: 0; line-height: 1; }
-
-        .table-portion { 
-            flex: 1 1 auto; 
-            height: 250px; 
-            overflow-y: auto; 
-            overflow-x: auto; 
-            margin-top: 5px; 
-            border-bottom: 1px solid #ddd; 
-            width: 100%; 
-            position: relative; 
-            -webkit-overflow-scrolling: touch; 
-        }
-        
-        .table-portion.large-scroll { 
-            height: calc(100vh - 280px) !important; 
-            max-height: calc(100vh - 280px) !important; 
-            flex: 1 1 auto; 
-            margin-bottom: 10px;
-            border: 1px solid #007bff;
-            border-radius: 4px;
-        }
-
-        .drilldown-scroll {
-            height: calc(100vh - 150px) !important;
-            max-height: calc(100vh - 150px) !important;
-            border: 1px solid #007bff !important;
-            border-radius: 4px !important;
-            overflow-y: auto !important;
-            overflow-x: auto !important;
-            -webkit-overflow-scrolling: touch;
-        }
-
+        .table-portion { flex: 1 1 auto; height: 250px; overflow-y: auto; overflow-x: auto; margin-top: 5px; border-bottom: 1px solid #ddd; width: 100%; position: relative; -webkit-overflow-scrolling: touch; }
+        .table-portion.large-scroll { height: calc(100vh - 280px) !important; max-height: calc(100vh - 280px) !important; flex: 1 1 auto; margin-bottom: 10px; border: 1px solid #007bff; border-radius: 4px; }
+        .drilldown-scroll { height: calc(100vh - 150px) !important; max-height: calc(100vh - 150px) !important; border: 1px solid #007bff !important; border-radius: 4px !important; overflow-y: auto !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th, td { border: 1px solid #ddd; padding: clamp(4px, 0.4vw + 2px, 6px) clamp(1px, 0.3vw + 1px, 4px); text-align: center; font-size: clamp(10px, 0.7vw + 6px, 12.5px); white-space: normal; overflow: hidden; word-wrap: break-word; word-break: normal; hyphens: none; vertical-align: middle; }
         th { background-color: #f2f2f2; font-weight: bold; position: sticky; top: 0; z-index: 10; line-height: 1.1; }
@@ -161,61 +54,29 @@
         tbody tr { height: clamp(26px, 1vw + 20px, 32px); }
         td.clickable-val { cursor: pointer; font-weight: bold; color: #007bff; text-decoration: none !important; }
         td.clickable-val:hover { background-color: #e2f0ff; text-decoration: none !important; }
-        
         .slip-link { color: #007bff; font-weight: bold; text-decoration: none !important; cursor: pointer; }
         .slip-link:hover { color: #0056b3; text-decoration: none !important; }
         a { text-decoration: none !important; }
-
         .text-right { text-align: right !important; padding-right: 4px !important; white-space: nowrap !important; }
         th.text-right { text-align: right !important; padding-right: 4px !important; white-space: nowrap !important; }
-
         .status { margin-bottom: 5px; color: #666; font-size: clamp(10px, 0.6vw + 7px, 12px); }
-
         .selected-details-container { flex: 0 0 auto; margin-top: 6px; padding: 0 6px 6px 6px; background: #eef6ff; border: 1px solid #007bff; border-radius: 4px; width: 100%; max-height: 600px; overflow-y: auto; position: relative; }
         .selected-details-header { display: flex; align-items: center; justify-content: space-between; font-size: clamp(11px, 0.7vw + 7px, 13.5px); font-weight: bold; color: #007bff; padding: 6px 0 4px 0; background: #eef6ff; position: sticky; top: 0; z-index: 20; border-bottom: 1px solid #cce4ff; }
         .selected-details-container th { position: sticky; top: 25px; z-index: 15; background-color: #f2f2f2; }
-        
-        .selected-details-container th, 
-        .selected-details-container td { font-size: clamp(9px, 0.6vw + 5px, 11.5px); }
-
-        .third-details-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        #ceo-third-details table {
-            width: 100%;
-            table-layout: fixed;
-        }
-        #ceo-third-details th {
-            font-size: clamp(8.5px, 0.5vw + 5px, 10.5px) !important;
-            padding: 4px 2px !important;
-            line-height: 1.1 !important;
-            text-align: center;
-        }
-        #ceo-third-details td {
-            font-size: clamp(9px, 0.55vw + 5.5px, 11px) !important;
-            padding: 4px 2px !important;
-        }
-        #ceo-third-details td.text-right {
-            padding-right: 4px !important;
-            font-size: clamp(9px, 0.6vw + 5.5px, 11.5px) !important;
-        }
-
+        .selected-details-container th, .selected-details-container td { font-size: clamp(9px, 0.6vw + 5px, 11.5px); }
+        .third-details-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        #ceo-third-details table { width: 100%; table-layout: fixed; }
+        #ceo-third-details th { font-size: clamp(8.5px, 0.5vw + 5px, 10.5px) !important; padding: 4px 2px !important; line-height: 1.1 !important; text-align: center; }
+        #ceo-third-details td { font-size: clamp(9px, 0.55vw + 5.5px, 11px) !important; padding: 4px 2px !important; }
+        #ceo-third-details td.text-right { padding-right: 4px !important; font-size: clamp(9px, 0.6vw + 5.5px, 11.5px) !important; }
         .date-badge { background: #007bff; color: #fff; padding: 2px 5px; border-radius: 3px; font-size: clamp(9.5px, 0.6vw + 6px, 12px); }
-        
         .pdf-btn { background-color: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: clamp(10px, 0.6vw + 6.5px, 12.5px); font-weight: bold; }
         .pdf-btn:hover { background-color: #bd2130; }
-
         .jpg-btn { background-color: #28a745; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: clamp(10px, 0.6vw + 6.5px, 12.5px); font-weight: bold; }
         .jpg-btn:hover { background-color: #218838; }
-
         .footer-text { text-align: center; font-size: clamp(11px, 0.6vw + 7px, 13px); font-weight: bold; color: #333; margin-top: 15px; margin-bottom: 10px; padding-bottom: 10px; }
-
         .export-meta-footer { display: none; margin-top: 10px; font-size: 9px; color: #666; text-align: right; border-top: 1px dashed #ccc; padding-top: 4px; }
-        .export-mode-active .export-meta-footer,
-        .ms-clean-export-active .export-meta-footer { display: block !important; }
-
+        .export-mode-active .export-meta-footer, .ms-clean-export-active .export-meta-footer { display: block !important; }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal-box { background: #fff; padding: 18px; border-radius: 8px; width: 90%; max-width: 380px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-align: center; font-family: Arial, sans-serif; }
         .modal-box h3 { margin-top: 0; font-size: 16px; color: #007bff; }
@@ -229,526 +90,92 @@
         .btn-all { background: #28a745; color: white; }
         .btn-range { background: #007bff; color: white; }
         .btn-cancel { background: #6c757d; color: white; margin-top: 4px; }
-
-        .export-mode-active,
-        .export-mode-active.table-portion,
-        .export-mode-active.large-scroll,
-        .export-mode-active.drilldown-scroll {
-            height: auto !important;
-            max-height: none !important;
-            overflow: visible !important;
-            width: 100% !important;
-            box-sizing: border-box !important;
-            border: none !important;
-            word-spacing: normal !important;
-            letter-spacing: normal !important;
-        }
-        .export-mode-active * {
-            word-spacing: normal !important;
-            letter-spacing: normal !important;
-        }
-        .export-mode-active table {
-            width: 100% !important;
-            min-width: 100% !important;
-            table-layout: fixed !important;
-        }
-        .export-mode-active tbody tr {
-            height: auto !important;
-        }
-        .export-mode-active th {
-            position: static !important;
-        }
-        .export-mode-active table,
-        .export-mode-active tbody {
-            page-break-inside: auto !important;
-            break-inside: auto !important;
-        }
-        .export-mode-active tr {
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-        }
-
-        .export-header-title {
-            display: none;
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            color: #007bff;
-            margin-bottom: 12px;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 6px;
-        }
-        #main-export-title {
-            margin-bottom: 2px !important;
-            border-bottom: none !important;
-            padding-bottom: 0 !important;
-        }
-        .export-header-subtitle {
-            display: none;
-            text-align: center;
-            font-size: 13.5px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 12px;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 6px;
-        }
-        .export-mode-active .export-header-title,
-        .export-mode-active .export-header-subtitle {
-            display: block !important;
-        }
-
-        #table-container.pdf-export-mode .export-header-title {
-            font-size: 26px !important;
-        }
-        #table-container.pdf-export-mode .export-header-subtitle {
-            font-size: 16.5px !important;
-        }
-        #table-container.pdf-export-mode th, 
-        #table-container.pdf-export-mode td {
-            font-size: 14px !important;
-            padding: 4px 3px !important;
-            line-height: 1.2 !important;
-            word-break: keep-all !important;
-            word-wrap: break-word !important;
-        }
-
-        .pdf-export-mode .card h3,
-        .pdf-export-mode .card p {
-            font-size: 18px !important;
-        }
-
-        .jpg-export-mode .card h3,
-        .jpg-export-mode .card p {
-            font-size: 11px !important;
-        }
-
-        #monthly-summary-section {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            padding: 2px;
-            margin-top: 15px;
-            margin-bottom: 25px;
-            background: #dc3545;
-            border-radius: 12px;
-        }
-        .ms-border-layer-1 {
-            background: #ffffff;
-            padding: 1px;
-            border-radius: 10px;
-        }
-        .ms-border-layer-2 {
-            background: #28a745;
-            padding: 2px;
-            border-radius: 8px;
-        }
-        .ms-border-layer-3 {
-            background: #ffffff;
-            padding: 1px;
-            border-radius: 6px;
-        }
-        .ms-border-layer-4 {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            padding: 8px;
-            background: #fff;
-            border: 2px solid #e5a108;
-            border-radius: 5px;
-        }
-
-        .monthly-summary-divider {
-            width: 100%;
-            height: 3px;
-            background-color: #007bff;
-            margin-bottom: 15px;
-        }
-
-        .ms-header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 8px;
-            margin-bottom: 10px;
-            gap: 6px;
-            position: relative;
-            z-index: 1;
-        }
-        .ms-title {
-            font-size: clamp(17px, 1.3vw + 10px, 21px);
-            font-weight: bold;
-            color: #333;
-            margin: 0;
-            letter-spacing: 0.2px;
-        }
-        .ms-export-subtitle {
-            display: none;
-            font-size: 14px;
-            font-weight: bold;
-            color: #007bff;
-            margin-top: 4px;
-        }
-        .ms-clean-export-active .ms-export-subtitle {
-            display: block !important;
-        }
-        .ms-header-right-btns {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .ms-month-row {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 12px;
-            background: #f8faff;
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px dashed #007bff;
-            position: relative;
-            z-index: 1;
-        }
-        .ms-month-row label {
-            font-size: clamp(11px, 0.7vw + 7.5px, 14px);
-            color: #333;
-            font-weight: bold;
-            letter-spacing: 0.2px;
-            flex-shrink: 0;
-        }
-        .ms-select {
-            padding: 4px 10px;
-            font-size: clamp(12px, 0.8vw + 8px, 14px);
-            border-radius: 4px;
-            border: 1px solid #007bff;
-            background: #fff;
-            font-weight: bold;
-            color: #007bff;
-            outline: none;
-            flex: 1;
-        }
-        .ms-table-container {
-            border: 1px solid #28a745;
-            border-radius: 4px;
-            overflow-x: auto;
-            overflow-y: auto;
-            max-height: 300px;
-            margin-bottom: 8px;
-            -webkit-overflow-scrolling: touch;
-            position: relative;
-            z-index: 1;
-        }
-        .ms-table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
-        .ms-table th, .ms-table td {
-            border: 1px solid #ddd;
-            padding: clamp(6px, 0.6vw + 3px, 9px) clamp(4px, 0.4vw + 2px, 8px);
-            font-size: clamp(11.5px, 0.8vw + 7px, 14px);
-            vertical-align: middle;
-            letter-spacing: 0.2px;
-        }
-        .ms-table th {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-            font-weight: bold;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            text-shadow: 0 1px 0 #ffffff, 0 2px 2px rgba(46, 125, 50, 0.35);
-        }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        tr.ms-clickable-row {
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-        tr.ms-clickable-row:hover {
-            background-color: #e2f0ff !important;
-        }
-        
-        .ms-account-name-cell {
-            text-align: left;
-            font-weight: bold;
-            color: #333 !important;
-            text-decoration: none !important;
-            letter-spacing: 0.2px;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 1px rgba(0, 0, 0, 0.2);
-        }
-        .ms-table td.clickable-val {
-            color: #dc3545 !important;
-            font-weight: bold;
-            font-size: clamp(13.5px, 0.9vw + 8px, 16px);
-            text-align: right;
-            cursor: pointer;
-            text-decoration: none !important;
-            letter-spacing: 0.2px;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 1px 2px rgba(220, 53, 69, 0.25);
-        }
-
-        .ms-dues-table-container {
-            border: 1px solid #007bff;
-            border-radius: 4px;
-            overflow-x: auto;
-            margin-bottom: 6px;
-            margin-top: 15px;
-            position: relative;
-            z-index: 1;
-        }
-        .ms-dues-table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
-        .ms-dues-table th, .ms-dues-table td {
-            border: 1px solid #ddd;
-            padding: clamp(5px, 0.5vw + 2px, 7px) clamp(4px, 0.4vw + 2px, 8px);
-            font-size: clamp(11px, 0.7vw + 6px, 13.5px);
-            vertical-align: middle;
-        }
-        .ms-dues-table th {
-            background-color: #e9f5ff;
-            color: #007bff;
-            font-weight: bold;
-            text-shadow: 0 1px 0 #ffffff, 0 2px 2px rgba(0, 123, 255, 0.35);
-        }
-        .ms-dues-table td.dues-val {
-            font-weight: bold;
-            font-size: clamp(13px, 0.85vw + 7.5px, 15.5px);
-            text-align: right;
-            color: #dc3545;
-            cursor: pointer;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 1px 2px rgba(220, 53, 69, 0.25);
-        }
-        
-        .ms-footer-wrapper {
-            display: flex;
-            width: 100%;
-            align-items: stretch;
-            border-radius: 5px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.12);
-            margin-top: 4px;
-            position: relative;
-            z-index: 1;
-        }
-        .ms-footer-label-box {
-            background-color: #28a745;
-            color: #ffffff;
-            font-size: clamp(11.5px, 0.8vw + 7.5px, 14px);
-            font-weight: bold;
-            padding: 7px 10px;
-            flex: 1 1 auto;
-            min-width: 0;
-            display: flex;
-            align-items: center;
-            text-align: left;
-            letter-spacing: 0.2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7), 0 2px 3px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-        .ms-footer-amount-box {
-            background-color: #dc3545;
-            color: #ffffff;
-            font-size: clamp(14px, 1vw + 9.5px, 16.5px);
-            font-weight: bold;
-            padding: 7px 10px;
-            flex: 0 0 auto;
-            min-width: 35%;
-            text-align: right;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            word-break: normal;
-            white-space: nowrap;
-            letter-spacing: 0.2px;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7), 0 2px 4px rgba(0, 0, 0, 0.7), 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-
-        .drilldown-top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-            padding-bottom: 6px;
-            gap: 6px;
-        }
-        .drilldown-badge-row {
-            display: flex;
-            width: 100%;
-            align-items: stretch;
-            border-radius: 5px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 6px;
-        }
-        .drilldown-badge-label {
-            background-color: #007bff;
-            color: #ffffff;
-            font-size: clamp(11.5px, 0.8vw + 7px, 14px);
-            font-weight: bold;
-            padding: 6px 10px;
-            flex: 1;
-            display: flex;
-            align-items: center;
-            white-space: nowrap;
-        }
-        .drilldown-badge-amount {
-            background-color: #dc3545;
-            color: #ffffff;
-            font-size: clamp(12px, 0.9vw + 7.5px, 15px);
-            font-weight: bold;
-            padding: 6px 12px;
-            text-align: right;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-        }
-
-        /* ڈیسک ٹاپ ویو کے لیے تجویز کردہ فونٹ سائز (موبائل ویو میں کوئی تبدیلی نہیں) */
+        .export-mode-active, .export-mode-active.table-portion, .export-mode-active.large-scroll, .export-mode-active.drilldown-scroll { height: auto !important; max-height: none !important; overflow: visible !important; width: 100% !important; box-sizing: border-box !important; border: none !important; word-spacing: normal !important; letter-spacing: normal !important; }
+        .export-mode-active * { word-spacing: normal !important; letter-spacing: normal !important; }
+        .export-mode-active table { width: 100% !important; min-width: 100% !important; table-layout: fixed !important; }
+        .export-mode-active tbody tr { height: auto !important; }
+        .export-mode-active th { position: static !important; }
+        .export-mode-active table, .export-mode-active tbody { page-break-inside: auto !important; break-inside: auto !important; }
+        .export-mode-active tr { page-break-inside: avoid !important; break-inside: avoid !important; }
+        .export-header-title { display: none; text-align: center; font-size: 18px; font-weight: bold; color: #007bff; margin-bottom: 12px; border-bottom: 2px solid #007bff; padding-bottom: 6px; }
+        #main-export-title { margin-bottom: 2px !important; border-bottom: none !important; padding-bottom: 0 !important; }
+        .export-header-subtitle { display: none; text-align: center; font-size: 13.5px; font-weight: bold; color: #333; margin-bottom: 12px; border-bottom: 2px solid #007bff; padding-bottom: 6px; }
+        .export-mode-active .export-header-title, .export-mode-active .export-header-subtitle { display: block !important; }
+        #table-container.pdf-export-mode .export-header-title { font-size: 26px !important; }
+        #table-container.pdf-export-mode .export-header-subtitle { font-size: 16.5px !important; }
+        #table-container.pdf-export-mode th, #table-container.pdf-export-mode td { font-size: 14px !important; padding: 4px 3px !important; line-height: 1.2 !important; word-break: keep-all !important; word-wrap: break-word !important; }
+        .pdf-export-mode .card h3, .pdf-export-mode .card p { font-size: 18px !important; }
+        .jpg-export-mode .card h3, .jpg-export-mode .card p { font-size: 11px !important; }
+        #monthly-summary-section { display: flex; flex-direction: column; width: 100%; padding: 2px; margin-top: 15px; margin-bottom: 25px; background: #dc3545; border-radius: 12px; }
+        .ms-border-layer-1 { background: #ffffff; padding: 1px; border-radius: 10px; }
+        .ms-border-layer-2 { background: #28a745; padding: 2px; border-radius: 8px; }
+        .ms-border-layer-3 { background: #ffffff; padding: 1px; border-radius: 6px; }
+        .ms-border-layer-4 { display: flex; flex-direction: column; width: 100%; padding: 8px; background: #fff; border: 2px solid #e5a108; border-radius: 5px; }
+        .monthly-summary-divider { width: 100%; height: 3px; background-color: #007bff; margin-bottom: 15px; }
+        .ms-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #007bff; padding-bottom: 8px; margin-bottom: 10px; gap: 6px; position: relative; z-index: 1; }
+        .ms-title { font-size: clamp(17px, 1.3vw + 10px, 21px); font-weight: bold; color: #333; margin: 0; letter-spacing: 0.2px; }
+        .ms-export-subtitle { display: none; font-size: 14px; font-weight: bold; color: #007bff; margin-top: 4px; }
+        .ms-clean-export-active .ms-export-subtitle { display: block !important; }
+        .ms-header-right-btns { display: flex; align-items: center; gap: 5px; }
+        .ms-month-row { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; background: #f8faff; padding: 8px; border-radius: 4px; border: 1px dashed #007bff; position: relative; z-index: 1; }
+        .ms-month-row label { font-size: clamp(11px, 0.7vw + 7.5px, 14px); color: #333; font-weight: bold; letter-spacing: 0.2px; flex-shrink: 0; }
+        .ms-select { padding: 4px 10px; font-size: clamp(12px, 0.8vw + 8px, 14px); border-radius: 4px; border: 1px solid #007bff; background: #fff; font-weight: bold; color: #007bff; outline: none; flex: 1; }
+        .ms-table-container { border: 1px solid #28a745; border-radius: 4px; overflow-x: auto; overflow-y: auto; max-height: 300px; margin-bottom: 8px; -webkit-overflow-scrolling: touch; position: relative; z-index: 1; }
+        .ms-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .ms-table th, .ms-table td { border: 1px solid #ddd; padding: clamp(6px, 0.6vw + 3px, 9px) clamp(4px, 0.4vw + 2px, 8px); font-size: clamp(11.5px, 0.8vw + 7px, 14px); vertical-align: middle; letter-spacing: 0.2px; }
+        .ms-table th { background-color: #e8f5e9; color: #2e7d32; font-weight: bold; position: sticky; top: 0; z-index: 10; text-shadow: 0 1px 0 #ffffff, 0 2px 2px rgba(46, 125, 50, 0.35); }
+        tr.ms-clickable-row { cursor: pointer; transition: background-color 0.2s ease; }
+        tr.ms-clickable-row:hover { background-color: #e2f0ff !important; }
+        .ms-account-name-cell { text-align: left; font-weight: bold; color: #333 !important; text-decoration: none !important; letter-spacing: 0.2px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 1px rgba(0, 0, 0, 0.2); }
+        .ms-table td.clickable-val { color: #dc3545 !important; font-weight: bold; font-size: clamp(13.5px, 0.9vw + 8px, 16px); text-align: right; cursor: pointer; text-decoration: none !important; letter-spacing: 0.2px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 1px 2px rgba(220, 53, 69, 0.25); }
+        .ms-dues-table-container { border: 1px solid #007bff; border-radius: 4px; overflow-x: auto; margin-bottom: 6px; margin-top: 15px; position: relative; z-index: 1; }
+        .ms-dues-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .ms-dues-table th, .ms-dues-table td { border: 1px solid #ddd; padding: clamp(5px, 0.5vw + 2px, 7px) clamp(4px, 0.4vw + 2px, 8px); font-size: clamp(11px, 0.7vw + 6px, 13.5px); vertical-align: middle; }
+        .ms-dues-table th { background-color: #e9f5ff; color: #007bff; font-weight: bold; text-shadow: 0 1px 0 #ffffff, 0 2px 2px rgba(0, 123, 255, 0.35); }
+        .ms-dues-table td.dues-val { font-weight: bold; font-size: clamp(13px, 0.85vw + 7.5px, 15.5px); text-align: right; color: #dc3545; cursor: pointer; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 1px 2px rgba(220, 53, 69, 0.25); }
+        .ms-footer-wrapper { display: flex; width: 100%; align-items: stretch; border-radius: 5px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.12); margin-top: 4px; position: relative; z-index: 1; }
+        .ms-footer-label-box { background-color: #28a745; color: #ffffff; font-size: clamp(11.5px, 0.8vw + 7.5px, 14px); font-weight: bold; padding: 7px 10px; flex: 1 1 auto; min-width: 0; display: flex; align-items: center; text-align: left; letter-spacing: 0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7), 0 2px 3px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 255, 255, 0.5); }
+        .ms-footer-amount-box { background-color: #dc3545; color: #ffffff; font-size: clamp(14px, 1vw + 9.5px, 16.5px); font-weight: bold; padding: 7px 10px; flex: 0 0 auto; min-width: 35%; text-align: right; display: flex; align-items: center; justify-content: flex-end; word-break: normal; white-space: nowrap; letter-spacing: 0.2px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7), 0 2px 4px rgba(0, 0, 0, 0.7), 0 0 10px rgba(255, 255, 255, 0.5); }
+        .drilldown-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding-bottom: 6px; gap: 6px; }
+        .drilldown-badge-row { display: flex; width: 100%; align-items: stretch; border-radius: 5px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 6px; }
+        .drilldown-badge-label { background-color: #007bff; color: #ffffff; font-size: clamp(11.5px, 0.8vw + 7px, 14px); font-weight: bold; padding: 6px 10px; flex: 1; display: flex; align-items: center; white-space: nowrap; }
+        .drilldown-badge-amount { background-color: #dc3545; color: #ffffff; font-size: clamp(12px, 0.9vw + 7.5px, 15px); font-weight: bold; padding: 6px 12px; text-align: right; display: flex; align-items: center; justify-content: flex-end; }
         @media (min-width: 768px) {
-            .ms-table th, .ms-table td {
-                font-size: 15.5px;
-            }
-            .ms-table td.clickable-val {
-                font-size: 18px;
-            }
-            .ms-dues-table th, .ms-dues-table td {
-                font-size: 15px;
-            }
-            .ms-dues-table td.dues-val {
-                font-size: 17.5px;
-            }
-            .ms-footer-label-box {
-                font-size: 15.5px;
-            }
-            .ms-footer-amount-box {
-                font-size: 18px;
-            }
-            .card h3 {
-                font-size: 13.5px;
-            }
-            .card p {
-                font-size: 19px;
-            }
-            th, td {
-                font-size: 14.5px;
-            }
-            .selected-details-container th, 
-            .selected-details-container td {
-                font-size: 13.5px;
-            }
-            #ceo-third-details th {
-                font-size: 13px !important;
-            }
-            #ceo-third-details td {
-                font-size: 13.5px !important;
-            }
-            #ceo-third-details td.text-right {
-                font-size: 14px !important;
-            }
+            .ms-table th, .ms-table td { font-size: 15.5px; }
+            .ms-table td.clickable-val { font-size: 18px; }
+            .ms-dues-table th, .ms-dues-table td { font-size: 15px; }
+            .ms-dues-table td.dues-val { font-size: 17.5px; }
+            .ms-footer-label-box { font-size: 15.5px; }
+            .ms-footer-amount-box { font-size: 18px; }
+            .card h3 { font-size: 13.5px; }
+            .card p { font-size: 19px; }
+            th, td { font-size: 14.5px; }
+            .selected-details-container th, .selected-details-container td { font-size: 13.5px; }
+            #ceo-third-details th { font-size: 13px !important; }
+            #ceo-third-details td { font-size: 13.5px !important; }
+            #ceo-third-details td.text-right { font-size: 14px !important; }
         }
-
-        .ms-clean-export-active {
-            width: 720px !important;
-            max-width: 720px !important;
-            height: auto !important;
-            max-height: none !important;
-            overflow: visible !important;
-            background: #dc3545 !important;
-            padding: 2px !important;
-            font-family: Arial, Helvetica, sans-serif !important;
-            position: relative !important;
-            box-sizing: border-box !important;
-            border-radius: 12px !important;
-        }
-        .ms-clean-export-active * {
-            letter-spacing: normal !important;
-            word-spacing: normal !important;
-        }
-        .ms-clean-export-active .ms-table-container,
-        .ms-clean-export-active .ms-dues-table-container {
-            max-height: none !important;
-            overflow: visible !important;
-            height: auto !important;
-        }
-        .ms-clean-export-active .ms-month-row {
-            display: none !important;
-        }
-
-        .ms-pdf-boost-mode .ms-title {
-            font-size: 24px !important;
-        }
-        .ms-pdf-boost-mode .ms-export-subtitle {
-            font-size: 16px !important;
-        }
-
-        .ms-jpg-boost-mode .ms-title {
-            font-size: 34px !important;
-        }
-        .ms-jpg-boost-mode .ms-export-subtitle {
-            font-size: 22px !important;
-        }
-        .ms-jpg-boost-mode .ms-table th,
-        .ms-jpg-boost-mode .ms-table td {
-            font-size: 27.5px !important;
-            padding: 9px 8px !important;
-        }
-        .ms-jpg-boost-mode .ms-dues-table th,
-        .ms-jpg-boost-mode .ms-dues-table td {
-            font-size: 25px !important;
-            padding: 8px 8px !important;
-        }
-        .ms-jpg-boost-mode .ms-table td.clickable-val,
-        .ms-jpg-boost-mode .ms-dues-table td.dues-val {
-            font-size: 29px !important;
-        }
-        .ms-jpg-boost-mode .ms-footer-wrapper {
-            display: flex !important;
-            width: 100% !important;
-            background: transparent !important;
-            box-shadow: none !important;
-        }
-        .ms-jpg-boost-mode .ms-footer-label-box {
-            margin-left: 0 !important;
-            width: 65% !important;
-            min-width: 65% !important;
-            max-width: 65% !important;
-            flex: 0 0 65% !important;
-            font-size: 24.5px !important;
-            padding: 9px 10px !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            border-top-left-radius: 5px !important;
-            border-bottom-left-radius: 5px !important;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 4px rgba(0, 0, 0, 0.65), 0 0 12px rgba(255, 255, 255, 0.6) !important;
-        }
-        .ms-jpg-boost-mode .ms-footer-amount-box {
-            width: 35% !important;
-            min-width: 35% !important;
-            max-width: 35% !important;
-            flex: 0 0 35% !important;
-            font-size: 32px !important;
-            padding: 9px 8px !important;
-            white-space: nowrap !important;
-            border-top-right-radius: 5px !important;
-            border-bottom-right-radius: 5px !important;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.6) !important;
-        }
-        .ms-jpg-boost-mode .export-meta-footer {
-            font-size: 22px !important;
-        }
+        .ms-clean-export-active { width: 720px !important; max-width: 720px !important; height: auto !important; max-height: none !important; overflow: visible !important; background: #dc3545 !important; padding: 2px !important; font-family: Arial, Helvetica, sans-serif !important; position: relative !important; box-sizing: border-box !important; border-radius: 12px !important; }
+        .ms-clean-export-active * { letter-spacing: normal !important; word-spacing: normal !important; }
+        .ms-clean-export-active .ms-table-container, .ms-clean-export-active .ms-dues-table-container { max-height: none !important; overflow: visible !important; height: auto !important; }
+        .ms-clean-export-active .ms-month-row { display: none !important; }
+        .ms-pdf-boost-mode .ms-title { font-size: 24px !important; }
+        .ms-pdf-boost-mode .ms-export-subtitle { font-size: 16px !important; }
+        .ms-jpg-boost-mode .ms-title { font-size: 34px !important; }
+        .ms-jpg-boost-mode .ms-export-subtitle { font-size: 22px !important; }
+        .ms-jpg-boost-mode .ms-table th, .ms-jpg-boost-mode .ms-table td { font-size: 27.5px !important; padding: 9px 8px !important; }
+        .ms-jpg-boost-mode .ms-dues-table th, .ms-jpg-boost-mode .ms-dues-table td { font-size: 25px !important; padding: 8px 8px !important; }
+        .ms-jpg-boost-mode .ms-table td.clickable-val, .ms-jpg-boost-mode .ms-dues-table td.dues-val { font-size: 29px !important; }
+        .ms-jpg-boost-mode .ms-footer-wrapper { display: flex !important; width: 100% !important; background: transparent !important; box-shadow: none !important; }
+        .ms-jpg-boost-mode .ms-footer-label-box { margin-left: 0 !important; width: 65% !important; min-width: 65% !important; max-width: 65% !important; flex: 0 0 65% !important; font-size: 24.5px !important; padding: 9px 10px !important; white-space: nowrap !important; overflow: hidden !important; border-top-left-radius: 5px !important; border-bottom-left-radius: 5px !important; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 4px rgba(0, 0, 0, 0.65), 0 0 12px rgba(255, 255, 255, 0.6) !important; }
+        .ms-jpg-boost-mode .ms-footer-amount-box { width: 35% !important; min-width: 35% !important; max-width: 35% !important; flex: 0 0 35% !important; font-size: 32px !important; padding: 9px 8px !important; white-space: nowrap !important; border-top-right-radius: 5px !important; border-bottom-right-radius: 5px !important; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.6) !important; }
+        .ms-jpg-boost-mode .export-meta-footer { font-size: 22px !important; }
     </style>
 </head>
 <body>
     <div class="container">
         <div id="main-view-wrapper">
             <div class="brand-title-main">Khan Petroleum Service</div>
-
             <div id="monthly-summary-section">
                 <div class="ms-border-layer-1">
                     <div class="ms-border-layer-2">
@@ -764,7 +191,6 @@
                                         <button type="button" id="ms-jpg-btn" class="jpg-btn">JPG</button>
                                     </div>
                                 </div>
-
                                 <div class="ms-month-row">
                                     <div class="filter-line">
                                         <label for="ms-month-select">Select Month:</label>
@@ -773,14 +199,11 @@
                                     <div class="filter-line" style="flex-wrap: nowrap;">
                                         <label for="from-date-filter">From:</label>
                                         <input type="date" id="from-date-filter" class="control-input" style="flex: 1; min-width: 0;">
-
                                         <label for="to-date-filter">To:</label>
                                         <input type="date" id="to-date-filter" class="control-input" style="flex: 1; min-width: 0;">
-
                                         <button type="button" id="clear-dates-btn" class="reset-filter-btn" title="Reset Dates">✕</button>
                                     </div>
                                 </div>
-
                                 <div id="ms-table-container-export" class="ms-table-container">
                                     <table class="ms-table">
                                         <thead>
@@ -793,13 +216,11 @@
                                         <tbody id="ms-table-body"></tbody>
                                     </table>
                                 </div>
-
                                 <div>
                                     <div class="ms-footer-wrapper">
                                         <span id="ms-footer-label" class="ms-footer-label-box">In Month of total Exp.</span>
                                         <span id="ms-footer-amount" class="ms-footer-amount-box">0</span>
                                     </div>
-
                                     <div id="ms-dues-container" class="ms-dues-table-container" style="display: none;">
                                         <table class="ms-dues-table">
                                             <thead>
@@ -812,13 +233,11 @@
                                             <tbody id="ms-dues-body"></tbody>
                                         </table>
                                     </div>
-
                                     <div class="ms-footer-wrapper" style="margin-bottom: 6px;">
                                         <span id="ms-remaining-label" class="ms-footer-label-box" style="background-color: #007bff;">In Month of total Dues</span>
                                         <span id="ms-remaining-amount" class="ms-footer-amount-box">0</span>
                                     </div>
                                 </div>
-
                                 <div id="ms-export-meta-footer" class="export-meta-footer">
                                     Report Generated on: <span id="ms-export-timestamp-span">-</span>
                                 </div>
@@ -835,18 +254,15 @@
                     <h1 id="drilldown-title">Detail.</h1>
                     <button type="button" id="drilldown-back-btn" class="ms-back-btn" style="background-color: #6c757d; color: #fff; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">Back</button>
                 </div>
-
                 <div id="drilldown-badge" class="drilldown-badge-row" style="display: none;">
                     <div id="drilldown-badge-label" class="drilldown-badge-label">Total Expenses Month of</div>
                     <div id="drilldown-badge-amount" class="drilldown-badge-amount">0</div>
                 </div>
-
                 <div id="default-header-top" class="header-top">
                     <h1 id="page-title">Account's Detail</h1>
                     <button type="button" id="search-toggle-btn-top" class="search-toggle-btn">Search</button>
                 </div>
                 <div id="top-action-bar" style="display: none;"></div>
-
                 <div id="account-select-row" class="account-select-group">
                     <label for="account-filter">Select Account: </label>
                     <select id="account-filter" class="account-select">
@@ -870,12 +286,10 @@
                     <button type="button" id="row-pdf-btn" class="pdf-btn">PDF</button>
                     <button type="button" id="row-jpg-btn" class="jpg-btn">JPG</button>
                 </div>
-
                 <div id="search-container" class="search-container">
                     <input type="text" id="search-input" class="search-box" placeholder="Lafz, detail ya amount likhein...">
                     <button type="button" id="search-inline-cancel-btn" class="search-cancel-btn">Cancel</button>
                 </div>
-                
                 <div class="summary" id="first-summary-cards">
                     <div class="card received-card">
                         <h3 id="card-one-label">Amount Received</h3>
@@ -890,7 +304,6 @@
                         <p id="total-balance">0</p>
                     </div>
                 </div>
-
                 <div class="summary" id="second-summary" style="display: none;">
                     <div class="card received-card">
                         <h3>Amanat Received</h3>
@@ -905,23 +318,19 @@
                         <p id="total-balance-2">0</p>
                     </div>
                 </div>
-
                 <div id="loading" class="status">Loading data...</div>
             </div>
 
             <div id="table-container" class="table-portion">
                 <div id="main-export-title" class="export-header-title">All Accounts detail for CEO</div>
                 <div id="main-export-subtitle" class="export-header-subtitle"></div>
-                
                 <div id="export-summary-holder" class="export-summary-container"></div>
-
                 <table id="main-view-table">
                     <thead>
                         <tr id="table-header-row"></tr>
                     </thead>
                     <tbody id="expense-list"></tbody>
                 </table>
-
                 <div id="export-meta-footer" class="export-meta-footer">
                     Report Generated on: <span id="export-timestamp-span">-</span>
                 </div>
@@ -946,9 +355,7 @@
                         </tr>
                     </thead>
                     <tbody id="selected-details-body">
-                        <tr>
-                            <td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td>
-                        </tr>
+                        <tr><td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -973,9 +380,7 @@
                             </tr>
                         </thead>
                         <tbody id="third-details-body">
-                            <tr>
-                                <td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td>
-                            </tr>
+                            <tr><td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -991,7 +396,6 @@
         <div class="modal-box">
             <h3>Export Options</h3>
             <p>تمام ڈیٹا ایکسپورٹ کریں یا رو کا رینج منتخب کریں:</p>
-            
             <div class="modal-inputs">
                 <div>
                     <label for="fromSno">From S.No:</label>
@@ -1002,7 +406,6 @@
                     <input type="number" id="toSno" min="1" placeholder="10">
                 </div>
             </div>
-
             <div class="modal-actions">
                 <button type="button" id="modal-btn-range" class="modal-btn btn-range">ایکپورٹ منتخب روز (Selected Range)</button>
                 <button type="button" id="modal-btn-all" class="modal-btn btn-all">ایکپورٹ تمام ڈیٹا (All Data)</button>
@@ -1039,7 +442,6 @@
         const searchContainer = document.getElementById('search-container');
         const searchToggleBtnTop = document.getElementById('search-toggle-btn-top');
         const searchInlineCancelBtn = document.getElementById('search-inline-cancel-btn');
-        const topActionBar = document.getElementById('top-action-bar');
 
         const rowPdfBtn = document.getElementById('row-pdf-btn');
         const rowJpgBtn = document.getElementById('row-jpg-btn');
@@ -1048,7 +450,6 @@
         const drilldownHeader = document.getElementById('drilldown-header');
         const drilldownTitle = document.getElementById('drilldown-title');
         const drilldownBadge = document.getElementById('drilldown-badge');
-        const drilldownBadgeLabel = document.getElementById('drilldown-badge-label');
         const drilldownBadgeAmount = document.getElementById('drilldown-badge-amount');
         const drilldownBackBtn = document.getElementById('drilldown-back-btn');
         const accountSelectRow = document.getElementById('account-select-row');
@@ -1067,10 +468,6 @@
         const totalSentDisplay = document.getElementById('total-sent');
         const totalBalanceDisplay = document.getElementById('total-balance');
 
-        const totalReceivedDisplay2 = document.getElementById('total-received-2');
-        const totalSentDisplay2 = document.getElementById('total-sent-2');
-        const totalBalanceDisplay2 = document.getElementById('total-balance-2');
-
         const loadingDiv = document.getElementById('loading');
         
         const ceoSelectedDetails = document.getElementById('ceo-selected-details');
@@ -1082,11 +479,9 @@
         const thirdDateDisplay = document.getElementById('third-date-display');
         const thirdTableHeader = document.getElementById('third-table-header');
         const thirdDetailsBody = document.getElementById('third-details-body');
-        const thirdTableScrollWrapper = document.getElementById('third-table-scroll-wrapper');
         const thirdDetailsTable = document.getElementById('third-details-table');
 
         const createdByContainer = document.getElementById('created-by-container');
-
         const tableContainer = document.getElementById('table-container');
         const mainExportTitle = document.getElementById('main-export-title');
         const mainExportSubtitle = document.getElementById('main-export-subtitle');
@@ -1117,47 +512,31 @@
         ];
 
         const allowedOrderedAccounts = [
-            'AC 53 Farooq Shah',
-            'AC 44-C Iftikhar',
-            'AC 49-B Fawad Khan',
-            'AC B-1 Farooq Shah',
-            'AC B-2 Farooq Shah',
-            'AC Abbott',
-            'Bank 02% Musharaf',
-            'Depo Bachat',
-            'Office 02% Arif'
+            'AC 53 Farooq Shah', 'AC 44-C Iftikhar', 'AC 49-B Fawad Khan',
+            'AC B-1 Farooq Shah', 'AC B-2 Farooq Shah', 'AC Abbott',
+            'Bank 02% Musharaf', 'Depo Bachat', 'Office 02% Arif'
         ];
 
         const duesTargetAccounts = [
-            'Farooq Shah Amanat',
-            'Musharaf Amanat',
-            'Altaf Rent A Car'
+            'Farooq Shah Amanat', 'Musharaf Amanat', 'Altaf Rent A Car'
         ];
 
         function getSystemCurrentYearMonth() {
             const d = new Date();
-            const yyyy = d.getFullYear();
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            return `${yyyy}-${mm}`;
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
         }
 
         function getSystemTodayDate() {
             const d = new Date();
-            const yyyy = d.getFullYear();
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            const dd = String(d.getDate()).padStart(2, '0');
-            return `${yyyy}-${mm}-${dd}`;
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         }
 
         function formatYMToMonthYear(ym) {
             if (!ym || ym === 'all') return '';
             const parts = ym.split('-');
             if (parts.length >= 2) {
-                const year = parts[0];
                 const mIndex = parseInt(parts[1], 10) - 1;
-                if (mIndex >= 0 && mIndex < 12) {
-                    return `${monthNames[mIndex]} ${year}`;
-                }
+                if (mIndex >= 0 && mIndex < 12) return `${monthNames[mIndex]} ${parts[0]}`;
             }
             return ym;
         }
@@ -1166,55 +545,44 @@
             if (!ymdStr || ymdStr === 'no-date') return null;
             const parts = ymdStr.trim().split('-');
             if (parts.length !== 3) return null;
-            const year = parts[0];
             const mIndex = parseInt(parts[1], 10) - 1;
-            const day = parts[2].padStart(2, '0');
             if (isNaN(mIndex) || mIndex < 0 || mIndex >= 12) return null;
-            return `${day} ${monthNames[mIndex]} ${year}`;
+            return `${parts[2].padStart(2, '0')} ${monthNames[mIndex]} ${parts[0]}`;
         }
 
         function parseDMYToFullDate(dmyStr) {
             if (!dmyStr) return null;
             const parts = dmyStr.trim().split('-');
             if (parts.length !== 3) return null;
-            const dd = parts[0].padStart(2, '0');
             const mIndex = parseInt(parts[1], 10) - 1;
             let yyyy = parts[2];
             if (yyyy.length === 2) yyyy = '20' + yyyy;
             if (isNaN(mIndex) || mIndex < 0 || mIndex >= 12) return null;
-            return `${dd} ${monthNames[mIndex]} ${yyyy}`;
+            return `${parts[0].padStart(2, '0')} ${monthNames[mIndex]} ${yyyy}`;
         }
 
         function getMsExportSubtitleText() {
             const ym = msMonthSelect ? msMonthSelect.value : 'all';
             const fromDateVal = fromDateFilter ? fromDateFilter.value : '';
             const toDateVal = toDateFilter ? toDateFilter.value : '';
-
             if (fromDateVal || toDateVal) {
                 const fStr = formatYMDToFullDate(fromDateVal) || 'Start';
                 const tStr = formatYMDToFullDate(toDateVal) || 'End';
                 return `Date: ${fStr} to ${tStr}`;
             }
-
-            if (ym && ym !== 'all') {
-                return `Month of : ${formatYMToMonthYear(ym)}`;
-            }
+            if (ym && ym !== 'all') return `Month of : ${formatYMToMonthYear(ym)}`;
             const validYMD = [];
             allExpensesData.forEach(item => {
                 const rawAcc = item.expense.account ? item.expense.account.toLowerCase() : '';
                 if (rawAcc.includes('sharif') || rawAcc.includes('sajid') || rawAcc.includes('rashid driver')) return;
                 const d = item.expense.date;
-                if (d && d !== 'no-date' && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
-                    validYMD.push(d);
-                }
+                if (d && d !== 'no-date' && /^\d{4}-\d{2}-\d{2}$/.test(d)) validYMD.push(d);
             });
             validYMD.sort();
             if (validYMD.length > 0) {
                 const startFull = formatYMDToFullDate(validYMD[0]);
                 const endFull = formatYMDToFullDate(validYMD[validYMD.length - 1]);
-                if (startFull && endFull) {
-                    return `Month of: ${startFull} to ${endFull}`;
-                }
+                if (startFull && endFull) return `Month of: ${startFull} to ${endFull}`;
             }
             return 'Month of: All Months';
         }
@@ -1224,37 +592,27 @@
             const activeYM = isDrillDownMode ? (drillDownSelectedYM || currentSelectedMonth) : currentSelectedMonth;
             const fromDateVal = fromDateFilter ? fromDateFilter.value : '';
             const toDateVal = toDateFilter ? toDateFilter.value : '';
-
             if (activeYM && activeYM !== 'all' && !fromDateVal && !toDateVal) {
                 return `Month of : ${formatYMToMonthYear(activeYM)}`;
             }
-
             const rows = expenseList.querySelectorAll('tr');
             const validDates = [];
             const dmyRegex = /^\d{2}-\d{2}-\d{2,4}$/;
-
             rows.forEach(row => {
                 if (row.style.display === 'none') return;
                 const cells = row.querySelectorAll('td');
                 if (cells.length >= 2) {
                     const c0 = cells[0].innerText.trim();
                     const c1 = cells[1].innerText.trim();
-                    if (dmyRegex.test(c0)) {
-                        validDates.push(c0);
-                    } else if (dmyRegex.test(c1)) {
-                        validDates.push(c1);
-                    }
+                    if (dmyRegex.test(c0)) validDates.push(c0);
+                    else if (dmyRegex.test(c1)) validDates.push(c1);
                 }
             });
-
             if (validDates.length > 0) {
                 const startFull = parseDMYToFullDate(validDates[0]);
                 const endFull = parseDMYToFullDate(validDates[validDates.length - 1]);
-                if (startFull && endFull) {
-                    return `Month of: ${startFull} to ${endFull}`;
-                }
+                if (startFull && endFull) return `Month of: ${startFull} to ${endFull}`;
             }
-
             return 'Month of: All Months';
         }
 
@@ -1278,7 +636,6 @@
         function isAcAccount(accStr) {
             if (!accStr) return false;
             const acc = accStr.toLowerCase().trim();
-
             if (acc.includes('musharaf amanat') || acc.includes('mushraf amanat') || 
                 acc === 'musharaf' || acc === 'amanat musharaf' ||
                 (acc.includes('farooq shah') && !acc.includes('ac')) ||
@@ -1289,43 +646,26 @@
                 acc.includes('rashid driver') || acc === 'rashid driver') {
                 return false;
             }
-
             return true;
         }
 
         function isAccountMatch(itemAccount, selectedAccount) {
             const acc = itemAccount.toLowerCase().trim();
-            if (selectedAccount === 'Musharaf Amanat') {
-                return (acc.includes('musharaf amanat') || acc.includes('mushraf amanat') || acc === 'musharaf' || acc === '' || acc === 'amanat musharaf') && !acc.includes('sharif');
-            } else if (selectedAccount === 'Farooq Shah Amanat') {
-                return (acc.includes('farooq shah') || acc.includes('frooq shah')) && !acc.includes('ac');
-            } else if (selectedAccount === 'AC 53 Farooq Shah') {
-                return acc.includes('ac 53') || acc.includes('ac53');
-            } else if (selectedAccount === 'AC 44-C Iftikhar') {
-                return acc.includes('ac 44') || acc.includes('ac44') || acc.includes('iftikhar');
-            } else if (selectedAccount === 'AC 49-B Fawad Khan') {
-                return acc.includes('ac 49') || acc.includes('ac49') || acc.includes('fawad');
-            } else if (selectedAccount === 'AC B-1 Farooq Shah') {
-                return acc.includes('ac b-1') || acc.includes('ac b1');
-            } else if (selectedAccount === 'AC B-2 Farooq Shah') {
-                return acc.includes('ac b-2') || acc.includes('ac b2');
-            } else if (selectedAccount === 'AC Abbott') {
-                return acc.includes('abbott');
-            } else if (selectedAccount === 'Bank 02% Musharaf') {
-                return acc.includes('bank 02%') || acc.includes('bank 02% musharaf') || acc.includes('com musharaf');
-            } else if (selectedAccount === 'Depo Bachat') {
-                return acc.includes('depo bachat') || acc.includes('bachat');
-            } else if (selectedAccount === 'Office 02% Arif') {
-                return (acc.includes('office 02%') || acc.includes('office 02% arif') || acc === 'arif') && !acc.includes('sharif');
-            } else if (selectedAccount === 'Altaf Rent A Car') {
-                return acc.includes('altaf rent a car') || acc.includes('altaf rent');
-            } else if (selectedAccount === 'Sharif A/C') {
-                return acc === 'sharif a/c' || acc.includes('sharif a/c') || acc === 'sharif';
-            } else if (selectedAccount === 'SAJID') {
-                return acc === 'sajid' || acc.includes('sajid');
-            } else if (selectedAccount === 'RASHID DRIVER') {
-                return acc === 'rashid driver' || acc.includes('rashid driver');
-            }
+            if (selectedAccount === 'Musharaf Amanat') return (acc.includes('musharaf amanat') || acc.includes('mushraf amanat') || acc === 'musharaf' || acc === '' || acc === 'amanat musharaf') && !acc.includes('sharif');
+            if (selectedAccount === 'Farooq Shah Amanat') return (acc.includes('farooq shah') || acc.includes('frooq shah')) && !acc.includes('ac');
+            if (selectedAccount === 'AC 53 Farooq Shah') return acc.includes('ac 53') || acc.includes('ac53');
+            if (selectedAccount === 'AC 44-C Iftikhar') return acc.includes('ac 44') || acc.includes('ac44') || acc.includes('iftikhar');
+            if (selectedAccount === 'AC 49-B Fawad Khan') return acc.includes('ac 49') || acc.includes('ac49') || acc.includes('fawad');
+            if (selectedAccount === 'AC B-1 Farooq Shah') return acc.includes('ac b-1') || acc.includes('ac b1');
+            if (selectedAccount === 'AC B-2 Farooq Shah') return acc.includes('ac b-2') || acc.includes('ac b2');
+            if (selectedAccount === 'AC Abbott') return acc.includes('abbott');
+            if (selectedAccount === 'Bank 02% Musharaf') return acc.includes('bank 02%') || acc.includes('bank 02% musharaf') || acc.includes('com musharaf');
+            if (selectedAccount === 'Depo Bachat') return acc.includes('depo bachat') || acc.includes('bachat');
+            if (selectedAccount === 'Office 02% Arif') return (acc.includes('office 02%') || acc.includes('office 02% arif') || acc === 'arif') && !acc.includes('sharif');
+            if (selectedAccount === 'Altaf Rent A Car') return acc.includes('altaf rent a car') || acc.includes('altaf rent');
+            if (selectedAccount === 'Sharif A/C') return acc === 'sharif a/c' || acc.includes('sharif a/c') || acc === 'sharif';
+            if (selectedAccount === 'SAJID') return acc === 'sajid' || acc.includes('sajid');
+            if (selectedAccount === 'RASHID DRIVER') return acc === 'rashid driver' || acc.includes('rashid driver');
             return false;
         }
 
@@ -1335,31 +675,23 @@
 
         function formatPlainNum(num) {
             if (num === undefined || num === null || isNaN(num)) return '0';
-            const parsed = Number(num);
-            return parsed.toLocaleString('en-IN');
+            return Number(num).toLocaleString('en-IN');
         }
 
         function checkDateInRange(dateStr, selectedYearMonth, fromDate, toDate) {
             if (!dateStr || dateStr === 'no-date') return true;
-
             if (fromDate && dateStr < fromDate) return false;
             if (toDate && dateStr > toDate) return false;
-
             if (!fromDate && !toDate && selectedYearMonth !== 'all') {
                 const parts = dateStr.split('-');
                 if (parts.length >= 2) {
-                    const itemYM = `${parts[0]}-${parts[1]}`;
-                    if (itemYM !== selectedYearMonth) {
-                        return false;
-                    }
+                    if (`${parts[0]}-${parts[1]}` !== selectedYearMonth) return false;
                 }
             }
-
             return true;
         }
 
         window.openAccountDetailsFromSummary = function(accName, ym, isFromDues = false) {
-            // سرچ موڈ کو مکمل طور پر بند کریں تاکہ بیک کرنے پر مسئلہ نہ آئے
             if (isSearchActive) {
                 isSearchActive = false;
                 searchContainer.style.display = 'none';
@@ -1367,16 +699,12 @@
                 searchToggleBtnTop.innerText = 'Search';
                 searchToggleBtnTop.classList.remove('active');
             }
-
             isDrillDownMode = true;
             drillDownSelectedYM = ym;
-            
             drilldownTitle.innerText = `Detail. ${accName}`;
             accountFilter.value = accName;
             if (searchInput) searchInput.value = '';
-            
             window._isDuesDrillDown = isFromDues;
-            
             renderData();
         };
 
@@ -1389,7 +717,6 @@
             searchToggleBtnTop.innerText = 'Search';
             searchToggleBtnTop.classList.remove('active');
             if (searchInput) searchInput.value = '';
-
             accountFilter.value = 'CEO';
             renderData();
         };
@@ -1402,41 +729,27 @@
             const m = String(now.getMonth() + 1).padStart(2, '0');
             const y = now.getFullYear();
             const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            if (msExportTimestampSpan) {
-                msExportTimestampSpan.innerText = `${d}-${m}-${y},${time}`;
-            }
+            if (msExportTimestampSpan) msExportTimestampSpan.innerText = `${d}-${m}-${y},${time}`;
         }
 
         if (msPdfBtn) {
             msPdfBtn.onclick = function() {
                 const el = document.getElementById('monthly-summary-section');
-                
                 stampMsExportTime();
                 msPdfBtn.style.display = 'none';
                 msJpgBtn.style.display = 'none';
-                
                 if (msTitle) msTitle.innerText = "CEO's Expenses Detail";
                 if (msExportSubtitle) msExportSubtitle.innerText = getMsExportSubtitleText();
-
-                el.classList.add('ms-clean-export-active');
-                el.classList.add('ms-pdf-boost-mode');
-
+                el.classList.add('ms-clean-export-active', 'ms-pdf-boost-mode');
                 const opt = {
-                    margin:       [8, 8, 8, 8],
-                    filename:     `CEO_Expenses_Summary_${msMonthSelect.value}.pdf`,
-                    image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { 
-                        scale: 2, 
-                        useCORS: true, 
-                        letterRendering: true,
-                        width: 720,
-                        scrollY: 0
-                    },
-                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    margin: [8, 8, 8, 8],
+                    filename: `CEO_Expenses_Summary_${msMonthSelect.value}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, letterRendering: true, width: 720, scrollY: 0 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
                 };
                 html2pdf().set(opt).from(el).save().then(() => {
-                    el.classList.remove('ms-clean-export-active');
-                    el.classList.remove('ms-pdf-boost-mode');
+                    el.classList.remove('ms-clean-export-active', 'ms-pdf-boost-mode');
                     msPdfBtn.style.display = 'inline-block';
                     msJpgBtn.style.display = 'inline-block';
                     if (msTitle) msTitle.innerText = "CEO's Expenses Detail";
@@ -1447,32 +760,18 @@
         if (msJpgBtn) {
             msJpgBtn.onclick = function() {
                 const el = document.getElementById('monthly-summary-section');
-
                 stampMsExportTime();
                 msPdfBtn.style.display = 'none';
                 msJpgBtn.style.display = 'none';
-                
                 if (msTitle) msTitle.innerText = "CEO's Expenses Detail";
                 if (msExportSubtitle) msExportSubtitle.innerText = getMsExportSubtitleText();
-                
-                el.classList.add('ms-clean-export-active');
-                el.classList.add('ms-jpg-boost-mode');
-
-                html2canvas(el, { 
-                    scale: 2, 
-                    useCORS: true, 
-                    letterRendering: true,
-                    width: 720,
-                    scrollY: 0,
-                    windowHeight: el.scrollHeight + 100
-                }).then(canvas => {
+                el.classList.add('ms-clean-export-active', 'ms-jpg-boost-mode');
+                html2canvas(el, { scale: 2, useCORS: true, letterRendering: true, width: 720, scrollY: 0, windowHeight: el.scrollHeight + 100 }).then(canvas => {
                     const link = document.createElement('a');
                     link.download = `CEO_Expenses_Summary_${msMonthSelect.value}.jpg`;
                     link.href = canvas.toDataURL('image/jpeg', 0.98);
                     link.click();
-
-                    el.classList.remove('ms-clean-export-active');
-                    el.classList.remove('ms-jpg-boost-mode');
+                    el.classList.remove('ms-clean-export-active', 'ms-jpg-boost-mode');
                     msPdfBtn.style.display = 'inline-block';
                     msJpgBtn.style.display = 'inline-block';
                     if (msTitle) msTitle.innerText = "CEO's Expenses Detail";
@@ -1486,73 +785,49 @@
                 const d = item.expense.date;
                 if (d && d !== 'no-date') {
                     const parts = d.split('-');
-                    if (parts.length >= 2) {
-                        uniqueMonths.add(`${parts[0]}-${parts[1]}`);
-                    }
+                    if (parts.length >= 2) uniqueMonths.add(`${parts[0]}-${parts[1]}`);
                 }
             });
-
             const sorted = Array.from(uniqueMonths).sort();
             const currentSelected = msMonthSelect.value;
             msMonthSelect.innerHTML = '<option value="all">All Months</option>';
-
             sorted.forEach(ym => {
                 const parts = ym.split('-');
-                const year = parts[0];
-                const month = parts[1];
-                const mIndex = parseInt(month, 10) - 1;
-                const label = `${monthNames[mIndex]}${year}`;
-
+                const mIndex = parseInt(parts[1], 10) - 1;
                 const opt = document.createElement('option');
                 opt.value = ym;
-                opt.textContent = label;
+                opt.textContent = `${monthNames[mIndex]}${parts[0]}`;
                 msMonthSelect.appendChild(opt);
             });
-
             const sysYM = getSystemCurrentYearMonth();
-            if (preserveMonth && (preserveMonth === 'all' || sorted.includes(preserveMonth))) {
-                msMonthSelect.value = preserveMonth;
-            } else if (currentSelected && (currentSelected === 'all' || sorted.includes(currentSelected))) {
-                msMonthSelect.value = currentSelected;
-            } else if (sorted.includes(sysYM)) {
-                msMonthSelect.value = sysYM;
-            } else if (sorted.length > 0) {
-                msMonthSelect.value = sorted[sorted.length - 1];
-            } else {
-                msMonthSelect.value = 'all';
-            }
+            if (preserveMonth && (preserveMonth === 'all' || sorted.includes(preserveMonth))) msMonthSelect.value = preserveMonth;
+            else if (currentSelected && (currentSelected === 'all' || sorted.includes(currentSelected))) msMonthSelect.value = currentSelected;
+            else if (sorted.includes(sysYM)) msMonthSelect.value = sysYM;
+            else if (sorted.length > 0) msMonthSelect.value = sorted[sorted.length - 1];
+            else msMonthSelect.value = 'all';
         }
 
         function renderMonthlySummaryTable() {
             const selectedYM = msMonthSelect.value;
             if (!selectedYM) return;
-
             const fromDateVal = fromDateFilter ? fromDateFilter.value : '';
             const toDateVal = toDateFilter ? toDateFilter.value : '';
-
             const accountExpenseMap = {};
             let totalMonthExpense = 0;
 
             allExpensesData.forEach(item => {
                 const d = item.expense.date;
                 if (!d || d === 'no-date') return;
-
                 const rawAccount = (item.expense.account ? item.expense.account.trim() : '');
                 const accLower = rawAccount.toLowerCase();
                 if (accLower.includes('sharif') || accLower.includes('sajid') || accLower.includes('rashid driver')) return;
 
                 if (checkDateInRange(d, selectedYM, fromDateVal, toDateVal)) {
-                    const matchedStandardAccount = allowedOrderedAccounts.find(targetAcc => 
-                        isAccountMatch(rawAccount, targetAcc)
-                    );
-
+                    const matchedStandardAccount = allowedOrderedAccounts.find(targetAcc => isAccountMatch(rawAccount, targetAcc));
                     if (matchedStandardAccount) {
                         const expAmount = item.expense.sent || 0;
                         if (expAmount > 0) {
-                            if (!accountExpenseMap[matchedStandardAccount]) {
-                                accountExpenseMap[matchedStandardAccount] = 0;
-                            }
-                            accountExpenseMap[matchedStandardAccount] += expAmount;
+                            accountExpenseMap[matchedStandardAccount] = (accountExpenseMap[matchedStandardAccount] || 0) + expAmount;
                             totalMonthExpense += expAmount;
                         }
                     }
@@ -1561,7 +836,6 @@
 
             msTableBody.innerHTML = '';
             let sno = 1;
-
             allowedOrderedAccounts.forEach(acc => {
                 const expenseVal = accountExpenseMap[acc] || 0;
                 if (expenseVal > 0) {
@@ -1573,9 +847,7 @@
                         <td class="ms-account-name-cell">${acc}</td>
                         <td class="clickable-val">${formatPlainNum(expenseVal)}</td>
                     `;
-                    tr.addEventListener('click', () => {
-                        window.openAccountDetailsFromSummary(acc, selectedYM, false);
-                    });
+                    tr.addEventListener('click', () => window.openAccountDetailsFromSummary(acc, selectedYM, false));
                     msTableBody.appendChild(tr);
                 }
             });
@@ -1591,56 +863,37 @@
                 periodLabel = `${fStr} to ${tStr}`;
             } else if (selectedYM !== 'all') {
                 const parts = selectedYM.split('-');
-                const year = parts[0];
-                const mIndex = parseInt(parts[1], 10) - 1;
-                periodLabel = `${monthNames[mIndex]}${year}`;
+                periodLabel = `${monthNames[parseInt(parts[1], 10) - 1]}${parts[0]}`;
             }
 
-            if (msTitle) {
-                msTitle.innerText = "CEO's Expenses Detail";
-            }
-
+            if (msTitle) msTitle.innerText = "CEO's Expenses Detail";
             msFooterLabel.innerText = `Total Exp. (${periodLabel})`;
-            if (msRemainingLabel) {
-                msRemainingLabel.innerText = `Total Dues (${periodLabel})`;
-            }
+            if (msRemainingLabel) msRemainingLabel.innerText = `Total Dues (${periodLabel})`;
             msFooterAmount.innerText = formatPlainNum(totalMonthExpense);
 
             msDuesBody.innerHTML = '';
             let duesSno = 1;
-
             let totalMonthDues = 0;
 
             duesTargetAccounts.forEach(accName => {
                 let recSum = 0;
                 let sentSum = 0;
-
                 allExpensesData.forEach(item => {
                     const rawAcc = item.expense.account ? item.expense.account.trim() : '';
                     const accLower = rawAcc.toLowerCase();
                     if (accLower.includes('sharif') || accLower.includes('sajid') || accLower.includes('rashid driver')) return;
                     const d = item.expense.date || '';
-
                     if (isAccountMatch(rawAcc, accName)) {
                         if (toDateVal) {
                             if (!d || d === 'no-date' || d <= toDateVal) {
                                 recSum += item.expense.received || 0;
                                 sentSum += item.expense.sent || 0;
                             }
-                        } else if (fromDateVal) {
-                            recSum += item.expense.received || 0;
-                            sentSum += item.expense.sent || 0;
-                        } else if (selectedYM === 'all') {
+                        } else if (fromDateVal || selectedYM === 'all') {
                             recSum += item.expense.received || 0;
                             sentSum += item.expense.sent || 0;
                         } else {
-                            if (d && d !== 'no-date') {
-                                const itemYM = d.substring(0, 7);
-                                if (itemYM <= selectedYM) {
-                                    recSum += item.expense.received || 0;
-                                    sentSum += item.expense.sent || 0;
-                                }
-                            } else {
+                            if (!d || d === 'no-date' || d.substring(0, 7) <= selectedYM) {
                                 recSum += item.expense.received || 0;
                                 sentSum += item.expense.sent || 0;
                             }
@@ -1649,7 +902,6 @@
                 });
 
                 let balance = recSum - sentSum;
-
                 if (balance !== 0) {
                     totalMonthDues += balance;
                     const tr = document.createElement('tr');
@@ -1660,22 +912,13 @@
                         <td class="ms-account-name-cell">${accName}</td>
                         <td class="dues-val clickable-val">${formatPlainNum(balance)}</td>
                     `;
-                    tr.addEventListener('click', () => {
-                        window.openAccountDetailsFromSummary(accName, selectedYM, true);
-                    });
+                    tr.addEventListener('click', () => window.openAccountDetailsFromSummary(accName, selectedYM, true));
                     msDuesBody.appendChild(tr);
                 }
             });
 
-            if (duesSno === 1) {
-                msDuesContainer.style.display = 'none';
-            } else {
-                msDuesContainer.style.display = 'block';
-            }
-
-            if (msRemainingAmount) {
-                msRemainingAmount.innerText = formatPlainNum(totalMonthDues);
-            }
+            msDuesContainer.style.display = (duesSno === 1) ? 'none' : 'block';
+            if (msRemainingAmount) msRemainingAmount.innerText = formatPlainNum(totalMonthDues);
         }
 
         msMonthSelect.addEventListener('change', () => {
@@ -1683,40 +926,29 @@
             if (fromDateFilter) fromDateFilter.value = '';
             if (toDateFilter) toDateFilter.value = '';
             renderMonthlySummaryTable();
-            if (isDrillDownMode) {
-                drillDownSelectedYM = selectedYM;
-            }
+            if (isDrillDownMode) drillDownSelectedYM = selectedYM;
             renderData();
         });
 
         window.toggleSearchMode = function() {
             isSearchActive = !isSearchActive;
-
             if (isSearchActive) {
                 isDrillDownMode = false;
                 window._isDuesDrillDown = false;
-
                 searchContainer.style.display = 'flex';
                 searchContainer.classList.add('show');
                 searchToggleBtnTop.innerText = 'Cancel';
                 searchToggleBtnTop.classList.add('active');
-
-                if (accountFilter.value === 'CEO') {
-                    firstSummaryCards.style.display = 'none';
-                } else {
-                    firstSummaryCards.style.display = 'flex';
-                }
+                firstSummaryCards.style.display = (accountFilter.value === 'CEO') ? 'none' : 'flex';
                 secondSummary.style.display = 'none';
                 ceoSelectedDetails.style.display = 'none';
                 ceoThirdDetails.style.display = 'none';
-
                 searchInput.focus();
             } else {
                 searchContainer.style.display = 'none';
                 searchContainer.classList.remove('show');
                 searchToggleBtnTop.innerText = 'Search';
                 searchToggleBtnTop.classList.remove('active');
-
                 searchInput.value = '';
             }
             renderData();
@@ -1727,9 +959,7 @@
 
         function prepareExportSummaries() {
             exportSummaryHolder.innerHTML = '';
-            const selectedAccount = accountFilter.value;
-            if (selectedAccount === 'CEO') return;
-
+            if (accountFilter.value === 'CEO') return;
             const card1 = firstSummaryCards.cloneNode(true);
             card1.style.display = 'flex';
             exportSummaryHolder.appendChild(card1);
@@ -1741,14 +971,11 @@
             const m = String(now.getMonth() + 1).padStart(2, '0');
             const y = now.getFullYear();
             const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            if (exportTimestampSpan) {
-                exportTimestampSpan.innerText = `${d}-${m}-${y},${time}`;
-            }
+            if (exportTimestampSpan) exportTimestampSpan.innerText = `${d}-${m}-${y},${time}`;
         }
 
         window.triggerDownload = function(elementId, fileName, format) {
             currentExportTarget = { elementId, fileName, format };
-
             if (elementId !== 'table-container') {
                 executeExport(null, null);
             } else {
@@ -1772,55 +999,38 @@
             const fromVal = parseInt(fromSnoInput.value);
             const toVal = parseInt(toSnoInput.value);
             const totalRows = expenseList.querySelectorAll('tr').length;
-
             if (isNaN(fromVal) || isNaN(toVal) || fromVal < 1 || toVal < fromVal || fromVal > totalRows) {
                 alert('برائے مہربانی درست سیریل نمبر کا انتخاب کریں۔');
                 return;
             }
-
             window.closeExportModal();
             executeExport(fromVal, toVal);
         };
 
-        const modalBtnRange = document.getElementById('modal-btn-range');
-        const modalBtnAll = document.getElementById('modal-btn-all');
-        const modalBtnCancel = document.getElementById('modal-btn-cancel');
-
-        if (modalBtnRange) modalBtnRange.onclick = window.processExportRange;
-        if (modalBtnAll) modalBtnAll.onclick = window.processExportAll;
-        if (modalBtnCancel) modalBtnCancel.onclick = window.closeExportModal;
+        document.getElementById('modal-btn-range').onclick = window.processExportRange;
+        document.getElementById('modal-btn-all').onclick = window.processExportAll;
+        document.getElementById('modal-btn-cancel').onclick = window.closeExportModal;
 
         if (rowPdfBtn) rowPdfBtn.onclick = () => window.triggerDownload('table-container', 'Account_Details', 'pdf');
         if (rowJpgBtn) rowJpgBtn.onclick = () => window.triggerDownload('table-container', 'Account_Details', 'jpg');
 
-        const ceoSelPdfBtn = document.getElementById('ceo-sel-pdf-btn');
-        const ceoSelJpgBtn = document.getElementById('ceo-sel-jpg-btn');
-        if (ceoSelPdfBtn) ceoSelPdfBtn.onclick = () => window.downloadPDF('ceo-selected-details', 'Amount_Details');
-        if (ceoSelJpgBtn) ceoSelJpgBtn.onclick = () => window.downloadJPG('ceo-selected-details', 'Amount_Details');
-
-        const ceoThirdPdfBtn = document.getElementById('ceo-third-pdf-btn');
-        const ceoThirdJpgBtn = document.getElementById('ceo-third-jpg-btn');
-        if (ceoThirdPdfBtn) ceoThirdPdfBtn.onclick = () => window.downloadPDF('ceo-third-details', 'Date_Details');
-        if (ceoThirdJpgBtn) ceoThirdJpgBtn.onclick = () => window.downloadJPG('ceo-third-details', 'Date_Details');
+        document.getElementById('ceo-sel-pdf-btn').onclick = () => window.downloadPDF('ceo-selected-details', 'Amount_Details');
+        document.getElementById('ceo-sel-jpg-btn').onclick = () => window.downloadJPG('ceo-selected-details', 'Amount_Details');
+        document.getElementById('ceo-third-pdf-btn').onclick = () => window.downloadPDF('ceo-third-details', 'Date_Details');
+        document.getElementById('ceo-third-jpg-btn').onclick = () => window.downloadJPG('ceo-third-details', 'Date_Details');
 
         function executeExport(fromSno, toSno) {
             const { elementId, fileName, format } = currentExportTarget;
             stampExportTime();
-
-            if (format === 'pdf') {
-                window.downloadPDF(elementId, fileName, fromSno, toSno);
-            } else if (format === 'jpg') {
-                window.downloadJPG(elementId, fileName, fromSno, toSno);
-            }
+            if (format === 'pdf') window.downloadPDF(elementId, fileName, fromSno, toSno);
+            else if (format === 'jpg') window.downloadJPG(elementId, fileName, fromSno, toSno);
         }
 
         window.downloadPDF = function(elementId, fileName, fromSno = null, toSno = null) {
             const element = document.getElementById(elementId);
             const selectedAccount = accountFilter.value;
-            
             const rows = expenseList.querySelectorAll('tr');
             const hiddenRows = [];
-
             if (fromSno !== null && toSno !== null) {
                 rows.forEach((row, idx) => {
                     const currentSno = idx + 1;
@@ -1830,54 +1040,36 @@
                     }
                 });
             }
-
             if (elementId === 'table-container') {
                 if (isSearchActive && selectedAccount === 'CEO') {
-                    const searchVal = searchInput.value.trim();
-                    mainExportTitle.innerText = `Detail for ${searchVal || 'Search'}`;
+                    mainExportTitle.innerText = `Detail for ${searchInput.value.trim() || 'Search'}`;
                 } else if (selectedAccount === 'CEO' && !isDrillDownMode) {
                     mainExportTitle.innerText = `All Accounts detail for CEO`;
                 } else {
                     mainExportTitle.innerText = `Account Detail ${selectedAccount}`;
                 }
-
-                if (mainExportSubtitle) {
-                    mainExportSubtitle.innerText = getTableExportSubtitleText();
-                }
-                
+                if (mainExportSubtitle) mainExportSubtitle.innerText = getTableExportSubtitleText();
                 prepareExportSummaries();
-                
-                if (selectedAccount !== 'CEO') {
-                    element.classList.add('other-accounts-export');
-                }
+                if (selectedAccount !== 'CEO') element.classList.add('other-accounts-export');
             }
-
             const pdfBtn = element.querySelector('.pdf-btn');
             const jpgBtn = element.querySelector('.jpg-btn');
             if (pdfBtn) pdfBtn.style.display = 'none';
             if (jpgBtn) jpgBtn.style.display = 'none';
-
-            element.classList.add('export-mode-active');
-            element.classList.add('pdf-export-mode');
-
+            element.classList.add('export-mode-active', 'pdf-export-mode');
             const opt = {
-                margin:       [8, 8, 8, 8],
-                filename:     `${fileName}_${isSearchActive && selectedAccount === 'CEO' ? 'Search' : selectedAccount}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: 0 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['css', 'legacy'], avoid: ['tr', '.summary', '.export-meta-footer'] }
+                margin: [8, 8, 8, 8],
+                filename: `${fileName}_${isSearchActive && selectedAccount === 'CEO' ? 'Search' : selectedAccount}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollY: 0 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', '.summary', '.export-meta-footer'] }
             };
-
             html2pdf().set(opt).from(element).save().then(() => {
                 if (pdfBtn) pdfBtn.style.display = 'inline-block';
                 if (jpgBtn) jpgBtn.style.display = 'inline-block';
-                element.classList.remove('export-mode-active');
-                element.classList.remove('pdf-export-mode');
-                element.classList.remove('other-accounts-export');
-
+                element.classList.remove('export-mode-active', 'pdf-export-mode', 'other-accounts-export');
                 hiddenRows.forEach(row => row.style.display = '');
-
                 if (exportSummaryHolder) exportSummaryHolder.innerHTML = '';
             });
         };
@@ -1885,10 +1077,8 @@
         window.downloadJPG = function(elementId, fileName, fromSno = null, toSno = null) {
             const element = document.getElementById(elementId);
             const selectedAccount = accountFilter.value;
-
             const rows = expenseList.querySelectorAll('tr');
             const hiddenRows = [];
-
             if (fromSno !== null && toSno !== null) {
                 rows.forEach((row, idx) => {
                     const currentSno = idx + 1;
@@ -1898,50 +1088,32 @@
                     }
                 });
             }
-
             if (elementId === 'table-container') {
                 if (isSearchActive && selectedAccount === 'CEO') {
-                    const searchVal = searchInput.value.trim();
-                    mainExportTitle.innerText = `Detail for ${searchVal || 'Search'}`;
+                    mainExportTitle.innerText = `Detail for ${searchInput.value.trim() || 'Search'}`;
                 } else if (selectedAccount === 'CEO' && !isDrillDownMode) {
                     mainExportTitle.innerText = `All Accounts detail for CEO`;
                 } else {
                     mainExportTitle.innerText = `Account Detail ${selectedAccount}`;
                 }
-
-                if (mainExportSubtitle) {
-                    mainExportSubtitle.innerText = getTableExportSubtitleText();
-                }
-                
+                if (mainExportSubtitle) mainExportSubtitle.innerText = getTableExportSubtitleText();
                 prepareExportSummaries();
-                
-                if (selectedAccount !== 'CEO') {
-                    element.classList.add('other-accounts-export');
-                }
+                if (selectedAccount !== 'CEO') element.classList.add('other-accounts-export');
             }
-
             const pdfBtn = element.querySelector('.pdf-btn');
             const jpgBtn = element.querySelector('.jpg-btn');
             if (pdfBtn) pdfBtn.style.display = 'none';
             if (jpgBtn) jpgBtn.style.display = 'none';
-
-            element.classList.add('export-mode-active');
-            element.classList.add('jpg-export-mode');
-
+            element.classList.add('export-mode-active', 'jpg-export-mode');
             html2canvas(element, { scale: 2, useCORS: true, letterRendering: true }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `${fileName}_${isSearchActive && selectedAccount === 'CEO' ? 'Search' : selectedAccount}.jpg`;
                 link.href = canvas.toDataURL('image/jpeg', 0.98);
                 link.click();
-
                 if (pdfBtn) pdfBtn.style.display = 'inline-block';
                 if (jpgBtn) jpgBtn.style.display = 'inline-block';
-                element.classList.remove('export-mode-active');
-                element.classList.remove('jpg-export-mode');
-                element.classList.remove('other-accounts-export');
-
+                element.classList.remove('export-mode-active', 'jpg-export-mode', 'other-accounts-export');
                 hiddenRows.forEach(row => row.style.display = '');
-
                 if (exportSummaryHolder) exportSummaryHolder.innerHTML = '';
             });
         };
@@ -1949,97 +1121,8 @@
         function formatDateToDMY(dateStr) {
             if (!dateStr) return '-';
             const parts = dateStr.split('-');
-            if (parts.length === 3) {
-                const shortYear = parts[0].slice(-2);
-                return `${parts[2]}-${parts[1]}-${shortYear}`;
-            }
+            if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0].slice(-2)}`;
             return dateStr;
-        }
-
-        function getAutoCeoDataByDate(searchTerm = '', selectedYearMonth = 'all', fromDate = '', toDate = '') {
-            const dateSummary = {};
-
-            allExpensesData.forEach(item => {
-                const rawAccount = item.expense.account ? item.expense.account.trim() : '';
-                const accLower = rawAccount.toLowerCase();
-                if (accLower.includes('sharif') || accLower.includes('sajid') || accLower.includes('rashid driver')) return;
-
-                const desc = item.expense.desc ? item.expense.desc.trim() : '';
-                const date = item.expense.date || 'no-date';
-
-                if (!checkDateInRange(date, selectedYearMonth, fromDate, toDate)) {
-                    return;
-                }
-
-                if (searchTerm) {
-                    const matchSearch = rawAccount.toLowerCase().includes(searchTerm) || 
-                                        desc.toLowerCase().includes(searchTerm);
-                    if (!matchSearch) return;
-                }
-
-                if (!dateSummary[date]) {
-                    dateSummary[date] = {
-                        amountReceived: 0,
-                        amountSent: 0,
-                        amanatReceived: 0,
-                        amanatReturn: 0,
-                        items: []
-                    };
-                }
-
-                const rec = item.expense.received || 0;
-                const sent = item.expense.sent || 0;
-
-                const isAc = isAcAccount(rawAccount);
-                const isAmanat = !isAc;
-
-                if (isAc) {
-                    dateSummary[date].amountReceived += rec;
-                    dateSummary[date].amountSent += sent;
-                } else if (isAmanat) {
-                    dateSummary[date].amanatReceived += rec;
-                    dateSummary[date].amanatReturn += sent;
-                }
-
-                let displayAccountName = rawAccount;
-                if (!displayAccountName) {
-                    displayAccountName = 'Musharaf Amanat';
-                }
-
-                dateSummary[date].items.push({
-                    account: displayAccountName,
-                    desc: item.expense.desc || '',
-                    received: rec,
-                    sent: sent,
-                    isAc53: isAc,
-                    isAmanat: isAmanat
-                });
-            });
-
-            return dateSummary;
-        }
-
-        function getOverallAmanatSummary() {
-            let totalAmanatRec = 0;
-            let totalAmanatRet = 0;
-
-            allExpensesData.forEach(item => {
-                const rawAccount = item.expense.account ? item.expense.account.trim() : '';
-                const accLower = rawAccount.toLowerCase();
-                if (accLower.includes('sharif') || accLower.includes('sajid') || accLower.includes('rashid driver')) return;
-
-                const isAc = isAcAccount(rawAccount);
-                if (!isAc) {
-                    totalAmanatRec += item.expense.received || 0;
-                    totalAmanatRet += item.expense.sent || 0;
-                }
-            });
-
-            return {
-                amanatReceived: totalAmanatRec,
-                amanatReturn: totalAmanatRet,
-                remainingPayable: totalAmanatRec - totalAmanatRet
-            };
         }
 
         function renderData() {
@@ -2054,15 +1137,12 @@
 
             createdByContainer.style.display = 'block';
 
-            // 1. صرف CEO اکاؤنٹ کا سرچ ویو (5 کالمز والا: Date, Account Name, Description, Amount, Remarks)
-            // اس میں Amount Received اور Amanat Return شو نہیں ہوں گے، اور Musharaf Amanat و Farooq Shah Amanat کی خیالی انٹری (Old dues) بھی شو ہو گی
             if (isSearchActive && isCeo) {
                 drilldownHeader.style.display = 'none';
                 drilldownBadge.style.display = 'none';
                 defaultHeaderTop.style.display = 'flex';
                 accountSelectRow.style.display = 'flex';
                 searchContainer.style.display = 'flex';
-
                 pageTitle.innerText = "Search Details";
 
                 firstSummaryCards.style.display = 'none';
@@ -2086,7 +1166,6 @@
                 let searchTotalAmount = 0;
                 let matchCount = 0;
 
-                // Musharaf Amanat اور Farooq Shah Amanat کی پچھلے مہینے کے بقایا جات (Old dues) والی خیالی انٹری
                 if (currentSelectedMonth && currentSelectedMonth !== 'all' && !fromDateVal && !toDateVal) {
                     const parts = currentSelectedMonth.split('-');
                     if (parts.length >= 2) {
@@ -2097,20 +1176,15 @@
                         const prevMonthName = monthNames[prevM - 1];
                         const startOfCurrentMonth = `${y}-${String(m).padStart(2, '0')}-01`;
                         const vDateFormatted = `01-${String(m).padStart(2, '0')}-${String(y).slice(-2)}`;
-                        const vRawDate = startOfCurrentMonth;
                         const vDesc = `Old dues Month of ${prevMonthName}`;
 
-                        const virtualTargetAccounts = ['Musharaf Amanat', 'Farooq Shah Amanat'];
-
-                        virtualTargetAccounts.forEach(accName => {
+                        ['Musharaf Amanat', 'Farooq Shah Amanat'].forEach(accName => {
                             let prevBal = 0;
                             allExpensesData.forEach(item => {
                                 const itemAcc = item.expense.account ? item.expense.account.toLowerCase() : '';
                                 const itemDate = item.expense.date || '';
-                                if (isAccountMatch(itemAcc, accName)) {
-                                    if (itemDate && itemDate < startOfCurrentMonth) {
-                                        prevBal += (item.expense.received || 0) - (item.expense.sent || 0);
-                                    }
+                                if (isAccountMatch(itemAcc, accName) && itemDate && itemDate < startOfCurrentMonth) {
+                                    prevBal += (item.expense.received || 0) - (item.expense.sent || 0);
                                 }
                             });
 
@@ -2120,14 +1194,12 @@
                                     matchVirtual = accName.toLowerCase().includes(searchTerm) ||
                                                    vDesc.toLowerCase().includes(searchTerm) ||
                                                    vDateFormatted.toLowerCase().includes(searchTerm) ||
-                                                   vRawDate.toLowerCase().includes(searchTerm) ||
+                                                   startOfCurrentMonth.toLowerCase().includes(searchTerm) ||
                                                    String(prevBal).includes(searchTerm);
                                 }
-
                                 if (matchVirtual) {
                                     searchTotalAmount += prevBal;
                                     matchCount++;
-
                                     const vRow = document.createElement('tr');
                                     vRow.style.backgroundColor = '#fdfbf7';
                                     vRow.innerHTML = `
@@ -2147,63 +1219,81 @@
                 allExpensesData.forEach((item) => {
                     const rawAccount = item.expense.account ? item.expense.account.trim() : 'Musharaf Amanat';
                     const accLower = rawAccount.toLowerCase();
-                    const isExcludedAccount = accLower.includes('sharif') || accLower.includes('sajid') || accLower.includes('rashid driver');
-
-                    if (isExcludedAccount || accLower.includes('altaf rent')) return;
+                    if (accLower.includes('sharif') || accLower.includes('sajid') || accLower.includes('rashid driver') || accLower.includes('altaf rent')) return;
 
                     const desc = item.expense.desc ? item.expense.desc.trim() : '';
                     const itemDate = item.expense.date || '';
                     const recVal = item.expense.received || 0;
                     const sentVal = item.expense.sent || 0;
-
                     const isAc = isAcAccount(rawAccount);
 
-                    // Amount Received (isAc && recVal > 0) اور Amanat Return (!isAc && sentVal > 0) کو ہٹا دیا گیا ہے
                     let displayAmount = 0;
                     let remarkText = '';
+                    let isAmanatReturnRow = false;
 
                     if (isAc) {
-                        if (sentVal <= 0) return; // صرف Amount Sent دکھائیں، Amount Received کو چھوڑ دیں
+                        if (sentVal <= 0) return;
                         displayAmount = sentVal;
                         remarkText = 'Amount Sent';
                     } else {
-                        if (recVal <= 0) return; // صرف Amanat Rec دکھائیں، Amanat Return کو چھوڑ دیں
-                        displayAmount = recVal;
-                        remarkText = 'Amanat Rec.';
+                        if (recVal > 0) {
+                            displayAmount = recVal;
+                            remarkText = 'Amanat Rec.';
+                        } else if (sentVal > 0) {
+                            displayAmount = sentVal;
+                            remarkText = 'Amanat Return';
+                            isAmanatReturnRow = true;
+                        } else {
+                            return;
+                        }
                     }
 
                     const formattedDateDmy = formatDateToDMY(itemDate).toLowerCase();
                     const rawDate = itemDate.toLowerCase();
                     const isDateMatch = searchTerm && (formattedDateDmy.includes(searchTerm) || rawDate.includes(searchTerm));
 
-                    if (!isDateMatch && !checkDateInRange(itemDate, currentSelectedMonth, fromDateVal, toDateVal)) {
-                        return;
-                    }
+                    if (!isDateMatch && !checkDateInRange(itemDate, currentSelectedMonth, fromDateVal, toDateVal)) return;
 
                     if (searchTerm) {
                         const matchSearch = rawAccount.toLowerCase().includes(searchTerm) || 
                                             desc.toLowerCase().includes(searchTerm) ||
                                             formattedDateDmy.includes(searchTerm) ||
                                             rawDate.includes(searchTerm) ||
-                                            String(displayAmount).includes(searchTerm);
+                                            remarkText.toLowerCase().includes(searchTerm) ||
+                                            String(displayAmount).includes(searchTerm) ||
+                                            (isAmanatReturnRow && (`-${displayAmount}`).includes(searchTerm));
                         if (!matchSearch) return;
                     }
 
-                    searchTotalAmount += displayAmount;
+                    if (isAmanatReturnRow) {
+                        searchTotalAmount -= displayAmount;
+                    } else {
+                        searchTotalAmount += displayAmount;
+                    }
                     matchCount++;
 
                     const slipUrl = item.expense.slipUrl || item.expense.slip || '';
+                    const rowColorStyle = isAmanatReturnRow ? 'color: #dc3545 !important;' : '';
+                    const linkColorStyle = isAmanatReturnRow ? 'style="color: #dc3545 !important;"' : '';
                     const descHtml = slipUrl 
-                        ? `<a href="${slipUrl}" target="_blank" class="slip-link" title="View Slip">${desc || 'View Slip'}</a>` 
+                        ? `<a href="${slipUrl}" target="_blank" class="slip-link" ${linkColorStyle} title="View Slip">${desc || 'View Slip'}</a>` 
                         : (desc || '-');
 
+                    const formattedAmountStr = isAmanatReturnRow ? `-${formatPlainNum(displayAmount)}` : formatPlainNum(displayAmount);
+                    const amountColor = isAmanatReturnRow ? '#dc3545' : '#007bff';
+                    const remarkColor = isAmanatReturnRow ? '#dc3545' : '#333';
+
                     const row = document.createElement('tr');
+                    if (isAmanatReturnRow) {
+                        row.style.color = '#dc3545';
+                        row.style.backgroundColor = '#fff5f5';
+                    }
                     row.innerHTML = `
-                        <td>${formatDateToDMY(item.expense.date)}</td>
-                        <td style="text-align: left; font-weight: bold;">${rawAccount}</td>
-                        <td style="text-align: left;">${descHtml}</td>
-                        <td class="text-right" style="font-weight: bold; color: #007bff; white-space: nowrap;">${formatPlainNum(displayAmount)}</td>
-                        <td style="font-size: 9px; font-weight: bold; color: #333;">${remarkText}</td>
+                        <td style="${rowColorStyle}">${formatDateToDMY(item.expense.date)}</td>
+                        <td style="text-align: left; font-weight: bold; ${rowColorStyle}">${rawAccount}</td>
+                        <td style="text-align: left; ${rowColorStyle}">${descHtml}</td>
+                        <td class="text-right" style="font-weight: bold; color: ${amountColor}; white-space: nowrap;">${formattedAmountStr}</td>
+                        <td style="font-size: 9px; font-weight: bold; color: ${remarkColor};">${remarkText}</td>
                     `;
                     expenseList.appendChild(row);
                 });
@@ -2218,11 +1308,9 @@
                     `;
                     expenseList.appendChild(totalRow);
                 }
-
                 return;
             }
 
-            // 2. Drilldown یا باقی تمام اکاؤنٹس کا نارمل اور سرچ ویو
             if (isDrillDownMode) {
                 drilldownHeader.style.display = 'flex';
                 drilldownBadge.style.display = 'flex';
@@ -2236,10 +1324,7 @@
                     monthLabel = `${fStr} to ${tStr}`;
                 } else if (ymVal !== 'all') {
                     const parts = ymVal.split('-');
-                    if (parts.length >= 2) {
-                        const mIndex = parseInt(parts[1], 10) - 1;
-                        monthLabel = `${monthNames[mIndex]}${parts[0]}`;
-                    }
+                    if (parts.length >= 2) monthLabel = `${monthNames[parseInt(parts[1], 10) - 1]}${parts[0]}`;
                 }
 
                 if (window._isDuesDrillDown) {
@@ -2271,13 +1356,11 @@
 
             if (selectedAccount === 'CEO' && !isDrillDownMode) {
                 pageTitle.innerText = "Account's Detail";
-
                 firstSummaryCards.style.display = 'none';
                 secondSummary.style.display = 'none';
                 tableContainer.style.display = 'none';
                 ceoSelectedDetails.style.display = 'none';
                 ceoThirdDetails.style.display = 'none';
-
                 tableHeaderRow.innerHTML = '';
                 expenseList.innerHTML = '';
                 return;
@@ -2304,16 +1387,10 @@
                     firstColHeader = 'Charges';
                     secondColHeader = 'Pay';
                 } else if (selectedAccount === 'Sharif A/C' || selectedAccount === 'SAJID' || selectedAccount === 'RASHID DRIVER') {
-                    colOneLabel = 'Total Received';
-                    colTwoLabel = 'Total Sent';
                     colThreeLabel = 'Total Balance';
-                    firstColHeader = 'Received';
-                    secondColHeader = 'Sent';
                 } else if (!isAcAccount(selectedAccount)) {
-                    colOneLabel = 'Total Received';
                     colTwoLabel = 'Total Return';
                     colThreeLabel = 'Remaining Payable';
-                    firstColHeader = 'Received';
                     secondColHeader = 'Return';
                 }
 
@@ -2321,9 +1398,7 @@
                 cardTwoLabel.innerText = colTwoLabel;
                 cardThreeLabel.innerText = colThreeLabel;
 
-                if (!isDrillDownMode) {
-                    tableContainer.classList.add('large-scroll');
-                }
+                if (!isDrillDownMode) tableContainer.classList.add('large-scroll');
                 
                 tableHeaderRow.innerHTML = `
                     <th style="width: 9%;">S.No</th>
@@ -2336,19 +1411,15 @@
 
             expenseList.innerHTML = '';
             let count = 1;
-
             let totalReceived = 0;
             let totalSent = 0;
             const shouldFilterByMonth = !isExcludedFromMonthFilter(selectedAccount);
             const activeMonth = isDrillDownMode ? (drillDownSelectedYM || currentSelectedMonth) : currentSelectedMonth;
 
             const isAmanatTarget = (
-                selectedAccount === 'Farooq Shah Amanat' || 
-                selectedAccount === 'Musharaf Amanat' || 
-                selectedAccount === 'Altaf Rent A Car' || 
-                selectedAccount === 'Sharif A/C' || 
-                selectedAccount === 'SAJID' || 
-                selectedAccount === 'RASHID DRIVER'
+                selectedAccount === 'Farooq Shah Amanat' || selectedAccount === 'Musharaf Amanat' || 
+                selectedAccount === 'Altaf Rent A Car' || selectedAccount === 'Sharif A/C' || 
+                selectedAccount === 'SAJID' || selectedAccount === 'RASHID DRIVER'
             );
             let prevBalance = 0;
             let prevMonthName = '';
@@ -2361,21 +1432,15 @@
                     const y = parseInt(parts[0], 10);
                     const m = parseInt(parts[1], 10);
                     let prevM = m - 1;
-                    let prevY = y;
-                    if (prevM === 0) {
-                        prevM = 12;
-                        prevY = y - 1;
-                    }
+                    if (prevM === 0) prevM = 12;
                     prevMonthName = monthNames[prevM - 1];
                     const startOfCurrentMonth = `${y}-${String(m).padStart(2, '0')}-01`;
 
                     allExpensesData.forEach(item => {
                         const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
                         const itemDate = item.expense.date || '';
-                        if (isAccountMatch(itemAccount, selectedAccount)) {
-                            if (itemDate && itemDate < startOfCurrentMonth) {
-                                prevBalance += (item.expense.received || 0) - (item.expense.sent || 0);
-                            }
+                        if (isAccountMatch(itemAccount, selectedAccount) && itemDate && itemDate < startOfCurrentMonth) {
+                            prevBalance += (item.expense.received || 0) - (item.expense.sent || 0);
                         }
                     });
 
@@ -2406,7 +1471,6 @@
             allExpensesData.forEach((item) => {
                 const itemAccount = item.expense.account ? item.expense.account.toLowerCase() : '';
                 const itemDate = item.expense.date || '';
-
                 if (!isAccountMatch(itemAccount, selectedAccount)) return;
 
                 const expense = item.expense;
@@ -2419,9 +1483,7 @@
                     const rawDate = itemDate.toLowerCase();
                     const isDateMatch = searchTerm && (formattedDateDmy.includes(searchTerm) || rawDate.includes(searchTerm));
 
-                    if (!isDateMatch && shouldFilterByMonth && !checkDateInRange(itemDate, activeMonth, fromDateVal, toDateVal)) {
-                        return;
-                    }
+                    if (!isDateMatch && shouldFilterByMonth && !checkDateInRange(itemDate, activeMonth, fromDateVal, toDateVal)) return;
 
                     if (searchTerm) {
                         const matchSearch = descText.toLowerCase().includes(searchTerm) ||
@@ -2432,9 +1494,7 @@
                         if (!matchSearch) return;
                     }
                 } else {
-                    if (shouldFilterByMonth && !checkDateInRange(itemDate, activeMonth, fromDateVal, toDateVal)) {
-                        return;
-                    }
+                    if (shouldFilterByMonth && !checkDateInRange(itemDate, activeMonth, fromDateVal, toDateVal)) return;
                 }
 
                 totalReceived += recVal;
@@ -2461,163 +1521,8 @@
             totalBalanceDisplay.innerText = formatPlainNum(totalReceived - totalSent);
 
             if (isDrillDownMode) {
-                if (window._isDuesDrillDown) {
-                    drilldownBadgeAmount.innerText = formatPlainNum(totalReceived - totalSent);
-                } else {
-                    drilldownBadgeAmount.innerText = formatPlainNum(totalSent);
-                }
+                drilldownBadgeAmount.innerText = window._isDuesDrillDown ? formatPlainNum(totalReceived - totalSent) : formatPlainNum(totalSent);
             }
-        }
-
-        function updateAmountBoxOnly(items, type, columnHeaderLabel, clickedVal) {
-            selectedDateDisplay.innerText = `Amount: ${formatPlainNum(clickedVal)}`;
-            dynamicColumnHeader.innerText = columnHeaderLabel;
-            selectedDetailsBody.innerHTML = '';
-
-            const filteredItems = items.filter(i => {
-                if (type === 'amountReceived') return i.isAc53 && i.received > 0;
-                if (type === 'amountSent') return i.isAc53 && i.sent > 0;
-                if (type === 'amanatReceived') return i.isAmanat && i.received > 0;
-                if (type === 'amanatReturn') return i.isAmanat && i.sent > 0;
-                return false;
-            });
-
-            if (filteredItems.length === 0) {
-                selectedDetailsBody.innerHTML = `<tr><td colspan="3" style="color:#666; padding: 8px;">No records found</td></tr>`;
-            } else {
-                filteredItems.forEach(item => {
-                    let amountVal = 0;
-                    if (type === 'amountReceived' || type === 'amanatReceived') amountVal = item.received;
-                    if (type === 'amountSent' || type === 'amanatReturn') amountVal = item.sent;
-
-                    const tr2 = document.createElement('tr');
-                    tr2.innerHTML = `
-                        <td style="text-align: left; font-weight: bold;">${item.account}</td>
-                        <td style="text-align: left;">${item.desc || '-'}</td>
-                        <td class="text-right" style="font-weight: bold; color: #007bff; white-space: nowrap;">${formatPlainNum(amountVal)}</td>
-                    `;
-                    selectedDetailsBody.appendChild(tr2);
-                });
-            }
-
-            thirdDateDisplay.innerText = `Date: None`;
-            thirdTableHeader.innerHTML = `
-                <th style="width: 25%;">Account Name</th>
-                <th style="width: 45%;">Description</th>
-                <th style="width: 30%;">Amount Details</th>
-            `;
-            thirdDetailsBody.innerHTML = `<tr><td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td></tr>`;
-            if (thirdDetailsTable) {
-                thirdDetailsTable.style.minWidth = '100%';
-            }
-        }
-
-        function updateDateBoxOnly(dateStr, items) {
-            selectedDateDisplay.innerText = `Amount: 0`;
-            selectedDetailsBody.innerHTML = `<tr><td colspan="3" style="color: #666; padding: 8px;">Click on any value (> 0) above to view details</td></tr>`;
-
-            thirdDateDisplay.innerHTML = `Date: ${dateStr}`;
-
-            let totalAmtRec = 0;
-            let totalAmtSent = 0;
-            let totalAmnRec = 0;
-            let totalAmnRet = 0;
-
-            items.forEach(item => {
-                if (item.isAc53 && item.received > 0) totalAmtRec += item.received;
-                if (item.isAc53 && item.sent > 0) totalAmtSent += item.sent;
-                if (item.isAmanat && item.received > 0) totalAmnRec += item.received;
-                if (item.isAmanat && item.sent > 0) totalAmnRet += item.sent;
-            });
-
-            const activeCols = [];
-            if (totalAmtRec > 0) activeCols.push({ key: 'amtRec', label: 'Amount<br>Rec.' });
-            if (totalAmtSent > 0) activeCols.push({ key: 'amtSent', label: 'Amount<br>Sent' });
-            if (totalAmnRec > 0) activeCols.push({ key: 'amnRec', label: 'Amanat<br>Rec.' });
-            if (totalAmnRet > 0) activeCols.push({ key: 'amnRet', label: 'Amanat<br>Return' });
-
-            if (activeCols.length === 0) {
-                thirdTableHeader.innerHTML = `
-                    <th style="width: 25%;">Account Name</th>
-                    <th style="width: 45%;">Description</th>
-                    <th style="width: 30%;">Amount Details</th>
-                `;
-                thirdDetailsBody.innerHTML = `<tr><td colspan="3" style="color:#666; padding: 8px;">No non-zero records found</td></tr>`;
-                if (thirdDetailsTable) {
-                    thirdDetailsTable.style.minWidth = '100%';
-                }
-                return;
-            }
-
-            let numActive = activeCols.length;
-            let accWidth = 24;
-            let descWidth = 24;
-            let dynamicColWidth = '18%';
-
-            if (numActive === 1) {
-                accWidth = 24;
-                descWidth = 50;
-                dynamicColWidth = '26%';
-                if (thirdDetailsTable) thirdDetailsTable.style.minWidth = '100%';
-            } else if (numActive === 2) {
-                accWidth = 24;
-                descWidth = 38;
-                dynamicColWidth = '19%';
-                if (thirdDetailsTable) thirdDetailsTable.style.minWidth = '100%';
-            } else if (numActive === 3) {
-                accWidth = 24;
-                descWidth = 28;
-                dynamicColWidth = '16%';
-                if (thirdDetailsTable) thirdDetailsTable.style.minWidth = '100%';
-            } else if (numActive >= 4) {
-                accWidth = 24;
-                descWidth = 28;
-                dynamicColWidth = '18%';
-                if (thirdDetailsTable) thirdDetailsTable.style.minWidth = '390px';
-            }
-
-            let headerHtml = `<th style="width: ${accWidth}%;">Account Name</th><th style="width: ${descWidth}%;">Description</th>`;
-            activeCols.forEach(col => {
-                headerHtml += `<th style="width: ${dynamicColWidth}; text-align: center;">${col.label}</th>`;
-            });
-            thirdTableHeader.innerHTML = headerHtml;
-
-            thirdDetailsBody.innerHTML = '';
-            items.forEach(item => {
-                let valAmtRec = (item.isAc53 && item.received > 0) ? item.received : 0;
-                let valAmtSent = (item.isAc53 && item.sent > 0) ? item.sent : 0;
-                let valAmnRec = (item.isAmanat && item.received > 0) ? item.received : 0;
-                let valAmnRet = (item.isAmanat && item.sent > 0) ? item.sent : 0;
-
-                let hasValue = false;
-                activeCols.forEach(col => {
-                    if (col.key === 'amtRec' && valAmtRec > 0) hasValue = true;
-                    if (col.key === 'amtSent' && valAmtSent > 0) hasValue = true;
-                    if (col.key === 'amnRec' && valAmnRec > 0) hasValue = true;
-                    if (col.key === 'amnRet' && valAmnRet > 0) hasValue = true;
-                });
-
-                if (!hasValue) return;
-
-                let rowHtml = `
-                    <td style="text-align: left; font-weight: bold; word-break: break-word;">${item.account}</td>
-                    <td style="text-align: left; word-break: break-word;">${item.desc || '-'}</td>
-                `;
-
-                activeCols.forEach(col => {
-                    let cellVal = 0;
-                    if (col.key === 'amtRec') cellVal = valAmtRec;
-                    if (col.key === 'amtSent') cellVal = valAmtSent;
-                    if (col.key === 'amnRec') cellVal = valAmnRec;
-                    if (col.key === 'amnRet') cellVal = valAmnRet;
-
-                    rowHtml += `<td class="text-right" style="font-weight: bold; color: ${cellVal > 0 ? '#007bff' : '#333'}; white-space: nowrap;">${cellVal > 0 ? formatPlainNum(cellVal) : '0'}</td>`;
-                });
-
-                const tr3 = document.createElement('tr');
-                tr3.innerHTML = rowHtml;
-                thirdDetailsBody.appendChild(tr3);
-            });
         }
 
         onSnapshot(q, (snapshot) => {
@@ -2628,26 +1533,19 @@
             snapshot.forEach((docSnap) => {
                 const itemData = docSnap.data();
                 const rawAcc = itemData.account || '';
-
                 if (isAccountMatch(rawAcc, 'Altaf Rent A Car')) {
                     const recVal = Number(itemData.received) || 0;
                     const sentVal = Number(itemData.sent) || 0;
-
                     if (recVal === 0 && sentVal === 0 && itemData.date !== todayStr) {
                         itemData.date = todayStr;
-                        updateDoc(doc(db, "ceo_expenses", docSnap.id), {
-                            date: todayStr
-                        }).catch((err) => console.error("Auto date update error:", err));
+                        updateDoc(doc(db, "ceo_expenses", docSnap.id), { date: todayStr }).catch((err) => console.error(err));
                     }
                 }
-
                 allExpensesData.push({ id: docSnap.id, expense: itemData });
             });
 
             allExpensesData.sort((a, b) => {
-                const dateA = a.expense.date || '';
-                const dateB = b.expense.date || '';
-                const dateCompare = dateA.localeCompare(dateB);
+                const dateCompare = (a.expense.date || '').localeCompare(b.expense.date || '');
                 if (dateCompare !== 0) return dateCompare;
                 return getCreatedAtTime(a.expense) - getCreatedAtTime(b.expense);
             });
@@ -2676,7 +1574,6 @@
                 renderData();
             });
         }
-
         if (clearDatesBtn) {
             clearDatesBtn.addEventListener('click', () => {
                 if (fromDateFilter) fromDateFilter.value = '';
@@ -2685,7 +1582,6 @@
                 renderData();
             });
         }
-
         searchInput.addEventListener('input', renderData);
     </script>
 </body>
