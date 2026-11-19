@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Google Drive Link Updater (Temporary)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+        }
+        .card {
+            background: #ffffff;
+            max-width: 500px;
+            width: 100%;
+            padding: 24px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            text-align: center;
+        }
+        h2 {
+            color: #007bff;
+            margin-top: 0;
+            font-size: 20px;
+        }
+        p {
+            color: #444;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        #log-box {
+            margin-top: 16px;
+            padding: 12px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            text-align: left;
+            font-size: 13px;
+            max-height: 250px;
+            overflow-y: auto;
+            color: #333;
+            line-height: 1.6;
+        }
+        .success { color: #28a745; font-weight: bold; }
+        .error { color: #dc3545; font-weight: bold; }
+        .info { color: #007bff; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Google Drive Links Updater</h2>
+        <p>Apna Admin Email aur Password darj kar ke button dabayein. Yeh script Firebase ki tamam purani Drive links ko <b>/preview</b> mein badal degi.</p>
+        
+        <input type="email" id="admin-email" placeholder="Admin Email darj karein" required>
+        <input type="password" id="admin-password" placeholder="Admin Password darj karein" required>
+        <button id="start-btn">Login & Update All Links</button>
+
+        <div id="log-box">Status: Tayyar hai. Upar apna Admin login darj karein...</div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSPb0bIHj9edsuZi0RO1VNhTovDZYOrP8",
+            authDomain: "khanpetolum.firebaseapp.com",
+            projectId: "khanpetolum",
+            storageBucket: "khanpetolum.firebasestorage.app",
+            messagingSenderId: "667827334582",
+            appId: "1:667827334582:web:dc1edc4522f027689ca517",
+            measurementId: "G-HHLCHWEE06"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const emailInput = document.getElementById('admin-email');
+        const passInput = document.getElementById('admin-password');
+        const startBtn = document.getElementById('start-btn');
+        const logBox = document.getElementById('log-box');
+
+        function addLog(msg, className = '') {
+            const div = document.createElement('div');
+            if (className) div.className = className;
+            div.innerHTML = msg;
+            logBox.appendChild(div);
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        function formatDrivePreviewUrl(url) {
+            if (!url || typeof url !== 'string') return url;
+            const trimmedUrl = url.trim();
+
+            // 1. Individual File (/file/d/ID/view -> /file/d/ID/preview)
+            const fileMatch = trimmedUrl.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/i);
+            if (fileMatch && fileMatch[1]) {
+                return `https://drive.google.com/file/d/${fileMatch[1]}/preview`;
+            }
+
+            // 2. Open ID link (drive.google.com/open?id=ID -> /file/d/ID/preview)
+            const openMatch = trimmedUrl.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/i);
+            if (openMatch && openMatch[1]) {
+                return `https://drive.google.com/file/d/${openMatch[1]}/preview`;
+            }
+
+            // 3. Folder link (/drive/folders/ID -> embeddedfolderview)
+            const folderMatch = trimmedUrl.match(/drive\.google\.com\/drive\/folders\/([a-zA-Z0-9_-]+)/i);
+            if (folderMatch && folderMatch[1]) {
+                return `https://drive.google.com/embeddedfolderview?id=${folderMatch[1]}#list`;
+            }
+
+            return trimmedUrl;
+        }
+
+        startBtn.addEventListener('click', async () => {
+            const email = emailInput.value.trim();
+            const password = passInput.value;
+
+            if (!email || !password) {
+                alert("Brahe karam Admin Email aur Password darj karein!");
+                return;
+            }
+
+            startBtn.disabled = true;
+            startBtn.innerText = "Kaam jari hai, intezar karein...";
+            logBox.innerHTML = "";
+
+            try {
+                addLog("1. Admin login check ho raha hai...", "info");
+                await signInWithEmailAndPassword(auth, email, password);
+                addLog("✓ Login kamyab!", "success");
+
+                addLog("2. Firebase se tamam records hasil kiye ja rahe hain...", "info");
+                const snapshot = await getDocs(collection(db, "ceo_expenses"));
+                addLog(`✓ Kul ${snapshot.size} records mil gaye hain.`, "info");
+
+                let updatedCount = 0;
+                let alreadyUpdatedCount = 0;
+
+                for (const docSnap of snapshot.docs) {
+                    const data = docSnap.data();
+                    const updatePayload = {};
+                    let needsUpdate = false;
+
+                    // 'slip' field check karein
+                    if (data.slip && typeof data.slip === 'string' && data.slip.includes('drive.google.com')) {
+                        const newSlip = formatDrivePreviewUrl(data.slip);
+                        if (newSlip !== data.slip) {
+                            updatePayload.slip = newSlip;
+                            needsUpdate = true;
+                        } else {
+                            alreadyUpdatedCount++;
+                        }
+                    }
+
+                    // 'slipUrl' field check karein
+                    if (data.slipUrl && typeof data.slipUrl === 'string' && data.slipUrl.includes('drive.google.com')) {
+                        const newSlipUrl = formatDrivePreviewUrl(data.slipUrl);
+                        if (newSlipUrl !== data.slipUrl) {
+                            updatePayload.slipUrl = newSlipUrl;
+                            needsUpdate = true;
+                        } else {
+                            alreadyUpdatedCount++;
+                        }
+                    }
+
+                    if (needsUpdate) {
+                        await updateDoc(doc(db, "ceo_expenses", docSnap.id), updatePayload);
+                        updatedCount++;
+                        addLog(`→ Updated (${updatedCount}): ${data.account || 'Record'} - ${data.desc || docSnap.id}`);
+                    }
+                }
+
+                addLog("-----------------------------------------");
+                addLog(`🎉 MUKAMMAL! Kul ${updatedCount} links ko /preview mein badal diya gaya hai.`, "success");
+                if (alreadyUpdatedCount > 0) {
+                    addLog(`(${alreadyUpdatedCount} links pehle se hi /preview format mein theen).`);
+                }
+                addLog("Ab aap is temporary file ko delete kar sakte hain!", "info");
+
+                await signOut(auth);
+                startBtn.innerText = "Kaam Mukammal Ho Gaya ✓";
+
+            } catch (err) {
+                console.error(err);
+                addLog(`❌ Error: ${err.message}`, "error");
+                startBtn.disabled = false;
+                startBtn.innerText = "Dobara Koshish Karein";
+            }
+        });
+    </script>
+</body>
+</html>
