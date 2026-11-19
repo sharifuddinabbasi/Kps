@@ -554,6 +554,32 @@
         const expensesRef = collection(db, "ceo_expenses");
         const q = query(expensesRef, orderBy("date", "asc"));
 
+        // Google Drive Links ko /preview aur embedded format mein badalne wala function
+        function formatDrivePreviewUrl(url) {
+            if (!url || typeof url !== 'string') return url;
+            const trimmedUrl = url.trim();
+
+            // 1. Individual Google Drive File Link (/file/d/ID/view... -> /file/d/ID/preview)
+            const fileMatch = trimmedUrl.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/i);
+            if (fileMatch && fileMatch[1]) {
+                return `https://drive.google.com/file/d/${fileMatch[1]}/preview`;
+            }
+
+            // 2. Google Drive Open Link (drive.google.com/open?id=ID -> /file/d/ID/preview)
+            const openMatch = trimmedUrl.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/i);
+            if (openMatch && openMatch[1]) {
+                return `https://drive.google.com/file/d/${openMatch[1]}/preview`;
+            }
+
+            // 3. Google Drive Folder Link (/drive/folders/ID -> embeddedfolderview)
+            const folderMatch = trimmedUrl.match(/drive\.google\.com\/drive\/folders\/([a-zA-Z0-9_-]+)/i);
+            if (folderMatch && folderMatch[1]) {
+                return `https://drive.google.com/embeddedfolderview?id=${folderMatch[1]}#list`;
+            }
+
+            return trimmedUrl;
+        }
+
         let isAdminLoggedIn = false;
         let auth = null;
         let authSignIn = null;
@@ -1081,6 +1107,8 @@
                     let newVal = input.value;
                     if (inputType === 'number') {
                         newVal = parseFloat(newVal) || 0;
+                    } else if (fieldName === 'slip') {
+                        newVal = formatDrivePreviewUrl(newVal);
                     } else {
                         newVal = newVal.trim();
                     }
@@ -1360,7 +1388,7 @@
                             const itemDate = item.expense.date || '';
                             if (isAccountMatch(itemAccount, selectedAccount)) {
                                 if (itemDate && itemDate < startOfCurrentMonth) {
-                                    prevBalance += (item.expense.received || 0) - (item.expense.sent || 0);
+                                    prevBalance += (Number(item.expense.received) || 0) - (Number(item.expense.sent) || 0);
                                 }
                             }
                         });
@@ -1415,7 +1443,8 @@
 
                     runningSubTotal = runningSubTotal + recVal - sentVal;
 
-                    const slipVal = expense.slip || expense.slipUrl || '';
+                    const rawSlipVal = expense.slip || expense.slipUrl || '';
+                    const slipVal = formatDrivePreviewUrl(rawSlipVal);
                     const slipHtml = slipVal 
                         ? `<a href="${slipVal}" target="_blank" class="slip-link">View</a>` 
                         : '-';
@@ -1575,7 +1604,7 @@
 
             const newDate = modalDate.value;
             const newDesc = modalDesc.value.trim();
-            const newSlip = modalSlip.value.trim();
+            const newSlip = formatDrivePreviewUrl(modalSlip.value);
             const newRec = parseFloat(modalReceived.value) || 0;
             const newSent = parseFloat(modalSent.value) || 0;
 
@@ -1611,7 +1640,7 @@
             const selectedAccount = accountFilter.value;
             const newDate = addModalDate.value;
             const newDesc = addModalDesc.value.trim();
-            const newSlip = addModalSlip.value.trim();
+            const newSlip = formatDrivePreviewUrl(addModalSlip.value);
             const newRec = parseFloat(addModalReceived.value) || 0;
             const newSent = parseFloat(addModalSent.value) || 0;
 
@@ -1674,7 +1703,7 @@
                 account: selectedAccount,
                 date: dateInput ? dateInput.value : '',
                 desc: descInput ? descInput.value : '',
-                slip: slipInput ? slipInput.value.trim() : '',
+                slip: slipInput ? formatDrivePreviewUrl(slipInput.value) : '',
                 received: receivedInput ? (parseFloat(receivedInput.value) || 0) : 0,
                 sent: sentInput ? (parseFloat(sentInput.value) || 0) : 0,
                 createdAt: new Date()
@@ -1815,13 +1844,13 @@
             if (!isAdminLoggedIn) return;
             const dataForA = {
                 desc: itemB.expense.desc || '',
-                slip: (itemB.expense.slip || itemB.expense.slipUrl || '').trim(),
+                slip: formatDrivePreviewUrl(itemB.expense.slip || itemB.expense.slipUrl || ''),
                 received: itemB.expense.received || 0,
                 sent: itemB.expense.sent || 0
             };
             const dataForB = {
                 desc: itemA.expense.desc || '',
-                slip: (itemA.expense.slip || itemA.expense.slipUrl || '').trim(),
+                slip: formatDrivePreviewUrl(itemA.expense.slip || itemA.expense.slipUrl || ''),
                 received: itemA.expense.received || 0,
                 sent: itemA.expense.sent || 0
             };
@@ -1837,6 +1866,8 @@
             snapshot.forEach((docSnap) => {
                 const itemData = docSnap.data();
                 const rawAcc = itemData.account || '';
+                const updatePayload = {};
+                let needsFirebaseUpdate = false;
 
                 if (isAccountMatch(rawAcc, 'Altaf Rent A Car')) {
                     const recVal = Number(itemData.received) || 0;
@@ -1844,12 +1875,32 @@
 
                     if (recVal === 0 && sentVal === 0 && itemData.date !== todayStr) {
                         itemData.date = todayStr;
-                        if (isAdminLoggedIn) {
-                            updateDoc(doc(db, "ceo_expenses", docSnap.id), {
-                                date: todayStr
-                            }).catch((err) => console.error("Auto date update error:", err));
-                        }
+                        updatePayload.date = todayStr;
+                        needsFirebaseUpdate = true;
                     }
+                }
+
+                // Purani Google Drive links ko bhi /preview mein convert karna
+                if (itemData.slip) {
+                    const convertedSlip = formatDrivePreviewUrl(itemData.slip);
+                    if (convertedSlip !== itemData.slip) {
+                        itemData.slip = convertedSlip;
+                        updatePayload.slip = convertedSlip;
+                        needsFirebaseUpdate = true;
+                    }
+                }
+                if (itemData.slipUrl) {
+                    const convertedSlipUrl = formatDrivePreviewUrl(itemData.slipUrl);
+                    if (convertedSlipUrl !== itemData.slipUrl) {
+                        itemData.slipUrl = convertedSlipUrl;
+                        updatePayload.slipUrl = convertedSlipUrl;
+                        needsFirebaseUpdate = true;
+                    }
+                }
+
+                if (needsFirebaseUpdate && isAdminLoggedIn) {
+                    updateDoc(doc(db, "ceo_expenses", docSnap.id), updatePayload)
+                        .catch((err) => console.error("Auto update error:", err));
                 }
 
                 allExpensesData.push({ id: docSnap.id, expense: itemData });
