@@ -392,6 +392,18 @@
         </div>
     </div>
 
+    <!-- Slip Viewer Modal (Pop-out button ko chhupane wale cover ke sath) -->
+    <div id="slipViewerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; flex-direction:column; justify-content:center; align-items:center; padding:10px;">
+        <div style="width:100%; max-width:850px; display:flex; justify-content:space-between; align-items:center; background:#007bff; color:#fff; padding:8px 14px; border-radius:6px 6px 0 0;">
+            <span style="font-weight:bold; font-size:14px;">Slip Preview</span>
+            <button type="button" onclick="window.closeSlipViewer()" style="background:#dc3545; color:#fff; border:none; padding:4px 12px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:14px;">✕ Close</button>
+        </div>
+        <div style="position:relative; width:100%; max-width:850px; height:80vh; background:#202124; border-radius:0 0 6px 6px; overflow:hidden;">
+            <div style="position:absolute; top:8px; right:8px; width:50px; height:50px; background:#202124; z-index:10; border-radius:4px;"></div>
+            <iframe id="slipViewerFrame" src="" style="width:100%; height:100%; border:none; background:#fff;" allow="autoplay"></iframe>
+        </div>
+    </div>
+
     <div id="exportModal" class="modal-overlay">
         <div class="modal-box">
             <h3>Export Options</h3>
@@ -432,6 +444,36 @@
         const db = getFirestore(app);
         const expensesRef = collection(db, "ceo_expenses");
         const q = query(expensesRef, orderBy("date", "asc"));
+
+        function formatDrivePreviewUrl(url) {
+            if (!url || typeof url !== 'string') return url;
+            const trimmedUrl = url.trim();
+            const fileMatch = trimmedUrl.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/i);
+            if (fileMatch && fileMatch[1]) {
+                return `https://drive.google.com/file/d/${fileMatch[1]}/preview`;
+            }
+            const openMatch = trimmedUrl.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/i);
+            if (openMatch && openMatch[1]) {
+                return `https://drive.google.com/file/d/${openMatch[1]}/preview`;
+            }
+            const folderMatch = trimmedUrl.match(/drive\.google\.com\/drive\/folders\/([a-zA-Z0-9_-]+)/i);
+            if (folderMatch && folderMatch[1]) {
+                return `https://drive.google.com/embeddedfolderview?id=${folderMatch[1]}#list`;
+            }
+            return trimmedUrl;
+        }
+
+        window.openSlipInModal = function(url) {
+            if (!url) return;
+            const previewUrl = formatDrivePreviewUrl(url);
+            document.getElementById('slipViewerFrame').src = previewUrl;
+            document.getElementById('slipViewerModal').style.display = 'flex';
+        };
+
+        window.closeSlipViewer = function() {
+            document.getElementById('slipViewerModal').style.display = 'none';
+            document.getElementById('slipViewerFrame').src = '';
+        };
 
         const accountFilter = document.getElementById('account-filter');
         const fromDateFilter = document.getElementById('from-date-filter');
@@ -1272,11 +1314,12 @@
                     }
                     matchCount++;
 
-                    const slipUrl = item.expense.slipUrl || item.expense.slip || '';
+                    const rawSlipUrl = item.expense.slipUrl || item.expense.slip || '';
+                    const slipUrl = formatDrivePreviewUrl(rawSlipUrl);
                     const rowColorStyle = isAmanatReturnRow ? 'color: #dc3545 !important;' : '';
                     const linkColorStyle = isAmanatReturnRow ? 'style="color: #dc3545 !important;"' : '';
                     const descHtml = slipUrl 
-                        ? `<a href="${slipUrl}" target="_blank" class="slip-link" ${linkColorStyle} title="View Slip">${desc || 'View Slip'}</a>` 
+                        ? `<a href="javascript:void(0)" onclick="window.openSlipInModal('${slipUrl.replace(/'/g, "\\'")}')" class="slip-link" ${linkColorStyle} title="View Slip">${desc || 'View Slip'}</a>` 
                         : (desc || '-');
 
                     const formattedAmountStr = isAmanatReturnRow ? `-${formatPlainNum(displayAmount)}` : formatPlainNum(displayAmount);
@@ -1500,9 +1543,10 @@
                 totalReceived += recVal;
                 totalSent += sentVal;
 
-                const slipUrl = expense.slipUrl || expense.slip || '';
+                const rawSlipUrl = expense.slipUrl || expense.slip || '';
+                const slipUrl = formatDrivePreviewUrl(rawSlipUrl);
                 const descHtml = slipUrl 
-                    ? `<a href="${slipUrl}" target="_blank" class="slip-link" title="View Slip">${descText || 'View Slip'}</a>` 
+                    ? `<a href="javascript:void(0)" onclick="window.openSlipInModal('${slipUrl.replace(/'/g, "\\'")}')" class="slip-link" title="View Slip">${descText || 'View Slip'}</a>` 
                     : (descText || '-');
 
                 const row = document.createElement('tr');
