@@ -167,6 +167,80 @@
         .btn-all { background: #28a745; color: white; }
         .btn-range { background: #007bff; color: white; }
         .btn-cancel { background: #6c757d; color: white; margin-top: 4px; }
+
+        /* Full-Page Slip Viewer Styles (Bina Black Box Ke) */
+        #slipViewerModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #ffffff;
+            z-index: 9999;
+            flex-direction: column;
+            margin: 0;
+            padding: 0;
+        }
+        .slip-top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #007bff;
+            color: #ffffff;
+            padding: 8px 14px;
+            flex-shrink: 0;
+        }
+        .slip-info-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            color: #222222;
+            padding: 7px 12px;
+            border-bottom: 2px solid #007bff;
+            font-size: clamp(11px, 0.7vw + 7.5px, 14px);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .slip-info-date { color: #007bff; white-space: nowrap; flex-shrink: 0; }
+        .slip-info-desc { flex: 1; text-align: center; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .slip-info-amount { color: #dc3545; white-space: nowrap; flex-shrink: 0; }
+        .slip-nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f1f5f9;
+            padding: 6px 14px;
+            border-bottom: 1px solid #cbd5e1;
+            flex-shrink: 0;
+        }
+        .slip-nav-btn {
+            background-color: #28a745;
+            color: #ffffff;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .slip-nav-btn:hover:not(:disabled) { background-color: #218838; }
+        .slip-nav-btn:disabled { background-color: #adb5bd; color: #e9ecef; cursor: not-allowed; opacity: 0.65; }
+        .slip-counter-text { font-size: 12.5px; font-weight: bold; color: #475569; }
+        .slip-iframe-wrapper {
+            position: relative;
+            flex: 1 1 auto;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
     </style>
 </head>
 <body>
@@ -255,15 +329,25 @@
         </div>
     </div>
 
-    <!-- Slip Viewer Modal -->
-    <div id="slipViewerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; flex-direction:column; justify-content:center; align-items:center; padding:10px;">
-        <div style="width:100%; max-width:850px; display:flex; justify-content:space-between; align-items:center; background:#007bff; color:#fff; padding:8px 14px; border-radius:6px 6px 0 0;">
-            <span style="font-weight:bold; font-size:14px;">Slip Preview</span>
-            <button type="button" onclick="window.closeSlipViewer()" style="background:#dc3545; color:#fff; border:none; padding:4px 12px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:14px;">✕ Close</button>
+    <!-- Full-Page Slip Viewer Modal (Bina Black Box Ke) -->
+    <div id="slipViewerModal">
+        <div class="slip-top-header">
+            <span id="slip-modal-account-title" style="font-weight:bold; font-size:15px;">AC Abbott</span>
+            <button type="button" onclick="window.closeSlipViewer()" style="background:#dc3545; color:#fff; border:none; padding:5px 14px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:14px;">✕ Close</button>
         </div>
-        <div style="position:relative; width:100%; max-width:850px; height:80vh; background:#202124; border-radius:0 0 6px 6px; overflow:hidden;">
-            <div style="position:absolute; top:8px; right:8px; width:50px; height:50px; background:#202124; z-index:10; border-radius:4px;"></div>
-            <iframe id="slipViewerFrame" src="" style="width:100%; height:100%; border:none; background:#fff;" allow="autoplay"></iframe>
+        <div class="slip-info-bar">
+            <span id="slip-info-date" class="slip-info-date">Date: -</span>
+            <span id="slip-info-desc" class="slip-info-desc">-</span>
+            <span id="slip-info-amount" class="slip-info-amount">0</span>
+        </div>
+        <div class="slip-nav-bar">
+            <button type="button" id="slip-prev-btn" class="slip-nav-btn" onclick="window.navigateSlip(-1)">&lt;== Previous</button>
+            <span id="slip-counter-text" class="slip-counter-text">1 / 1</span>
+            <button type="button" id="slip-next-btn" class="slip-nav-btn" onclick="window.navigateSlip(1)">Next ==&gt;</button>
+        </div>
+        <div class="slip-iframe-wrapper">
+            <img id="slipViewerImg" src="" alt="Slip" style="max-width:100%; max-height:100%; object-fit:contain; display:none;">
+            <iframe id="slipViewerFrame" src="" style="width:100%; height:100%; border:none; background:#fff; display:none;" allow="autoplay"></iframe>
         </div>
     </div>
 
@@ -320,14 +404,74 @@
             return trimmedUrl;
         }
 
-        window.openSlipInModal = function(url) {
-            if (!url) return;
-            document.getElementById('slipViewerFrame').src = formatDrivePreviewUrl(url);
+        function getDriveFileId(url) {
+            if (!url || typeof url !== 'string') return null;
+            const fileMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/i);
+            if (fileMatch && fileMatch[1]) return fileMatch[1];
+            const openMatch = url.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/i);
+            if (openMatch && openMatch[1]) return openMatch[1];
+            return null;
+        }
+
+        let currentAccountSlips = [];
+        let currentSlipIndex = 0;
+
+        function renderCurrentSlipInModal() {
+            if (!currentAccountSlips || currentAccountSlips.length === 0) return;
+            const item = currentAccountSlips[currentSlipIndex];
+            if (!item) return;
+
+            document.getElementById('slip-modal-account-title').innerText = item.accountTitle || 'AC Abbott';
+            document.getElementById('slip-info-date').innerText = item.date || '-';
+            document.getElementById('slip-info-desc').innerText = item.desc || '-';
+            document.getElementById('slip-info-amount').innerText = item.amount || '0';
+            document.getElementById('slip-counter-text').innerText = `${currentSlipIndex + 1} / ${currentAccountSlips.length}`;
+
+            const prevBtn = document.getElementById('slip-prev-btn');
+            const nextBtn = document.getElementById('slip-next-btn');
+            if (prevBtn) prevBtn.disabled = (currentSlipIndex <= 0);
+            if (nextBtn) nextBtn.disabled = (currentSlipIndex >= currentAccountSlips.length - 1);
+
+            const imgEl = document.getElementById('slipViewerImg');
+            const frameEl = document.getElementById('slipViewerFrame');
+            const fileId = getDriveFileId(item.url);
+
+            if (fileId) {
+                frameEl.style.display = 'none';
+                frameEl.src = '';
+                imgEl.style.display = 'block';
+                imgEl.onerror = function() {
+                    imgEl.style.display = 'none';
+                    frameEl.src = `https://drive.google.com/file/d/${fileId}/preview`;
+                    frameEl.style.display = 'block';
+                };
+                imgEl.src = `https://lh3.googleusercontent.com/d/${fileId}`;
+            } else {
+                imgEl.style.display = 'none';
+                imgEl.src = '';
+                frameEl.src = item.url;
+                frameEl.style.display = 'block';
+            }
+        }
+
+        window.openSlipByIndex = function(idx) {
+            if (idx < 0 || idx >= currentAccountSlips.length) return;
+            currentSlipIndex = idx;
+            renderCurrentSlipInModal();
             document.getElementById('slipViewerModal').style.display = 'flex';
+        };
+
+        window.navigateSlip = function(step) {
+            const newIdx = currentSlipIndex + step;
+            if (newIdx >= 0 && newIdx < currentAccountSlips.length) {
+                currentSlipIndex = newIdx;
+                renderCurrentSlipInModal();
+            }
         };
 
         window.closeSlipViewer = function() {
             document.getElementById('slipViewerModal').style.display = 'none';
+            document.getElementById('slipViewerImg').src = '';
             document.getElementById('slipViewerFrame').src = '';
         };
 
@@ -627,6 +771,7 @@
 
         function renderData() {
             if (exportSummaryHolder) exportSummaryHolder.innerHTML = '';
+            currentAccountSlips = [];
 
             const searchTerm = searchInput.value.trim().toLowerCase();
             const currentSelectedMonth = monthFilter ? monthFilter.value : 'all';
@@ -665,9 +810,29 @@
                 totalSent += sentVal;
 
                 const slipUrl = formatDrivePreviewUrl(expense.slipUrl || expense.slip || '');
-                const descHtml = slipUrl 
-                    ? `<a href="javascript:void(0)" onclick="window.openSlipInModal('${slipUrl.replace(/'/g, "\\'")}')" class="slip-link" title="View Slip">${descText || 'View Slip'}</a>` 
-                    : (descText || '-');
+                let amountDisplayText = '';
+                if (recVal > 0 && sentVal > 0) {
+                    amountDisplayText = `Rec: ${formatPlainNum(recVal)} | Sent: ${formatPlainNum(sentVal)}`;
+                } else if (recVal > 0) {
+                    amountDisplayText = `Received: ${formatPlainNum(recVal)}`;
+                } else if (sentVal > 0) {
+                    amountDisplayText = `Sent: ${formatPlainNum(sentVal)}`;
+                } else {
+                    amountDisplayText = '0';
+                }
+
+                let descHtml = descText || '-';
+                if (slipUrl) {
+                    const slipIdx = currentAccountSlips.length;
+                    currentAccountSlips.push({
+                        url: slipUrl,
+                        accountTitle: 'AC Abbott',
+                        date: formatDateToDMY(expense.date),
+                        desc: descText || 'Slip',
+                        amount: amountDisplayText
+                    });
+                    descHtml = `<a href="javascript:void(0)" onclick="window.openSlipByIndex(${slipIdx})" class="slip-link" title="View Slip">${descText || 'View Slip'}</a>`;
+                }
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
