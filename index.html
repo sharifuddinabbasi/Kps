@@ -216,9 +216,13 @@
             flex: 1;
             text-align: center;
             color: #333;
+            white-space: normal;
+            word-break: break-word;
+            line-height: 1.25;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
             overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
         .slip-info-amount {
             color: #dc3545;
